@@ -1,0 +1,88 @@
+npm verbose cli C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\npm\bin\npm-cli.js
+npm info using npm@10.9.2
+npm info using node@v22.16.0
+npm verbose title npm run build
+npm verbose argv "run" "build" "--loglevel" "verbose"
+npm verbose logfile logs-max:10 dir:C:\Users\Acer\AppData\Local\npm-cache\_logs\2026-02-06T10_49_42_521Z-
+npm verbose logfile C:\Users\Acer\AppData\Local\npm-cache\_logs\2026-02-06T10_49_42_521Z-debug-0.log
+
+> spl-website@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma\schema.prisma
+
+✔ Generated Prisma Client (v5.22.0) to .\node_modules\@prisma\client in 107ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Easily identify and fix slow SQL queries in your app. Optimize helps you enhance your visibility: https://pris.ly/--optimize
+
+   ▲ Next.js 14.0.4
+   - Environments: .env
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+   Generating static pages (0/36) ...
+   Generating static pages (9/36) 
+   Generating static pages (18/36) 
+   Generating static pages (27/36) 
+ ⚠ Entire page /payment deopted into client-side rendering. https://nextjs.org/docs/messages/deopted-into-client-rendering /payment
+ ⚠ Entire page /register deopted into client-side rendering. https://nextjs.org/docs/messages/deopted-into-client-rendering /register
+ ✓ Generating static pages (36/36) 
+   Finalizing page optimization ...
+   Collecting build traces ...
+
+Route (app)                              Size     First Load JS
+┌ ○ /                                    97.5 kB         186 kB
+├ ○ /_not-found                          869 B          82.8 kB
+├ ○ /about                               163 B          82.1 kB
+├ ○ /admin/dashboard                     2.92 kB        84.8 kB
+├ ○ /admin/login                         2.15 kB        84.1 kB
+├ ○ /admin/players                       2.36 kB        84.3 kB
+├ ○ /admin/teams                         2.42 kB        84.3 kB
+├ ○ /api/admin/dashboard                 0 B                0 B
+├ ○ /api/admin/players                   0 B                0 B
+├ ○ /api/admin/teams                     0 B                0 B
+├ λ /api/admin/teams/update-status       0 B                0 B
+├ λ /api/auth/admin-login                0 B                0 B
+├ λ /api/auth/coordinator-login          0 B                0 B
+├ λ /api/payment/create-order            0 B                0 B
+├ λ /api/payment/individual              0 B                0 B
+├ λ /api/payment/initiate                0 B                0 B
+├ λ /api/payment/team                    0 B                0 B
+├ λ /api/payment/verify                  0 B                0 B
+├ λ /api/register/individual             0 B                0 B
+├ λ /api/register/team                   0 B                0 B
+├ ○ /contact                             163 B          82.1 kB
+├ ○ /coordinator/dashboard               2.48 kB        84.4 kB
+├ ○ /coordinator/login                   2.2 kB         84.1 kB
+├ ○ /eligibility                         163 B          82.1 kB
+├ ○ /gallery                             163 B          82.1 kB
+├ ○ /news                                163 B          82.1 kB
+├ ○ /payment                             1.62 kB        83.5 kB
+├ ○ /payment/failed                      178 B          88.9 kB
+├ ○ /payment/success                     178 B          88.9 kB
+├ ○ /prizes                              163 B          82.1 kB
+├ ○ /register                            14.5 kB        96.4 kB
+├ ○ /schedule                            163 B          82.1 kB
+├ ○ /sponsors                            163 B          82.1 kB
+└ ○ /tournament-format                   163 B          82.1 kB
++ First Load JS shared by all            81.9 kB
+  ├ chunks/938-2b0b89a3caeacff0.js       26.7 kB
+  ├ chunks/fd9d1056-bb2aa057f8077f3d.js  53.3 kB
+  ├ chunks/main-app-d9712a83a19ebff7.js  220 B
+  └ chunks/webpack-036db1223320fb34.js   1.74 kB
+
+
+○  (Static)   prerendered as static content
+λ  (Dynamic)  server-rendered on demand using Node.js
+
+npm verbose cwd C:\Users\Acer\Documents\SPL
+npm verbose os Windows_NT 10.0.19045
+npm verbose node v22.16.0
+npm verbose npm  v10.9.2
+npm verbose exit 0
+npm info ok
