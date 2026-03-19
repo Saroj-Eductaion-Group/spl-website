@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FileCheck, Users, Eye } from 'lucide-react'
+import { FileCheck, Users, Eye, X } from 'lucide-react'
 
 interface Player {
   id: string
@@ -18,12 +18,18 @@ interface Player {
   photoDoc?: string
 }
 
+interface Team { id: string; name: string; district: string }
+
 export default function AdminPlayers() {
   const [players, setPlayers] = useState<Player[]>([])
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('ALL')
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
   const [showModal, setShowModal] = useState(false)
+  const [assignPlayer, setAssignPlayer] = useState<Player | null>(null)
+  const [teams, setTeams] = useState<Team[]>([])
+  const [assignTeamId, setAssignTeamId] = useState('')
+  const [assigning, setAssigning] = useState(false)
 
   useEffect(() => {
     loadPlayers()
@@ -32,14 +38,32 @@ export default function AdminPlayers() {
   const loadPlayers = async () => {
     try {
       const token = localStorage.getItem('adminToken') || ''
-      const response = await fetch('/api/admin/players', { headers: { Authorization: `Bearer ${token}` } })
-      const data = await response.json()
-      setPlayers(data)
+      const [pRes, tRes] = await Promise.all([
+        fetch('/api/admin/players', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch('/api/admin/teams', { headers: { Authorization: `Bearer ${token}` } })
+      ])
+      setPlayers(await pRes.json())
+      setTeams(await tRes.json())
     } catch (error) {
       console.error('Failed to load players:', error)
     } finally {
       setLoading(false)
     }
+  }
+
+  const doAssign = async () => {
+    if (!assignPlayer || !assignTeamId) return
+    setAssigning(true)
+    const token = localStorage.getItem('adminToken') || ''
+    await fetch('/api/coordinator/assign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ playerId: assignPlayer.id, teamId: assignTeamId })
+    })
+    setAssigning(false)
+    setAssignPlayer(null)
+    setAssignTeamId('')
+    loadPlayers()
   }
 
   const filteredPlayers = players.filter(player => {
@@ -59,6 +83,43 @@ export default function AdminPlayers() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Assign Modal */}
+      {assignPlayer && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-primary-600">Assign Player to Team</h2>
+              <button onClick={() => { setAssignPlayer(null); setAssignTeamId('') }}><X className="w-5 h-5 text-gray-400" /></button>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-4 mb-4">
+              <p className="font-semibold text-gray-900">{assignPlayer.name}</p>
+              <p className="text-sm text-gray-500">{assignPlayer.role} • {assignPlayer.district} • {assignPlayer.schoolCollege}</p>
+            </div>
+            <div className="mb-4">
+              <label className="form-label">Select Team</label>
+              <select className="form-input" value={assignTeamId} onChange={e => setAssignTeamId(e.target.value)}>
+                <option value="">Choose a team</option>
+                {teams.filter(t => t.district === assignPlayer.district).map(t => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+                {teams.filter(t => t.district !== assignPlayer.district).length > 0 && (
+                  <optgroup label="Other Districts">
+                    {teams.filter(t => t.district !== assignPlayer.district).map(t => (
+                      <option key={t.id} value={t.id}>{t.name} ({t.district})</option>
+                    ))}
+                  </optgroup>
+                )}
+              </select>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={doAssign} disabled={!assignTeamId || assigning} className="btn-primary disabled:opacity-50 flex-1">
+                {assigning ? 'Assigning...' : 'Assign'}
+              </button>
+              <button onClick={() => { setAssignPlayer(null); setAssignTeamId('') }} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex-1">Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-primary-600">Player Management</h1>
           <p className="text-gray-600">Manage individual players and team assignments</p>
@@ -143,7 +204,7 @@ export default function AdminPlayers() {
                         <Eye className="w-4 h-4" />
                       </button>
                       {player.isIndividual && !player.teamAssigned && (
-                        <button className="text-green-600 hover:text-green-900">
+                        <button onClick={() => { setAssignPlayer(player); setAssignTeamId('') }} className="text-green-600 hover:text-green-900" title="Assign to Team">
                           <Users className="w-4 h-4" />
                         </button>
                       )}

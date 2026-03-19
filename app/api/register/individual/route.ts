@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
         photoDoc: data.photoDoc,
         isIndividual: true,
         teamAssigned: false,
+        registrationId,
         createdById: user.id
       }
     })

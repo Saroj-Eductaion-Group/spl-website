@@ -75,7 +75,26 @@ export default function TeamRegistrationForm() {
       })
       const result = await response.json()
       if (response.ok && result.success) {
-        window.location.href = `/register/success?registrationId=${result.registrationId}&name=${encodeURIComponent(result.name)}&type=team`
+        // Initiate payment for team registration
+        const payRes = await fetch('/api/payment/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            registrationId: result.registrationId,
+            amount: 11000,
+            email: data.email,
+            phone: data.managerPhone || data.coachPhone || '',
+            name: data.teamName,
+            registrationType: 'team',
+            teamId: result.teamId
+          })
+        })
+        const payData = await payRes.json()
+        if (payData.success && payData.paymentUrl) {
+          window.location.href = payData.paymentUrl
+        } else {
+          alert(payData.error || 'Payment initiation failed')
+        }
       } else {
         alert(result.error || 'Registration failed. Please try again.')
       }

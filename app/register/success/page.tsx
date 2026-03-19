@@ -44,11 +44,11 @@ export default function RegistrationSuccess() {
           </div>
 
           {type === 'team' && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6 text-left">
-              <p className="text-sm font-semibold text-yellow-800 mb-1">Next Steps:</p>
-              <ul className="text-sm text-yellow-700 space-y-1">
-                <li>• Payment of ₹11,000 is pending — admin will contact you</li>
-                <li>• Your registration is under review</li>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+              <p className="text-sm font-semibold text-blue-800 mb-1">Next Steps:</p>
+              <ul className="text-sm text-blue-700 space-y-1">
+                <li>• Your registration is under review by the admin</li>
+                <li>• District coordinator will verify your player documents</li>
                 <li>• You will be notified on approval/rejection via email</li>
               </ul>
             </div>

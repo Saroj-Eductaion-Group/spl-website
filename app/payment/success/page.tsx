@@ -1,30 +1,70 @@
+'use client'
+
 import Link from 'next/link'
-import { CheckCircle } from 'lucide-react'
+import { CheckCircle, Copy } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { useState } from 'react'
 
 export default function PaymentSuccess() {
+  const searchParams = useSearchParams()
+  const registrationId = searchParams.get('registrationId') || ''
+  const txnid = searchParams.get('txnid') || ''
+  const name = searchParams.get('name') || ''
+  const type = searchParams.get('type') || 'team'
+  const [copied, setCopied] = useState(false)
+
+  const copyId = () => {
+    navigator.clipboard.writeText(registrationId)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
-      <div className="max-w-md w-full">
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
+      <div className="max-w-lg w-full">
         <div className="card text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            Payment Successful!
-          </h1>
-          <p className="text-gray-600 mb-6">
-            Your SPL registration payment has been processed successfully. 
-            You will receive a confirmation email shortly.
+          <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-6" />
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Successful!</h1>
+          <p className="text-gray-600 mb-8">
+            {type === 'team'
+              ? `Team "${name}" registration payment received.`
+              : `${name}'s individual registration payment received.`}
+            <br />A confirmation email has been sent to you.
           </p>
-          <div className="space-y-3">
-            <Link href="/" className="btn-primary block">
-              Back to Home
-            </Link>
-            <Link href="/register?type=team" className="btn-primary block">
-              Register Team (₹11,000)
-            </Link>
-            <Link href="/register?type=individual" className="btn-gold block">
-              Register Individual (₹1,000)
-            </Link>
+
+          <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+            <p className="text-sm text-gray-500 mb-2">Your Registration ID</p>
+            <div className="flex items-center justify-center gap-3">
+              <span className="text-2xl font-bold text-green-700 tracking-widest">{registrationId}</span>
+              <button onClick={copyId} className="text-green-600 hover:text-green-800" title="Copy">
+                <Copy className="w-5 h-5" />
+              </button>
+            </div>
+            {copied && <p className="text-xs text-green-600 mt-1">Copied!</p>}
+            {txnid && <p className="text-xs text-gray-500 mt-2">Transaction ID: {txnid}</p>}
+            <p className="text-xs text-gray-500 mt-2">Save this ID — you will need it for future reference.</p>
           </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-left">
+            <p className="text-sm font-semibold text-blue-800 mb-1">Next Steps:</p>
+            <ul className="text-sm text-blue-700 space-y-1">
+              {type === 'team' ? (
+                <>
+                  <li>• Your team registration is under review by the admin</li>
+                  <li>• District coordinator will verify your player documents</li>
+                  <li>• You will be notified on approval/rejection via email</li>
+                </>
+              ) : (
+                <>
+                  <li>• Your profile has been submitted to the district coordinator</li>
+                  <li>• You will be assigned to a district team based on your role</li>
+                  <li>• You will be notified once a team is assigned</li>
+                </>
+              )}
+            </ul>
+          </div>
+
+          <Link href="/" className="btn-primary block text-center">Back to Home</Link>
         </div>
       </div>
     </div>
