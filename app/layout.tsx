@@ -19,7 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   const isPanel = pathname.startsWith('/admin') || pathname.startsWith('/coordinator')
 
   return (
-    <ClerkProvider>
+    <ClerkProvider dynamic>
       <html lang="en">
         <body className={inter.className}>
           {!isPanel && <Navbar />}

@@ -60,7 +60,7 @@ export default function SignUpPage() {
       const result = await signUp.attemptEmailAddressVerification({ code })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        router.push('/register')
+        window.location.href = '/register'
       }
     } catch (err: unknown) {
       setError(

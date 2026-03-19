@@ -34,7 +34,7 @@ export default function SignInPage() {
       const result = await signIn.create({ identifier: email, password })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        router.push('/register')
+        window.location.href = '/register'
       }
     } catch (err: unknown) {
       const msg =

@@ -46,7 +46,7 @@ export default function ForgotPasswordPage() {
       })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        router.push('/register')
+        window.location.href = '/register'
       }
     } catch (err: unknown) {
       setError((err as { errors?: { message: string }[] })?.errors?.[0]?.message || 'Invalid code or password')
