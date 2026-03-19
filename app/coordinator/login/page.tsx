@@ -98,10 +98,7 @@ export default function CoordinatorLogin() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <div className="text-center text-sm text-gray-600">
-            <p>Demo Coordinator Credentials:</p>
-            <p>Email: coordinator@spl.com | Password: coord123</p>
-          </div>
+
         </form>
       </div>
     </div>

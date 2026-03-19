@@ -97,10 +97,7 @@ export default function AdminLogin() {
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
 
-          <div className="text-center text-sm text-gray-600">
-            <p>Default Admin Credentials:</p>
-            <p>Email: admin@spl.com | Password: admin123</p>
-          </div>
+
         </form>
       </div>
     </div>
