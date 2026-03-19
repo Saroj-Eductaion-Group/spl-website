@@ -90,6 +90,35 @@ export const sendRejectionEmail = async (email: string, teamName: string, regist
   })
 }
 
+export const sendPaymentReceiptEmail = async (
+  email: string,
+  name: string,
+  registrationId: string,
+  amount: number,
+  transactionId: string
+) => {
+  await transporter.sendMail({
+    from,
+    to: email,
+    subject: `SPL Payment Receipt — ${registrationId}`,
+    html: `
+      <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+        <h2 style="color:#16a34a;">Payment Received ✅</h2>
+        <p>Dear ${name},</p>
+        <p>Your payment for SPL U19 Cricket Tournament has been received successfully.</p>
+        <div style="background:#f0fdf4;padding:20px;border-radius:8px;margin:20px 0;border-left:4px solid #16a34a;">
+          <p><strong>Registration ID:</strong> ${registrationId}</p>
+          <p><strong>Amount Paid:</strong> ₹${amount.toLocaleString('en-IN')}</p>
+          <p><strong>Transaction ID:</strong> ${transactionId}</p>
+          <p><strong>Status:</strong> Paid ✅</p>
+        </div>
+        <p>Your registration is now under review. You will be notified on approval.</p>
+        <p>Best regards,<br/>SPL Tournament Committee</p>
+      </div>
+    `
+  })
+}
+
 export const sendMatchNotificationEmail = async (
   email: string,
   teamName: string,

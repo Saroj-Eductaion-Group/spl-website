@@ -2,9 +2,13 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyAdminToken } from '@/lib/auth'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const isAdmin = verifyAdminToken(request)
   try {
-    const announcements = await prisma.announcement.findMany({ orderBy: { createdAt: 'desc' } })
+    const announcements = await prisma.announcement.findMany({
+      where: isAdmin ? {} : { active: true },
+      orderBy: { createdAt: 'desc' }
+    })
     return NextResponse.json(announcements)
   } catch {
     return NextResponse.json({ error: 'Failed to load announcements' }, { status: 500 })

@@ -5,17 +5,17 @@ import { verifyAdminToken } from '@/lib/auth'
 export async function GET(request: NextRequest) {
   if (!verifyAdminToken(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
-    const [totalTeams, pendingTeams, approvedTeams, totalPlayers, individualPlayers, totalPayments, completedPayments] = await Promise.all([
+    const [totalTeams, pendingTeams, approvedTeams, rejectedTeams, totalPlayers, individualPlayers, revenueAgg] = await Promise.all([
       prisma.team.count(),
       prisma.team.count({ where: { status: 'PENDING' } }),
       prisma.team.count({ where: { status: 'APPROVED' } }),
+      prisma.team.count({ where: { status: 'REJECTED' } }),
       prisma.player.count(),
       prisma.player.count({ where: { isIndividual: true } }),
-      prisma.payment.count(),
-      prisma.payment.count({ where: { status: 'COMPLETED' } })
+      prisma.payment.aggregate({ where: { status: 'COMPLETED' }, _sum: { amount: true } })
     ])
-    const rejectedTeams = await prisma.team.count({ where: { status: 'REJECTED' } })
-    return NextResponse.json({ totalTeams, pendingTeams, pendingApprovals: pendingTeams, approvedTeams, rejectedTeams, totalPlayers, individualPlayers, totalPayments, completedPayments })
+    const totalPayments = revenueAgg._sum.amount || 0
+    return NextResponse.json({ totalTeams, pendingApprovals: pendingTeams, approvedTeams, rejectedTeams, totalPlayers, individualPlayers, totalPayments })
   } catch {
     return NextResponse.json({ error: 'Failed to load dashboard' }, { status: 500 })
   }
