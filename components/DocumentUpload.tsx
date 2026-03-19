@@ -1,14 +1,14 @@
-'use client'
+'use client';
 
 import { useState } from 'react'
 import { Upload, File, X, CheckCircle, AlertCircle } from 'lucide-react'
 
 interface DocumentUploadProps {
-  label: string
-  required?: boolean
-  accept?: string
-  onChange?: (url: string | null) => void
-  name: string
+  label: string;
+  required?: boolean;
+  accept?: string;
+  onChange?: (url: string | null) => void;
+  name: string;
 }
 
 const MAX_SIZE_MB = 5
@@ -41,9 +41,9 @@ export default function DocumentUpload({ label, required = false, accept = 'imag
     } catch {
       setError('Upload failed. Please try again.')
     } finally {
-      setUploading(false)
+      setUploading(false);
     }
-  }
+  };
 
   const handleFile = (f: File | null) => {
     setFile(f)
@@ -58,6 +58,7 @@ export default function DocumentUpload({ label, required = false, accept = 'imag
       <label className="form-label">
         {label} {required && <span className="text-red-500">*</span>}
       </label>
+
 
       <div
         className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors cursor-pointer ${
@@ -95,8 +96,9 @@ export default function DocumentUpload({ label, required = false, accept = 'imag
             <p className="text-xs text-gray-400 mt-2">JPG, PNG, PDF — Max {MAX_SIZE_MB}MB</p>
           </>
         )}
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </div>
       {error && <p className="text-red-500 text-xs mt-1 flex items-center gap-1"><AlertCircle className="w-3 h-3" />{error}</p>}
     </div>
-  )
+  );
 }

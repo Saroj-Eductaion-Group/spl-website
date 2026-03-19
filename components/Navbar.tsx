@@ -2,8 +2,9 @@
 
 import Link from 'next/link'
 import { useState } from 'react'
-import { Menu, X, Trophy } from 'lucide-react'
+import { Menu, X, Trophy, Import } from 'lucide-react'
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
+import Image from 'next/image'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -27,8 +28,14 @@ export default function Navbar() {
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
-            <div className="bg-primary-600/20 backdrop-blur-sm p-2 rounded-full">
-              <Trophy className="w-6 h-6 text-primary-600" />
+            <div className=" backdrop-blur-sm p-2 rounded-full">
+              {/* <Trophy className="w-6 h-6 text-primary-600" /> */}
+              <Image
+                src="/Hero.png"
+                alt="icon"
+                width={30}
+                height={30}
+              />
             </div>
             <div className="hidden sm:block">
               <div className="text-lg font-bold text-gray-900">SPL</div>

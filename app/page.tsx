@@ -11,6 +11,8 @@ import AnimatedCounter from '@/components/AnimatedCounter'
 import ParallaxCard from '@/components/TiltCard'
 import ScrollParallax from '@/components/ScrollParallax'
 import Reveal from '@/components/Reveal'
+import Image from 'next/image'
+import icon from "@/app/assets/icon.png";
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -43,22 +45,22 @@ export default function Home() {
 
     const ctx = gsap.context(() => {
       // Hero animations
-      gsap.fromTo('.hero-badge', 
+      gsap.fromTo('.hero-badge',
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }
       )
-      
-      gsap.fromTo('.hero-title', 
+
+      gsap.fromTo('.hero-title',
         { opacity: 0, y: 50 },
         { opacity: 1, y: 0, duration: 1.2, delay: 0.2, ease: 'power3.out' }
       )
-      
-      gsap.fromTo('.hero-subtitle', 
+
+      gsap.fromTo('.hero-subtitle',
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, duration: 1, delay: 0.4, ease: 'power3.out' }
       )
-      
-      gsap.fromTo('.hero-buttons', 
+
+      gsap.fromTo('.hero-buttons',
         { opacity: 0, y: 30 },
         { opacity: 1, y: 0, duration: 1, delay: 0.6, ease: 'power3.out' }
       )
@@ -146,20 +148,20 @@ export default function Home() {
       {/* Hero Section */}
       <section ref={heroRef} className="relative bg-white overflow-hidden pt-24">
         <div className="absolute inset-0 bg-gradient-to-br from-primary-50 to-primary-100"></div>
-        
+
         <div className="relative container mx-auto px-4 py-24">
           <div className="max-w-4xl mx-auto text-center">
-            <motion.div 
-              className="inline-flex items-center bg-primary-100 text-primary-800 px-4 py-2 rounded-full text-sm font-medium mb-8"
+            <motion.div
+              className="inline-flex items-center  text-primary-800 px-4 py-2 rounded-full text-sm font-medium mb-8"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              <Trophy className="w-4 h-4 mr-2" />
-              Uttar Pradesh's Premier Cricket Tournament
+             
+              <img src="/Hero.png" alt="Logo" className="w-64 h-auto object-contain"/>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               className="text-5xl md:text-7xl font-bold text-gray-900 mb-6 leading-tight"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -172,7 +174,7 @@ export default function Home() {
               >
                 Saroj Premier League
               </motion.span>
-              <motion.span 
+              <motion.span
                 className="block text-primary-600"
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -181,8 +183,8 @@ export default function Home() {
                 Under-19
               </motion.span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               className="text-xl text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -190,8 +192,8 @@ export default function Home() {
             >
               Where young cricket talents shine and dreams become reality. Join the most prestigious tournament for Class 12 students.
             </motion.p>
-            
-            <motion.div 
+
+            <motion.div
               className="flex flex-col sm:flex-row gap-4 justify-center"
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
