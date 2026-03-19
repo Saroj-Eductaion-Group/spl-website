@@ -1,14 +1,13 @@
-// SMS via Fast2SMS (https://www.fast2sms.com) - free Indian SMS API
+// SMS via Fast2SMS (https://www.fast2sms.com)
 // Set FAST2SMS_API_KEY in .env to enable SMS
 
 const SMS_API_KEY = process.env.FAST2SMS_API_KEY
 
 async function sendSMS(phone: string, message: string): Promise<void> {
-  if (!SMS_API_KEY || SMS_API_KEY === 'your-sms-api-key') {
-    console.log(`[SMS SKIPPED - no API key] To: ${phone} | Msg: ${message}`)
+  if (!SMS_API_KEY || SMS_API_KEY.startsWith('your-')) {
+    console.log('[SMS SKIPPED - no API key configured]')
     return
   }
-  // Remove country code if present, keep 10 digits
   const mobile = phone.replace(/^(\+91|91)/, '').replace(/\D/g, '').slice(-10)
   if (mobile.length !== 10) return
 
@@ -19,31 +18,31 @@ async function sendSMS(phone: string, message: string): Promise<void> {
       body: JSON.stringify({ route: 'q', message, language: 'english', flash: 0, numbers: mobile })
     })
     const data = await res.json()
-    if (!data.return) console.error('SMS failed:', data.message)
-  } catch (e) {
-    console.error('SMS send error:', e)
+    if (!data.return) console.error('SMS send failed')
+  } catch {
+    console.error('SMS send error')
   }
 }
 
 export async function sendRegistrationSMS(phone: string, registrationId: string, name: string, isTeam: boolean) {
   const msg = isTeam
-    ? `SPL U19: Team "${name}" registered successfully! Registration ID: ${registrationId}. Fee: Rs.11,000 pending. -SPL Committee`
-    : `SPL U19: ${name} registered as individual player! Registration ID: ${registrationId}. You will be assigned to a district team. -SPL Committee`
+    ? `SPL U19: Team registered! ID: ${registrationId}. Fee Rs.11,000 pending. -SPL Committee`
+    : `SPL U19: Individual registration done! ID: ${registrationId}. You will be assigned to a district team. -SPL Committee`
   await sendSMS(phone, msg)
 }
 
 export async function sendApprovalSMS(phone: string, teamName: string, registrationId: string) {
-  await sendSMS(phone, `SPL U19: Congratulations! Team "${teamName}" (ID: ${registrationId}) has been APPROVED. Check website for match schedule. -SPL Committee`)
+  await sendSMS(phone, `SPL U19: Team approved! ID: ${registrationId}. Check website for schedule. -SPL Committee`)
 }
 
 export async function sendRejectionSMS(phone: string, teamName: string, registrationId: string, reason?: string) {
-  await sendSMS(phone, `SPL U19: Team "${teamName}" (ID: ${registrationId}) registration was not approved.${reason ? ` Reason: ${reason}` : ''} Contact: support@splcricket.com -SPL`)
+  await sendSMS(phone, `SPL U19: Registration ID ${registrationId} was not approved. Contact: support@splcricket.com -SPL`)
 }
 
 export async function sendPaymentReceiptSMS(phone: string, name: string, registrationId: string, amount: number) {
-  await sendSMS(phone, `SPL U19: Payment of Rs.${amount} received for ${name} (ID: ${registrationId}). Your registration is under review. -SPL Committee`)
+  await sendSMS(phone, `SPL U19: Payment Rs.${amount} received. ID: ${registrationId}. Registration under review. -SPL Committee`)
 }
 
 export async function sendMatchNotificationSMS(phone: string, teamName: string, opponent: string, venue: string, date: string) {
-  await sendSMS(phone, `SPL U19 Match: ${teamName} vs ${opponent} at ${venue} on ${date}. Carry original documents. -SPL Committee`)
+  await sendSMS(phone, `SPL U19 Match alert! Check website for your match details. Carry original documents. -SPL Committee`)
 }
