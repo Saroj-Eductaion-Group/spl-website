@@ -56,7 +56,26 @@ export default function IndividualRegistrationForm() {
       })
       const result = await response.json()
       if (response.ok && result.success) {
-        window.location.href = `/register/success?registrationId=${result.registrationId}&name=${encodeURIComponent(data.name)}&type=individual`
+        // Initiate payment for individual registration
+        const payRes = await fetch('/api/payment/initiate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            registrationId: result.registrationId,
+            amount: 1000,
+            email: data.email,
+            phone: data.phone,
+            name: data.name,
+            registrationType: 'individual',
+            playerId: result.playerId
+          })
+        })
+        const payData = await payRes.json()
+        if (payData.success && payData.paymentUrl) {
+          window.location.href = payData.paymentUrl
+        } else {
+          alert(payData.error || 'Payment initiation failed')
+        }
       } else {
         alert(result.error || 'Registration failed. Please try again.')
       }

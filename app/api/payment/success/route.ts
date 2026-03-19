@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     const formData = await request.formData()
     const params = Object.fromEntries(formData.entries()) as Record<string, string>
 
-    const { txnid, amount, email, firstname, udf1: registrationId, udf2: registrationType, udf3: teamId, status, hash } = params
+    const { txnid, amount, email, firstname, udf1: registrationId, udf2: registrationType, udf3: teamId, udf4: playerId, status, hash } = params
 
     // Verify hash from Easebuzz
     if (EASEBUZZ_KEY && EASEBUZZ_SALT) {
@@ -26,11 +26,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.redirect(new URL('/payment/failed', request.url))
     }
 
-    // Update payment record
+    // Update payment record — team or individual
     if (teamId) {
       await prisma.payment.updateMany({
         where: { teamId },
         data: { status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
+      })
+    } else if (playerId) {
+      // Create a payment record for individual player
+      await prisma.payment.create({
+        data: { amount: parseInt(amount), status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
       })
     }
 

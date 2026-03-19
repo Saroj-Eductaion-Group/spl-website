@@ -23,6 +23,10 @@ export async function POST(request: NextRequest) {
           where: { teamId },
           data: { status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
         })
+      } else if (playerId) {
+        await prisma.payment.create({
+          data: { amount, status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
+        })
       }
       const successUrl = `/payment/success?registrationId=${registrationId}&txnid=${txnid}&name=${encodeURIComponent(name)}&type=${registrationType}`
       return NextResponse.json({ success: true, paymentUrl: successUrl })

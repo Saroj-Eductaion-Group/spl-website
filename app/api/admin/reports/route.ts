@@ -90,19 +90,31 @@ export async function GET(req: NextRequest) {
     }
 
     if (format === 'pdf') {
-      // Generate PDF-like HTML rendered as a downloadable HTML file (print-ready)
-      // Using xlsx to create a proper Excel file which opens in Excel/Sheets
-      const wb = XLSX.utils.book_new()
-      const ws = XLSX.utils.json_to_sheet(rows)
-      // Auto column widths
-      const colWidths = Object.keys(rows[0] || {}).map(k => ({ wch: Math.max(k.length, 15) }))
-      ws['!cols'] = colWidths
-      XLSX.utils.book_append_sheet(wb, ws, sheetName)
-      const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' })
-      return new NextResponse(buf, {
+      const headers = Object.keys(rows[0] || {})
+      const tableRows = rows.map(row =>
+        `<tr>${headers.map(h => `<td>${String(row[h] ?? '')}</td>`).join('')}</tr>`
+      ).join('')
+      const html = `<!DOCTYPE html><html><head><meta charset="utf-8">
+<title>SPL ${type} Report</title>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 11px; margin: 20px; }
+  h2 { color: #DAA737; margin-bottom: 8px; }
+  p { color: #666; margin-bottom: 16px; font-size: 10px; }
+  table { width: 100%; border-collapse: collapse; }
+  th { background: #1e3a5f; color: white; padding: 8px 6px; text-align: left; font-size: 10px; }
+  td { padding: 6px; border-bottom: 1px solid #eee; }
+  tr:nth-child(even) { background: #f9f9f9; }
+  @media print { body { margin: 0; } }
+</style></head><body>
+<h2>SPL – ${type.toUpperCase()} REPORT</h2>
+<p>Generated: ${new Date().toLocaleString('en-IN')} | Total Records: ${rows.length}</p>
+<table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+<tbody>${tableRows}</tbody></table>
+</body></html>`
+      return new NextResponse(html, {
         headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `attachment; filename="SPL_${type}_report.xlsx"`
+          'Content-Type': 'text/html; charset=utf-8',
+          'Content-Disposition': `attachment; filename="SPL_${type}_report.html"`
         }
       })
     }

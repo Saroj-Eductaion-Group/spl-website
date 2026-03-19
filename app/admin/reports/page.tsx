@@ -17,13 +17,18 @@ export default function AdminReports() {
       if (!response.ok) throw new Error((await response.json()).error || 'Download failed')
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `SPL_${type}_${new Date().toISOString().split('T')[0]}.${format}`
-      document.body.appendChild(a)
-      a.click()
+      if (format === 'pdf') {
+        // Open HTML in new tab so user can Ctrl+P to print/save as PDF
+        window.open(url, '_blank')
+      } else {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `SPL_${type}_${new Date().toISOString().split('T')[0]}.csv`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+      }
       window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
     } catch (error) {
       alert(`Failed to download: ${error instanceof Error ? error.message : 'Unknown error'}`)
     } finally {
