@@ -40,6 +40,10 @@ export async function sendRejectionSMS(phone: string, teamName: string, registra
   await sendSMS(phone, `SPL U19: Team "${teamName}" (ID: ${registrationId}) registration was not approved.${reason ? ` Reason: ${reason}` : ''} Contact: support@splcricket.com -SPL`)
 }
 
+export async function sendPaymentReceiptSMS(phone: string, name: string, registrationId: string, amount: number) {
+  await sendSMS(phone, `SPL U19: Payment of Rs.${amount} received for ${name} (ID: ${registrationId}). Your registration is under review. -SPL Committee`)
+}
+
 export async function sendMatchNotificationSMS(phone: string, teamName: string, opponent: string, venue: string, date: string) {
   await sendSMS(phone, `SPL U19 Match: ${teamName} vs ${opponent} at ${venue} on ${date}. Carry original documents. -SPL Committee`)
 }

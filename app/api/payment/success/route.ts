@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendPaymentReceiptEmail } from '@/lib/email'
+import { sendPaymentReceiptSMS } from '@/lib/sms'
 import crypto from 'crypto'
 
 const EASEBUZZ_KEY = process.env.EASEBUZZ_KEY || ''
@@ -39,12 +40,20 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // Send receipt email
+    // Send receipt email + SMS
     try {
-      if (email) {
-        await sendPaymentReceiptEmail(email, firstname, registrationId, parseInt(amount), txnid)
-      }
+      if (email) await sendPaymentReceiptEmail(email, firstname, registrationId, parseInt(amount), txnid)
     } catch (e) { console.error('Receipt email failed:', e) }
+
+    // Get phone from team or player record for SMS
+    try {
+      let phone = ''
+      if (teamId) {
+        const team = await prisma.team.findUnique({ where: { id: teamId }, select: { contactPhone: true } })
+        phone = team?.contactPhone || ''
+      }
+      if (phone) await sendPaymentReceiptSMS(phone, firstname, registrationId, parseInt(amount))
+    } catch (e) { console.error('Receipt SMS failed:', e) }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
     return NextResponse.redirect(

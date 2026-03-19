@@ -3,7 +3,7 @@
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { LogOut, LayoutDashboard, Users, UserCheck, Calendar, Shield, Bell, FileText, Award, Menu, X, Trophy, Send } from 'lucide-react'
+import { LogOut, LayoutDashboard, Users, UserCheck, Calendar, Shield, Bell, FileText, Award, Menu, X, Trophy, Send, Image, MessageSquare } from 'lucide-react'
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -13,6 +13,8 @@ const navItems = [
   { href: '/admin/coordinators', label: 'Coordinators', icon: Shield },
   { href: '/admin/announcements', label: 'Announcements', icon: Bell },
   { href: '/admin/notifications', label: 'Notifications', icon: Send },
+  { href: '/admin/gallery', label: 'Gallery', icon: Image },
+  { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { href: '/admin/reports', label: 'Reports', icon: FileText },
   { href: '/admin/sponsors', label: 'Sponsors', icon: Award },
 ]

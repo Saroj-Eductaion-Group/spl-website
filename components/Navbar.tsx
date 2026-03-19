@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { Menu, X, Trophy } from 'lucide-react'
+import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -49,11 +50,19 @@ export default function Navbar() {
           </div>
 
           {/* Action Buttons */}
-          <div className="hidden lg:flex items-center space-x-3">
-            <Link href="/register" className="bg-primary-600/90 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-semibold hover:bg-primary-700/90 transition-all">
-              Register
-            </Link>
-            <Link href="/admin/login" className="text-gray-600 hover:text-primary-600 text-sm font-medium">
+          <div className="hidden lg:flex items-center space-x-2">
+            <SignedIn>
+              <Link href="/register" className="bg-primary-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary-700 transition-colors">
+                Register
+              </Link>
+              <UserButton afterSignOutUrl="/" />
+            </SignedIn>
+            <SignedOut>
+              <Link href="/sign-in" className="text-gray-600 hover:text-primary-600 text-sm font-medium px-3 py-2 rounded-full hover:bg-white/30 transition-colors">
+                Sign In
+              </Link>
+            </SignedOut>
+            <Link href="/admin/login" className="text-gray-600 hover:text-primary-600 text-sm font-medium px-3 py-2 rounded-full hover:bg-white/30 transition-colors">
               Admin
             </Link>
           </div>
@@ -82,13 +91,27 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="flex flex-col space-y-2 pt-2">
-                <Link
-                  href="/register"
-                  className="bg-primary-600/90 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-semibold text-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Register
-                </Link>
+                <SignedIn>
+                  <Link
+                    href="/register"
+                    className="bg-primary-600/90 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-semibold text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Register
+                  </Link>
+                  <div className="flex justify-center">
+                    <UserButton afterSignOutUrl="/" />
+                  </div>
+                </SignedIn>
+                <SignedOut>
+                  <Link
+                    href="/sign-in"
+                    className="text-gray-600 hover:text-primary-600 text-sm font-medium text-center"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                </SignedOut>
                 <Link
                   href="/admin/login"
                   className="text-gray-600 hover:text-primary-600 text-sm font-medium text-center"

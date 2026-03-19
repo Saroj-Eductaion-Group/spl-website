@@ -44,11 +44,15 @@ export default function CoordinatorTeams() {
   }
 
   const updateStatus = async (teamId: string, status: string) => {
+    let reason = ''
+    if (status === 'REJECTED') {
+      reason = prompt('Enter rejection reason (optional):') || ''
+    }
     const token = localStorage.getItem('coordinatorToken') || ''
     await fetch('/api/coordinator/teams', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ teamId, status })
+      body: JSON.stringify({ teamId, status, reason })
     })
     loadTeams(district)
     if (viewTeam?.id === teamId) setViewTeam(prev => prev ? { ...prev, status } : null)
@@ -59,16 +63,13 @@ export default function CoordinatorTeams() {
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-primary-600">District Teams</h1>
+    <div className="bg-gray-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">District Teams</h1>
           <p className="text-sm text-gray-500">{district} District</p>
         </div>
-        <button onClick={() => router.push('/coordinator/dashboard')} className="text-gray-600 hover:text-primary-600 text-sm">← Dashboard</button>
-      </div>
 
-      {/* Document Viewer Modal */}
       {viewTeam && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -204,6 +205,7 @@ export default function CoordinatorTeams() {
               </tbody>
             </table>
           </div>
+        </div>
         </div>
       </div>
     </div>

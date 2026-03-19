@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useUser, SignIn } from '@clerk/nextjs'
 import TeamRegistrationForm from '@/components/TeamRegistrationForm'
 import IndividualRegistrationForm from '@/components/IndividualRegistrationForm'
 
 export default function RegisterPage() {
+  const { isLoaded, isSignedIn } = useUser()
   const searchParams = useSearchParams()
   const [registrationType, setRegistrationType] = useState<'team' | 'individual'>('team')
 
@@ -15,6 +17,26 @@ export default function RegisterPage() {
       setRegistrationType('individual')
     }
   }, [searchParams])
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
+      </div>
+    )
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-primary-600 mb-2">SPL Registration</h1>
+          <p className="text-gray-500">You must sign in or create an account to register for the tournament.</p>
+        </div>
+        <SignIn redirectUrl="/register" />
+      </div>
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">

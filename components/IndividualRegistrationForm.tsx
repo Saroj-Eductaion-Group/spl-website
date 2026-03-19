@@ -16,6 +16,7 @@ interface IndividualFormData {
   position: string
   experience: string
   email: string
+  aadhaarNo: string
   aadhaarDoc?: string
   schoolIdDoc?: string
   dobProofDoc?: string
@@ -148,6 +149,19 @@ export default function IndividualRegistrationForm() {
               className="form-input"
               placeholder="Enter alternate mobile number"
             />
+          </div>
+
+          <div>
+            <label className="form-label">Aadhaar Number *</label>
+            <input
+              {...register('aadhaarNo', { required: 'Aadhaar number is required', pattern: { value: /^\d{12}$/, message: 'Enter valid 12-digit Aadhaar number' } })}
+              className="form-input"
+              placeholder="12-digit Aadhaar number"
+              maxLength={12}
+            />
+            {errors.aadhaarNo && (
+              <p className="text-red-500 text-sm mt-1">{errors.aadhaarNo.message}</p>
+            )}
           </div>
 
           <div>
