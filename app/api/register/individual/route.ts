@@ -3,32 +3,26 @@ import { prisma } from '@/lib/prisma'
 import { nanoid } from 'nanoid'
 import { sendRegistrationEmail } from '@/lib/email'
 import { sendRegistrationSMS } from '@/lib/sms'
+import bcrypt from 'bcryptjs'
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    
     const registrationId = `SPL${nanoid(8).toUpperCase()}`
-    
-    const existingUser = await prisma.user.findUnique({
-      where: { email: data.email }
-    })
+    const tempPassword = await bcrypt.hash(nanoid(16), 10)
 
-    let user
-    if (existingUser) {
-      user = existingUser
-    } else {
-      user = await prisma.user.create({
-        data: {
-          email: data.email || `player_${nanoid(8)}@spl.com`,
-          password: 'temp',
-          role: 'PUBLIC',
-          name: data.name,
-          phone: data.phone,
-          district: data.district
-        }
-      })
-    }
+    const existingUser = await prisma.user.findUnique({ where: { email: data.email } })
+
+    const user = existingUser ?? await prisma.user.create({
+      data: {
+        email: data.email || `player_${nanoid(8)}@spl.com`,
+        password: tempPassword,
+        role: 'PUBLIC',
+        name: data.name,
+        phone: data.phone,
+        district: data.district
+      }
+    })
 
     const player = await prisma.player.create({
       data: {
@@ -37,7 +31,7 @@ export async function POST(request: NextRequest) {
         dateOfBirth: new Date(data.dateOfBirth),
         phone: data.phone,
         alternatePhone: data.alternatePhone,
-        aadhaarNo: data.aadhaarNo || nanoid(12),
+        aadhaarNo: data.aadhaarNo || '',
         schoolCollege: data.schoolCollege,
         district: data.district,
         role: data.role,
@@ -54,25 +48,12 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    try { if (data.email) await sendRegistrationEmail(data.email, registrationId, undefined, data.name) } catch (e) { console.error('Email failed:', e) }
-    try { if (data.phone) await sendRegistrationSMS(data.phone, registrationId, data.name, false) } catch (e) { console.error('SMS failed:', e) }
+    try { if (data.email) await sendRegistrationEmail(data.email, registrationId, undefined, data.name) } catch { }
+    try { if (data.phone) await sendRegistrationSMS(data.phone, registrationId, data.name, false) } catch { }
 
-    return NextResponse.json({ 
-      success: true, 
-      playerId: player.id,
-      userId: user.id,
-      registrationId,
-      paymentRequired: true,
-      amount: 1000,
-      email: data.email,
-      phone: data.phone,
-      name: data.name
-    })
+    return NextResponse.json({ success: true, playerId: player.id, registrationId, amount: 1000 })
   } catch (error) {
-    console.error('Individual registration error:', error)
-    return NextResponse.json(
-      { error: 'Registration failed', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    )
+    console.error('Individual registration error')
+    return NextResponse.json({ error: 'Registration failed' }, { status: 500 })
   }
 }

@@ -56,9 +56,13 @@ export async function POST(request: NextRequest) {
     } catch (e) { console.error('Receipt SMS failed:', e) }
 
     const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
-    return NextResponse.redirect(
-      new URL(`/payment/success?registrationId=${registrationId}&txnid=${txnid}&name=${encodeURIComponent(firstname)}&type=${registrationType}`, baseUrl)
-    )
+    // encodeURIComponent sanitizes all user-provided values in redirect URL
+    const safeUrl = new URL('/payment/success', baseUrl)
+    safeUrl.searchParams.set('registrationId', registrationId || '')
+    safeUrl.searchParams.set('txnid', txnid || '')
+    safeUrl.searchParams.set('name', firstname || '')
+    safeUrl.searchParams.set('type', registrationType || '')
+    return NextResponse.redirect(safeUrl)
   } catch (error) {
     console.error('Payment success handler error:', error)
     return NextResponse.redirect(new URL('/payment/failed', request.url))
