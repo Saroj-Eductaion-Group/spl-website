@@ -30,9 +30,11 @@ export default function CoordinatorPlayers() {
   }, [])
 
   const loadData = async (dist: string) => {
+    const token = localStorage.getItem('coordinatorToken') || ''
+    const headers = { Authorization: `Bearer ${token}` }
     const [pRes, tRes] = await Promise.all([
-      fetch(`/api/coordinator/players?district=${encodeURIComponent(dist)}`),
-      fetch(`/api/coordinator/teams?district=${encodeURIComponent(dist)}`)
+      fetch(`/api/coordinator/players?district=${encodeURIComponent(dist)}`, { headers }),
+      fetch(`/api/coordinator/teams?district=${encodeURIComponent(dist)}`, { headers })
     ])
     setPlayers(await pRes.json())
     setTeams(await tRes.json())
@@ -42,9 +44,10 @@ export default function CoordinatorPlayers() {
   const assignPlayer = async () => {
     if (!selectedPlayer || !assignTeamId) return
     setAssigning(true)
+    const token = localStorage.getItem('coordinatorToken') || ''
     await fetch('/api/coordinator/assign', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ playerId: selectedPlayer.id, teamId: assignTeamId })
     })
     setAssigning(false)

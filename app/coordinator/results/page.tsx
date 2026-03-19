@@ -28,15 +28,17 @@ export default function CoordinatorResults() {
   }, [])
 
   const loadMatches = async (dist: string) => {
-    const res = await fetch(`/api/coordinator/results?district=${encodeURIComponent(dist)}`)
+    const token = localStorage.getItem('coordinatorToken') || ''
+    const res = await fetch(`/api/coordinator/results?district=${encodeURIComponent(dist)}`, { headers: { Authorization: `Bearer ${token}` } })
     setMatches(await res.json())
     setLoading(false)
   }
 
   const saveResult = async (matchId: string) => {
+    const token = localStorage.getItem('coordinatorToken') || ''
     await fetch('/api/coordinator/results', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ matchId, ...resultForm })
     })
     setEditingId(null)

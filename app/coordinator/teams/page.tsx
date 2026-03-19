@@ -27,15 +27,17 @@ export default function CoordinatorTeams() {
   }, [])
 
   const loadTeams = async (dist: string) => {
-    const res = await fetch(`/api/coordinator/teams?district=${encodeURIComponent(dist)}`)
+    const token = localStorage.getItem('coordinatorToken') || ''
+    const res = await fetch(`/api/coordinator/teams?district=${encodeURIComponent(dist)}`, { headers: { Authorization: `Bearer ${token}` } })
     setTeams(await res.json())
     setLoading(false)
   }
 
   const updateStatus = async (teamId: string, status: string) => {
+    const token = localStorage.getItem('coordinatorToken') || ''
     await fetch('/api/coordinator/teams', {
       method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ teamId, status })
     })
     loadTeams(district)
