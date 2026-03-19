@@ -116,12 +116,9 @@ export async function GET(req: NextRequest) {
 </body></html>`
       return new NextResponse(html, {
         headers: {
-<<<<<<< Updated upstream
-          'Content-Type': 'text/html; charset=utf-8',
-=======
           'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
           'Content-Disposition': `inline; filename="SPL_${type}_report.xlsx"` //  change here
->>>>>>> Stashed changes
+
         }
       })
     }
