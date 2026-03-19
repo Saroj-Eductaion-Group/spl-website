@@ -23,7 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <html lang="en">
         <body className={inter.className}>
           {!isPanel && <Navbar />}
-          <main className={!isPanel ? 'min-h-screen pt-24' : 'min-h-screen'}>
+          <main className={!isPanel ? 'min-h-screen pt-28' : 'min-h-screen'}>
             {children}
           </main>
           {!isPanel && <Footer />}

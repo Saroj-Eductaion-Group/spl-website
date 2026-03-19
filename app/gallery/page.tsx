@@ -35,13 +35,15 @@ export default function Gallery() {
   const filtered = activeCategory === 'All' ? photos : photos.filter(p => p.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">Gallery</h1>
+          <p className="page-hero-sub">Capturing the Spirit of SPL Tournament</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">Gallery</h1>
-            <p className="text-xl text-gray-600">Capturing the Spirit of SPL Tournament</p>
-          </div>
 
           {/* Lightbox */}
           {lightbox && (

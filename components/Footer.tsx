@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Trophy, Mail, Phone, MapPin } from 'lucide-react'
+import Image from 'next/image'
+import { Mail, Phone, MapPin } from 'lucide-react'
 
 export default function Footer() {
   return (
@@ -8,11 +9,13 @@ export default function Footer() {
         <div className="grid md:grid-cols-4 gap-8">
           {/* Logo & Description */}
           <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Trophy className="w-8 h-8 text-gold-400" />
+            <div className="flex items-center gap-3 mb-4">
+              <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-2 ring-primary-500/40">
+                <Image src="/Hero.png" alt="SPL" fill className="object-cover" />
+              </div>
               <div>
                 <div className="text-xl font-bold">SPL Under-19</div>
-                <div className="text-sm text-gray-400">Saroj Premier League</div>
+                <div className="text-xs text-primary-400 tracking-widest uppercase">Saroj Premier League</div>
               </div>
             </div>
             <p className="text-gray-400 text-sm">

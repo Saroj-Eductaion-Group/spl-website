@@ -2,69 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom animations */
-@keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
-}
-
 @keyframes scroll-left {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
-
 @keyframes scroll-right {
   0% { transform: translateX(-50%); }
   100% { transform: translateX(0); }
 }
 
-.animate-marquee {
-  animation: marquee 20s linear infinite;
-}
+.animate-scroll-left { animation: scroll-left 30s linear infinite; }
+.animate-scroll-right { animation: scroll-right 30s linear infinite; }
 
-.animate-scroll-left {
-  animation: scroll-left 30s linear infinite;
-}
-
-.animate-scroll-right {
-  animation: scroll-right 30s linear infinite;
-}
-
-/* Hide scrollbar */
-::-webkit-scrollbar {
-  display: none;
-}
-
-html {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
+::-webkit-scrollbar { display: none; }
+html { -ms-overflow-style: none; scrollbar-width: none; scroll-behavior: auto; }
 
 @layer base {
-  html {
-    /* Remove default smooth scroll behavior to let Lenis handle it */
-    scroll-behavior: auto;
-  }
+  body { @apply bg-gray-50 text-gray-900 antialiased; }
 }
 
 @layer components {
+
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+    @apply inline-flex items-center justify-center bg-primary-600 hover:bg-primary-700 active:bg-primary-800 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5;
   }
-  
   .btn-gold {
-    @apply bg-gold-500 hover:bg-gold-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors;
+    @apply inline-flex items-center justify-center bg-gold-500 hover:bg-gold-600 text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200 shadow-md hover:shadow-lg hover:-translate-y-0.5;
   }
-  
+  .btn-outline {
+    @apply inline-flex items-center justify-center border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-6 py-3 rounded-xl font-semibold transition-all duration-200;
+  }
+
   .card {
-    @apply bg-white rounded-lg shadow-lg p-6 border border-gray-200;
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6;
   }
-  
+
   .form-input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 border border-gray-200 rounded-xl bg-white text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200;
   }
-  
   .form-label {
-    @apply block text-sm font-medium text-gray-700 mb-2;
+    @apply block text-sm font-semibold text-gray-700 mb-1.5;
   }
+
+  .page-hero {
+    @apply relative py-16 overflow-hidden;
+    background: linear-gradient(135deg, #1e3270 0%, #1d4ed8 50%, #1e3270 100%);
+  }
+  .page-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(218,167,55,0.15) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 20%, rgba(218,167,55,0.1) 0%, transparent 50%);
+  }
+  .page-hero-title {
+    @apply relative text-4xl md:text-5xl font-extrabold text-white mb-3 tracking-tight;
+  }
+  .page-hero-sub {
+    @apply relative text-blue-200 text-lg;
+  }
+
+  .badge { @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold; }
+  .badge-blue  { @apply bg-primary-100 text-primary-700; }
+  .badge-gold  { @apply bg-yellow-100 text-yellow-700; }
+  .badge-green { @apply bg-green-100 text-green-700; }
+  .badge-red   { @apply bg-red-100 text-red-700; }
 }

@@ -48,16 +48,11 @@ export default function CoordinatorResults() {
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="bg-white shadow px-6 py-4 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-primary-600">Match Results</h1>
-          <p className="text-sm text-gray-500">{district} District</p>
-        </div>
-        <button onClick={() => router.push('/coordinator/dashboard')} className="text-gray-600 hover:text-primary-600 text-sm">← Dashboard</button>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-gray-900 mb-1">Match Results</h1>
+        <p className="text-gray-500">{district} District</p>
       </div>
-
-      <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="space-y-4">
           {matches.map(match => (
             <div key={match.id} className="card">
@@ -111,7 +106,6 @@ export default function CoordinatorResults() {
             <div className="text-center py-12 text-gray-400">No matches scheduled for {district} district yet</div>
           )}
         </div>
-      </div>
     </div>
   )
 }

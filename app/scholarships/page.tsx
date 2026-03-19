@@ -3,16 +3,15 @@ import Link from 'next/link'
 
 export default function Scholarships() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">Scholarship Program</h1>
+          <p className="page-hero-sub">50% Scholarship for Every SPL Participant</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-
-          {/* Header */}
-          <div className="text-center mb-12">
-            <GraduationCap className="w-16 h-16 text-primary-500 mx-auto mb-4" />
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">Scholarship Program</h1>
-            <p className="text-xl text-gray-600">50% Scholarship for Every SPL Participant</p>
-          </div>
 
           {/* Hero Banner */}
           <div className="card mb-8 bg-gradient-to-r from-primary-600 to-primary-800 text-white text-center">

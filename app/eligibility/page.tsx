@@ -2,62 +2,38 @@ import { AlertCircle, CheckCircle, XCircle } from 'lucide-react'
 
 export default function Eligibility() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">Eligibility & Rules</h1>
+          <p className="page-hero-sub">Tournament Guidelines and Requirements</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">Eligibility & Rules</h1>
-            <p className="text-xl text-gray-600">Tournament Guidelines and Requirements</p>
-          </div>
-
           <div className="card mb-8">
             <h2 className="text-2xl font-semibold mb-6 text-primary-600 flex items-center">
-              <CheckCircle className="w-6 h-6 mr-2" />
-              Eligibility Criteria
+              <CheckCircle className="w-6 h-6 mr-2" /> Eligibility Criteria
             </h2>
-            
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="text-lg font-semibold mb-3 text-green-600">Player Requirements</h3>
                 <ul className="space-y-2 text-gray-700">
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                    Must be Under-19 years of age
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                    Currently enrolled in Class 12
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                    Resident of Uttar Pradesh
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" />
-                    Valid Aadhaar Card required
-                  </li>
+                  {['Must be Under-19 years of age', 'Currently enrolled in Class 12', 'Resident of Uttar Pradesh', 'Valid Aadhaar Card required'].map(r => (
+                    <li key={r} className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-1 mr-2 flex-shrink-0" /> {r}
+                    </li>
+                  ))}
                 </ul>
               </div>
-
               <div>
                 <h3 className="text-lg font-semibold mb-3 text-blue-600">Team Requirements</h3>
                 <ul className="space-y-2 text-gray-700">
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                    Minimum 11, Maximum 15 players
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                    All players from same district
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                    Coach and Manager details
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-4 h-4 text-blue-500 mt-1 mr-2 flex-shrink-0" />
-                    Registration fee: ₹11,000
-                  </li>
+                  {['Minimum 11, Maximum 15 players', 'All players from same district', 'Coach and Manager details', 'Registration fee: ₹11,000'].map(r => (
+                    <li key={r} className="flex items-start">
+                      <CheckCircle className="w-4 h-4 text-blue-500 mt-1 mr-2 flex-shrink-0" /> {r}
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -65,35 +41,27 @@ export default function Eligibility() {
 
           <div className="card mb-8">
             <h2 className="text-2xl font-semibold mb-6 text-red-600 flex items-center">
-              <XCircle className="w-6 h-6 mr-2" />
-              Disqualification Criteria
+              <XCircle className="w-6 h-6 mr-2" /> Disqualification Criteria
             </h2>
-            
             <div className="bg-red-50 p-6 rounded-lg">
               <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start">
-                  <XCircle className="w-4 h-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                  <span><strong>Age Fraud:</strong> Providing false age documents will lead to immediate disqualification</span>
-                </li>
-                <li className="flex items-start">
-                  <XCircle className="w-4 h-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                  <span><strong>Fake Documents:</strong> Submission of forged or invalid documents</span>
-                </li>
-                <li className="flex items-start">
-                  <XCircle className="w-4 h-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                  <span><strong>Misconduct:</strong> Unsporting behavior or violation of tournament rules</span>
-                </li>
-                <li className="flex items-start">
-                  <XCircle className="w-4 h-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
-                  <span><strong>Incomplete Registration:</strong> Missing required documents or information</span>
-                </li>
+                {[
+                  ['Age Fraud', 'Providing false age documents will lead to immediate disqualification'],
+                  ['Fake Documents', 'Submission of forged or invalid documents'],
+                  ['Misconduct', 'Unsporting behavior or violation of tournament rules'],
+                  ['Incomplete Registration', 'Missing required documents or information'],
+                ].map(([title, desc]) => (
+                  <li key={title} className="flex items-start">
+                    <XCircle className="w-4 h-4 text-red-500 mt-1 mr-2 flex-shrink-0" />
+                    <span><strong>{title}:</strong> {desc}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
 
           <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-gold-600">Tournament Rules</h2>
-            
+            <h2 className="text-2xl font-semibold mb-6 text-primary-600">Tournament Rules</h2>
             <div className="space-y-6">
               <div>
                 <h3 className="text-lg font-semibold mb-3">Match Rules</h3>
@@ -105,16 +73,6 @@ export default function Eligibility() {
                   <li>• No ball and wide ball penalties as per ICC rules</li>
                 </ul>
               </div>
-
-              <div>
-                <h3 className="text-lg font-semibold mb-3">Player Substitution</h3>
-                <ul className="space-y-2 text-gray-700 ml-4">
-                  <li>• Maximum 2 player changes allowed between matches</li>
-                  <li>• Substitute players must be from the same district</li>
-                  <li>• Changes must be approved by tournament committee</li>
-                </ul>
-              </div>
-
               <div>
                 <h3 className="text-lg font-semibold mb-3">Equipment & Dress Code</h3>
                 <ul className="space-y-2 text-gray-700 ml-4">
@@ -129,18 +87,15 @@ export default function Eligibility() {
 
           <div className="card">
             <h2 className="text-2xl font-semibold mb-6 text-orange-600 flex items-center">
-              <AlertCircle className="w-6 h-6 mr-2" />
-              Important Notes
+              <AlertCircle className="w-6 h-6 mr-2" /> Important Notes
             </h2>
-            
             <div className="bg-orange-50 p-6 rounded-lg">
               <ul className="space-y-3 text-gray-700">
                 <li>• Registration fee is non-refundable once payment is completed</li>
                 <li>• Tournament committee decisions are final and binding</li>
                 <li>• Players must carry original documents during matches</li>
-                <li>• Medical certificate may be required if requested</li>
-                <li>• All participants are covered under tournament insurance</li>
-                <li>• Weather conditions may affect match schedules</li>
+                <li>• Age fraud will lead to immediate disqualification</li>
+                <li>• Final team allocation for individual players is at SPL committee's discretion</li>
               </ul>
             </div>
           </div>

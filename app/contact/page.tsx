@@ -28,13 +28,15 @@ export default function Contact() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">Contact Us</h1>
+          <p className="page-hero-sub">Get in touch with SPL Tournament Team</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">Contact Us</h1>
-            <p className="text-xl text-gray-600">Get in touch with SPL Tournament Team</p>
-          </div>
 
           <div className="grid md:grid-cols-2 gap-8 mb-8">
             <div className="card">

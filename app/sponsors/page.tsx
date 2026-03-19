@@ -39,13 +39,15 @@ export default function Sponsors() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">Our Sponsors</h1>
+          <p className="page-hero-sub">Partners Supporting Youth Cricket Excellence</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">Our Sponsors</h1>
-            <p className="text-xl text-gray-600">Partners Supporting Youth Cricket Excellence</p>
-          </div>
 
           {/* Title Sponsors */}
           <div className="card mb-8 text-center bg-gradient-to-r from-yellow-50 to-yellow-100 border border-yellow-200">

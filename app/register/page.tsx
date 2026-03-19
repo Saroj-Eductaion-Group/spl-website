@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { useUser, SignIn } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import TeamRegistrationForm from '@/components/TeamRegistrationForm'
 import IndividualRegistrationForm from '@/components/IndividualRegistrationForm'
 
@@ -27,30 +27,26 @@ export default function RegisterPage() {
   }
 
   if (!isSignedIn) {
+    if (typeof window !== 'undefined') {
+      window.location.href = '/sign-in?redirect_url=/register'
+    }
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center py-12">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-primary-600 mb-2">SPL Registration</h1>
-          <p className="text-gray-500">You must sign in or create an account to register for the tournament.</p>
-        </div>
-        <SignIn redirectUrl="/register" />
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">SPL Registration</h1>
+          <p className="page-hero-sub">Register for Saroj Premier League Under-19 Cricket Tournament</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">
-              SPL Registration
-            </h1>
-            <p className="text-gray-600">
-              Register for Saroj Premier League Under-19 Cricket Tournament
-            </p>
-          </div>
 
           {/* Registration Type Selector */}
           <div className="card mb-8">

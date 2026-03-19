@@ -44,10 +44,7 @@ export default function CoordinatorTeams() {
   }
 
   const updateStatus = async (teamId: string, status: string) => {
-    let reason = ''
-    if (status === 'REJECTED') {
-      reason = prompt('Enter rejection reason (optional):') || ''
-    }
+    const reason = status === 'REJECTED' ? (prompt('Enter rejection reason (optional):') || '') : ''
     const token = localStorage.getItem('coordinatorToken') || ''
     await fetch('/api/coordinator/teams', {
       method: 'PATCH',
@@ -60,16 +57,20 @@ export default function CoordinatorTeams() {
 
   const filtered = teams.filter(t => filter === 'ALL' || t.status === filter)
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
+    </div>
+  )
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">District Teams</h1>
-          <p className="text-sm text-gray-500">{district} District</p>
-        </div>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900">District Teams</h1>
+        <p className="text-sm text-gray-500">{district} District</p>
+      </div>
 
+      {/* Modal */}
       {viewTeam && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
@@ -80,15 +81,11 @@ export default function CoordinatorTeams() {
               </div>
               <button onClick={() => setViewTeam(null)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6" /></button>
             </div>
-
             <div className="p-6 space-y-6">
-              {/* Team Info */}
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {viewTeam.coachName && <div><span className="text-gray-500">Coach:</span> <span className="font-medium">{viewTeam.coachName}</span> {viewTeam.coachPhone && `(${viewTeam.coachPhone})`}</div>}
                 {viewTeam.managerName && <div><span className="text-gray-500">Manager:</span> <span className="font-medium">{viewTeam.managerName}</span> {viewTeam.managerPhone && `(${viewTeam.managerPhone})`}</div>}
               </div>
-
-              {/* Players & Documents */}
               <div>
                 <h3 className="font-semibold text-gray-800 mb-3">Players & Documents ({viewTeam.players?.length || 0})</h3>
                 <div className="space-y-3">
@@ -102,28 +99,16 @@ export default function CoordinatorTeams() {
                         <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">{player.role}</span>
                       </div>
                       <div className="flex flex-wrap gap-2 mt-2">
-                        {player.aadhaarDoc
-                          ? <a href={player.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 Aadhaar</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ Aadhaar missing</span>}
-                        {player.schoolIdDoc
-                          ? <a href={player.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 School ID</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ School ID missing</span>}
-                        {player.dobProofDoc
-                          ? <a href={player.dobProofDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 DOB Proof</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ DOB Proof missing</span>}
-                        {player.photoDoc
-                          ? <a href={player.photoDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 Photo</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ Photo missing</span>}
+                        {player.aadhaarDoc ? <a href={player.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 Aadhaar</a> : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ Aadhaar missing</span>}
+                        {player.schoolIdDoc ? <a href={player.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 School ID</a> : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ School ID missing</span>}
+                        {player.dobProofDoc ? <a href={player.dobProofDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 DOB Proof</a> : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ DOB Proof missing</span>}
+                        {player.photoDoc ? <a href={player.photoDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 Photo</a> : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ Photo missing</span>}
                       </div>
                     </div>
                   ))}
-                  {(!viewTeam.players || viewTeam.players.length === 0) && (
-                    <p className="text-sm text-gray-400">No players found</p>
-                  )}
+                  {(!viewTeam.players || viewTeam.players.length === 0) && <p className="text-sm text-gray-400">No players found</p>}
                 </div>
               </div>
-
-              {/* Approve/Reject */}
               {viewTeam.status === 'PENDING' && (
                 <div className="flex gap-3 pt-2 border-t">
                   <button onClick={() => updateStatus(viewTeam.id, 'APPROVED')} className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2">
@@ -144,68 +129,67 @@ export default function CoordinatorTeams() {
         </div>
       )}
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex gap-3 mb-6 flex-wrap">
-          {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map(s => (
-            <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === s ? 'bg-primary-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'}`}>
-              {s} ({teams.filter(t => s === 'ALL' || t.status === s).length})
-            </button>
-          ))}
-        </div>
+      {/* Filters */}
+      <div className="flex gap-3 mb-6 flex-wrap">
+        {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map(s => (
+          <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === s ? 'bg-primary-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'}`}>
+            {s} ({teams.filter(t => s === 'ALL' || t.status === s).length})
+          </button>
+        ))}
+      </div>
 
-        <div className="card overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Players</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+      {/* Table */}
+      <div className="card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Players</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {filtered.map(team => (
+                <tr key={team.id}>
+                  <td className="px-4 py-4">
+                    <div className="font-medium text-gray-900 text-sm">{team.name}</div>
+                    <div className="text-xs text-gray-500">{team.registrationId}</div>
+                    <div className="text-xs text-gray-500">{team.schoolCollege}</div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <div className="flex items-center gap-1 text-sm text-gray-700">
+                      <Users className="w-4 h-4" /> {team._count?.players || 0}
+                    </div>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${team.payments?.[0]?.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {team.payments?.[0]?.status || 'PENDING'}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4">
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${team.status === 'APPROVED' ? 'bg-green-100 text-green-800' : team.status === 'REJECTED' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                      {team.status}
+                    </span>
+                  </td>
+                  <td className="px-4 py-4 space-x-2 whitespace-nowrap">
+                    <button onClick={() => setViewTeam(team)} className="text-blue-600 hover:text-blue-800" title="View Documents">
+                      <FileText className="w-5 h-5" />
+                    </button>
+                    {team.status === 'PENDING' && (
+                      <>
+                        <button onClick={() => updateStatus(team.id, 'APPROVED')} className="text-green-600 hover:text-green-800" title="Approve"><CheckCircle className="w-5 h-5" /></button>
+                        <button onClick={() => updateStatus(team.id, 'REJECTED')} className="text-red-500 hover:text-red-700" title="Reject"><XCircle className="w-5 h-5" /></button>
+                      </>
+                    )}
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filtered.map(team => (
-                  <tr key={team.id}>
-                    <td className="px-4 py-4">
-                      <div className="font-medium text-gray-900 text-sm">{team.name}</div>
-                      <div className="text-xs text-gray-500">{team.registrationId}</div>
-                      <div className="text-xs text-gray-500">{team.schoolCollege}</div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center gap-1 text-sm text-gray-700">
-                        <Users className="w-4 h-4" /> {team._count?.players || 0}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${team.payments?.[0]?.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
-                        {team.payments?.[0]?.status || 'PENDING'}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <span className={`text-xs font-semibold px-2 py-1 rounded-full ${team.status === 'APPROVED' ? 'bg-green-100 text-green-800' : team.status === 'REJECTED' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
-                        {team.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-4 space-x-2 whitespace-nowrap">
-                      <button onClick={() => setViewTeam(team)} className="text-blue-600 hover:text-blue-800" title="View Documents">
-                        <FileText className="w-5 h-5" />
-                      </button>
-                      {team.status === 'PENDING' && (
-                        <>
-                          <button onClick={() => updateStatus(team.id, 'APPROVED')} className="text-green-600 hover:text-green-800" title="Approve"><CheckCircle className="w-5 h-5" /></button>
-                          <button onClick={() => updateStatus(team.id, 'REJECTED')} className="text-red-500 hover:text-red-700" title="Reject"><XCircle className="w-5 h-5" /></button>
-                        </>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                {filtered.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">No teams found</td></tr>}
-              </tbody>
-            </table>
-          </div>
-        </div>
+              ))}
+              {filtered.length === 0 && <tr><td colSpan={5} className="px-4 py-8 text-center text-gray-400">No teams found</td></tr>}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

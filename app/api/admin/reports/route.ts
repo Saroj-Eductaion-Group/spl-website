@@ -112,14 +112,10 @@ export async function GET(req: NextRequest) {
 <p>Generated: ${new Date().toLocaleString('en-IN')} | Total Records: ${rows.length}</p>
 <table><thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
 <tbody>${tableRows}</tbody></table>
-<script>window.onload=function(){window.print()}<\/script>
+<script>window.onload=function(){window.print()}</` + `script>
 </body></html>`
       return new NextResponse(html, {
-        headers: {
-          'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-          'Content-Disposition': `inline; filename="SPL_${type}_report.xlsx"` //  change here
-
-        }
+        headers: { 'Content-Type': 'text/html; charset=utf-8' }
       })
     }
 

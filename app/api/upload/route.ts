@@ -49,9 +49,3 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// Next.js config to disable bodyParser (since we use formData)
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};

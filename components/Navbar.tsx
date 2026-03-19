@@ -1,136 +1,203 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { Menu, X, Trophy, Import } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Menu, X, Shield } from 'lucide-react'
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
 import Image from 'next/image'
+import { usePathname } from 'next/navigation'
+
+const navLinks = [
+  { href: '/', label: 'Home' },
+  { href: '/about', label: 'About' },
+  { href: '/tournament-format', label: 'Tournament' },
+  { href: '/eligibility', label: 'Rules' },
+  { href: '/prizes', label: 'Prizes' },
+  { href: '/scholarships', label: 'Scholarship' },
+  { href: '/schedule', label: 'Schedule' },
+  { href: '/news', label: 'News' },
+  { href: '/gallery', label: 'Gallery' },
+  { href: '/contact', label: 'Contact' },
+]
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
 
-  const navLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/about', label: 'About' },
-    { href: '/tournament-format', label: 'Tournament' },
-    { href: '/eligibility', label: 'Rules' },
-    { href: '/prizes', label: 'Prizes' },
-    { href: '/scholarships', label: 'Scholarship' },
-    { href: '/schedule', label: 'Schedule' },
-    { href: '/news', label: 'News' },
-    { href: '/gallery', label: 'Gallery' },
-    { href: '/contact', label: 'Contact' },
-  ]
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 60)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => { setIsOpen(false) }, [pathname])
+
+  const linkClass = scrolled
+    ? 'text-gray-300 hover:text-white hover:bg-white/10'
+    : 'text-gray-700 hover:text-primary-600 hover:bg-primary-50'
+
+  const activeLinkClass = scrolled ? 'text-primary-400' : 'text-primary-600'
 
   return (
-    <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="bg-white/20 backdrop-blur-md border border-white/30 rounded-full px-6 py-3 shadow-xl">
-        <div className="flex justify-between items-center">
-          {/* Logo */}
-          <Link href="/" className="flex items-center space-x-2">
-            <div className=" backdrop-blur-sm p-2 rounded-full">
-              {/* <Trophy className="w-6 h-6 text-primary-600" /> */}
-              <Image
-                src="/Hero.png"
-                alt="icon"
-                width={30}
-                height={30}
-              />
-            </div>
-            <div className="hidden sm:block">
-              <div className="text-lg font-bold text-gray-900">SPL</div>
-              <div className="text-xs text-gray-600">Under-19</div>
-            </div>
-          </Link>
+    <>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
+        scrolled
+          ? 'bg-gray-950/95 backdrop-blur-xl border-b border-white/10 shadow-2xl'
+          : 'bg-white/80 backdrop-blur-md border-b border-gray-200/60 shadow-sm'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6">
+          <div className="flex items-center justify-between h-20">
 
-          {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center space-x-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="px-4 py-2 text-gray-700 hover:text-primary-600 hover:bg-white/30 rounded-full transition-all duration-200 text-sm font-medium"
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="hidden lg:flex items-center space-x-2">
-            <SignedIn>
-              <Link href="/register" className="bg-primary-600 text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-primary-700 transition-colors">
-                Register
-              </Link>
-              <UserButton afterSignOutUrl="/" />
-            </SignedIn>
-            <SignedOut>
-              <Link href="/sign-in" className="text-gray-600 hover:text-primary-600 text-sm font-medium px-3 py-2 rounded-full hover:bg-white/30 transition-colors">
-                Sign In
-              </Link>
-            </SignedOut>
-            <Link href="/admin/login" className="text-gray-600 hover:text-primary-600 text-sm font-medium px-3 py-2 rounded-full hover:bg-white/30 transition-colors">
-              Admin
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className={`relative w-11 h-11 rounded-xl overflow-hidden transition-all duration-300 ring-2 ${scrolled ? 'ring-primary-500/40 group-hover:ring-primary-400' : 'ring-primary-300 group-hover:ring-primary-500'}`}>
+                <Image src="/Hero.png" alt="SPL" fill className="object-cover" />
+              </div>
+              <div className="hidden sm:block leading-tight">
+                <div className={`text-xl font-extrabold tracking-wide transition-colors duration-300 ${scrolled ? 'text-white' : 'text-gray-900'}`}>SPL</div>
+                <div className="text-[11px] text-primary-500 font-semibold tracking-widest uppercase">Under-19</div>
+              </div>
             </Link>
+
+            {/* Desktop Nav Links */}
+            <div className="hidden lg:flex items-center gap-0.5">
+              {navLinks.map((link) => {
+                const active = pathname === link.href
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative px-4 py-2 text-[15px] font-semibold rounded-lg transition-all duration-200 ${
+                      active ? activeLinkClass : linkClass
+                    }`}
+                  >
+                    {link.label}
+                    {active && (
+                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3.5 h-0.5 bg-primary-500 rounded-full" />
+                    )}
+                  </Link>
+                )
+              })}
+            </div>
+
+            {/* Right Actions */}
+            <div className="hidden lg:flex items-center gap-2 shrink-0">
+              <Link
+                href="/admin/login"
+                className={`flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-lg border transition-all duration-200 ${
+                  scrolled
+                    ? 'text-gray-400 border-white/15 hover:text-primary-400 hover:border-primary-500/40 hover:bg-primary-500/5'
+                    : 'text-gray-500 border-gray-300 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50'
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                Admin
+              </Link>
+
+              <SignedOut>
+                <Link
+                  href="/sign-in"
+                  className="text-base font-bold text-white bg-primary-600 hover:bg-primary-500 px-7 py-3 rounded-lg transition-all duration-200 shadow-md shadow-primary-600/30"
+                >
+                  Sign In
+                </Link>
+              </SignedOut>
+
+              <SignedIn>
+                <Link
+                  href="/register"
+                  className="text-base font-bold text-white bg-primary-600 hover:bg-primary-500 px-7 py-3 rounded-lg transition-all duration-200 shadow-md shadow-primary-600/30"
+                >
+                  Register
+                </Link>
+                <UserButton afterSignOutUrl="/" />
+              </SignedIn>
+            </div>
+
+            {/* Mobile Hamburger */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className={`lg:hidden p-2 rounded-lg transition-all ${scrolled ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
+            >
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+      </nav>
+
+      {/* Mobile Drawer */}
+      <div className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${isOpen ? 'visible' : 'invisible'}`}>
+        <div
+          className={`absolute inset-0 bg-gray-950/50 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
+          onClick={() => setIsOpen(false)}
+        />
+        <div className={`absolute top-0 right-0 h-full w-72 bg-white border-l border-gray-200 shadow-2xl transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="flex items-center justify-between px-5 h-16 border-b border-gray-100">
+            <div className="flex items-center gap-2">
+              <div className="relative w-8 h-8 rounded-lg overflow-hidden ring-2 ring-primary-300">
+                <Image src="/Hero.png" alt="SPL" fill className="object-cover" />
+              </div>
+              <span className="text-sm font-bold text-gray-900">SPL Under-19</span>
+            </div>
+            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all">
+              <X className="w-4 h-4" />
+            </button>
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="lg:hidden bg-white/30 backdrop-blur-sm p-2 rounded-full"
-            onClick={() => setIsOpen(!isOpen)}
-          >
-            {isOpen ? <X className="w-5 h-5 text-gray-700" /> : <Menu className="w-5 h-5 text-gray-700" />}
-          </button>
-        </div>
-
-        {/* Mobile Navigation */}
-        {isOpen && (
-          <div className="lg:hidden mt-4 pt-4 border-t border-white/20">
-            <div className="flex flex-col space-y-2">
-              {navLinks.map((link) => (
+          <div className="overflow-y-auto h-[calc(100%-4rem)] px-3 py-4 flex flex-col gap-0.5">
+            {navLinks.map((link) => {
+              const active = pathname === link.href
+              return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="px-4 py-2 text-gray-700 hover:text-primary-600 hover:bg-white/30 rounded-full transition-all text-sm font-medium"
-                  onClick={() => setIsOpen(false)}
+                  className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                    active
+                      ? 'bg-primary-50 text-primary-600 border border-primary-200'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
                 >
                   {link.label}
+                  {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />}
                 </Link>
-              ))}
-              <div className="flex flex-col space-y-2 pt-2">
-                <SignedIn>
-                  <Link
-                    href="/register"
-                    className="bg-primary-600/90 backdrop-blur-sm text-white px-6 py-2 rounded-full text-sm font-semibold text-center"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Register
-                  </Link>
-                  <div className="flex justify-center">
-                    <UserButton afterSignOutUrl="/" />
-                  </div>
-                </SignedIn>
-                <SignedOut>
-                  <Link
-                    href="/sign-in"
-                    className="text-gray-600 hover:text-primary-600 text-sm font-medium text-center"
-                    onClick={() => setIsOpen(false)}
-                  >
-                    Sign In
-                  </Link>
-                </SignedOut>
-                <Link
-                  href="/admin/login"
-                  className="text-gray-600 hover:text-primary-600 text-sm font-medium text-center"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Admin Login
-                </Link>
+              )
+            })}
+
+            <div className="my-3 border-t border-gray-100" />
+
+            <SignedOut>
+              <Link
+                href="/sign-in"
+                className="flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 transition-all shadow-md shadow-primary-600/20"
+              >
+                Sign In
+              </Link>
+            </SignedOut>
+
+            <SignedIn>
+              <Link
+                href="/register"
+                className="flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 transition-all shadow-md shadow-primary-600/20"
+              >
+                Register Now
+              </Link>
+              <div className="flex items-center gap-3 px-4 py-2.5">
+                <UserButton afterSignOutUrl="/" />
+                <span className="text-sm text-gray-500">My Account</span>
               </div>
-            </div>
+            </SignedIn>
+
+            <Link
+              href="/admin/login"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-50 border border-gray-200 transition-all"
+            >
+              <Shield className="w-3.5 h-3.5" />
+              Admin Login
+            </Link>
           </div>
-        )}
+        </div>
       </div>
-    </nav>
+    </>
   )
 }

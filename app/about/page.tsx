@@ -2,20 +2,16 @@ import { Trophy, Users, Calendar, MapPin, Award, GraduationCap } from 'lucide-re
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen bg-gray-50">
+      {/* Page Hero */}
+      <div className="page-hero">
+        <div className="container mx-auto px-4 text-center">
+          <h1 className="page-hero-title">About SPL</h1>
+          <p className="page-hero-sub">Uttar Pradesh's Premier Cricket Tournament for Under-19 Students</p>
+        </div>
+      </div>
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl font-bold text-primary-600 mb-4">
-              About Saroj Premier League
-            </h1>
-            <p className="text-xl text-gray-600">
-              Uttar Pradesh's Premier Cricket Tournament for Under-19 Students
-            </p>
-          </div>
-
-          {/* Overview */}
           <div className="card mb-8">
             <h2 className="text-2xl font-semibold mb-4 text-primary-600">Tournament Overview</h2>
             <p className="text-gray-700 leading-relaxed mb-4">
