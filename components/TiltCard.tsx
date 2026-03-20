@@ -21,12 +21,14 @@ export default function ParallaxCard({ children, className = '', index }: Parall
   const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0])
   const scale = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0.8, 1, 1, 0.8])
 
+  const yAlt = useTransform(scrollYProgress, [0, 1], [-50, 50])
+
   return (
     <motion.div
       ref={ref}
       className={className}
       style={{
-        y: index % 2 === 0 ? y : useTransform(scrollYProgress, [0, 1], [-50, 50]),
+        y: index % 2 === 0 ? y : yAlt,
         rotateX,
         opacity,
         scale,

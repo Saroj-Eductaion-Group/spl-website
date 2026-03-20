@@ -10,6 +10,7 @@ interface Player {
   dateOfBirth: string
   phone: string
   aadhaarNo: string
+  role: string
   aadhaarDoc: string
   schoolIdDoc: string
   dobProofDoc: string
@@ -40,7 +41,7 @@ const districts = [
   'Sonbhadra', 'Sultanpur', 'Unnao', 'Varanasi'
 ]
 
-const emptyPlayer = (): Player => ({ name: '', dateOfBirth: '', phone: '', aadhaarNo: '', aadhaarDoc: '', schoolIdDoc: '', dobProofDoc: '', photoDoc: '' })
+const emptyPlayer = (): Player => ({ name: '', dateOfBirth: '', phone: '', aadhaarNo: '', role: '', aadhaarDoc: '', schoolIdDoc: '', dobProofDoc: '', photoDoc: '' })
 
 export default function TeamRegistrationForm() {
   const { register, handleSubmit, formState: { errors } } = useForm<TeamFormData>()
@@ -204,7 +205,17 @@ export default function TeamRegistrationForm() {
                     </div>
                     <div>
                       <label className="form-label">Aadhaar Number *</label>
-                      <input value={player.aadhaarNo} onChange={e => updatePlayer(index, 'aadhaarNo', e.target.value)} className="form-input" placeholder="12-digit Aadhaar number" required />
+                      <input value={player.aadhaarNo} onChange={e => updatePlayer(index, 'aadhaarNo', e.target.value)} className="form-input" placeholder="12-digit Aadhaar number" maxLength={12} required />
+                    </div>
+                    <div>
+                      <label className="form-label">Playing Role *</label>
+                      <select value={player.role} onChange={e => updatePlayer(index, 'role', e.target.value)} className="form-input" required>
+                        <option value="">Select Role</option>
+                        <option value="BATSMAN">Batsman</option>
+                        <option value="BOWLER">Bowler</option>
+                        <option value="ALL_ROUNDER">All-Rounder</option>
+                        <option value="WICKET_KEEPER">Wicket-Keeper</option>
+                      </select>
                     </div>
                   </div>
 

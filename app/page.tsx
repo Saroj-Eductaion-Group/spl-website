@@ -10,6 +10,7 @@ import Lenis from 'lenis'
 import AnimatedCounter from '@/components/AnimatedCounter'
 import Reveal from '@/components/Reveal'
 import Image from 'next/image'
+import SponsorStrip from '@/components/SponsorStrip'
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -261,6 +262,9 @@ export default function Home() {
           </Reveal>
         </div>
       </section>
+
+      {/* ── Sponsors ── */}
+      <SponsorStrip />
 
       {/* ── Quick Links ── */}
       <section className="py-16 bg-gray-50">

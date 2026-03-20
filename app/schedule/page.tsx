@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { Calendar, MapPin, Clock, Users, Trophy } from 'lucide-react'
+import SponsorStrip from '@/components/SponsorStrip'
 
 interface Match {
   id: string
@@ -151,6 +152,7 @@ export default function Schedule() {
           </div>
         </div>
       </div>
+      <SponsorStrip />
     </div>
   )
 }

@@ -3,7 +3,8 @@
 import { useRouter, usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { LogOut, LayoutDashboard, Users, UserCheck, Calendar, Shield, Bell, FileText, Award, Menu, X, Trophy, Send, Image, MessageSquare } from 'lucide-react'
+import { LogOut, LayoutDashboard, Users, UserCheck, Calendar, Shield, Bell, FileText, Award, Menu, X, Send, MessageSquare, Image as GalleryIcon } from 'lucide-react'
+import NextImage from 'next/image'
 
 const navItems = [
   { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -13,7 +14,7 @@ const navItems = [
   { href: '/admin/coordinators', label: 'Coordinators', icon: Shield },
   { href: '/admin/announcements', label: 'Announcements', icon: Bell },
   { href: '/admin/notifications', label: 'Notifications', icon: Send },
-  { href: '/admin/gallery', label: 'Gallery', icon: Image },
+  { href: '/admin/gallery', label: 'Gallery', icon: GalleryIcon },
   { href: '/admin/messages', label: 'Messages', icon: MessageSquare },
   { href: '/admin/reports', label: 'Reports', icon: FileText },
   { href: '/admin/sponsors', label: 'Sponsors', icon: Award },
@@ -68,11 +69,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       <aside className={`fixed top-0 left-0 h-full w-64 bg-white border-r border-gray-200 shadow-lg z-30 flex flex-col transition-transform duration-300
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 lg:static lg:shadow-none`}>
         {/* Logo */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
+        <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100">
           <div className="flex items-center gap-3">
-            <div className="bg-primary-600 p-2 rounded-lg">
-              <Trophy className="w-5 h-5 text-white" />
-            </div>
+            <NextImage src="/logo.png" alt="SPL" width={52} height={52} className="object-contain" />
             <div>
               <div className="text-sm font-bold text-primary-600">SPL Admin</div>
               <div className="text-xs text-gray-500">Tournament Panel</div>

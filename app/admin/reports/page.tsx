@@ -16,19 +16,12 @@ export default function AdminReports() {
       })
       if (!response.ok) throw new Error((await response.json()).error || 'Download failed')
 
-      if (format === 'pdf') {
-        const html = await response.text()
-        const win = window.open('', '_blank')
-        if (win) { win.document.write(html); win.document.close() }
-        return
-      }
-
       const blob = await response.blob()
       const url = window.URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
       const date = new Date().toISOString().split('T')[0]
-      a.download = `SPL_${type}_${date}.${format}`
+      a.download = `SPL_${type}_${date}.${format === 'pdf' ? 'html' : format}`
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -110,7 +103,7 @@ export default function AdminReports() {
         <ul className="space-y-2 text-sm text-gray-600">
           <li className="flex items-center gap-2"><span className="w-16 text-center bg-green-100 text-green-700 px-2 py-0.5 rounded font-semibold text-xs">Excel</span> Opens directly in Microsoft Excel / Google Sheets with proper formatting</li>
           <li className="flex items-center gap-2"><span className="w-16 text-center bg-primary-100 text-primary-700 px-2 py-0.5 rounded font-semibold text-xs">CSV</span> Universal format compatible with all spreadsheet applications</li>
-          <li className="flex items-center gap-2"><span className="w-16 text-center bg-red-100 text-red-700 px-2 py-0.5 rounded font-semibold text-xs">PDF</span> Opens print dialog — press Ctrl+P / Cmd+P and choose "Save as PDF"</li>
+          <li className="flex items-center gap-2"><span className="w-16 text-center bg-red-100 text-red-700 px-2 py-0.5 rounded font-semibold text-xs">PDF</span> Downloads as HTML file — open it in browser and press Ctrl+P → Save as PDF</li>
         </ul>
       </div>
     </div>
