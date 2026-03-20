@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Trophy, GraduationCap, Star, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { log } from 'node:console'
 
 const leftPanelStyle = {
   background: 'linear-gradient(135deg, #1e3270 0%, #1d4ed8 60%, #1e3270 100%)',
@@ -36,6 +37,8 @@ export default function SignInPage() {
         await setActive({ session: result.createdSessionId })
         window.location.href = '/register'
       }
+      // console.log("Result is here"+result);
+      
     } catch (err: unknown) {
       const msg =
         (err as { errors?: { message: string }[] })?.errors?.[0]?.message ||

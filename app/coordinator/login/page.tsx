@@ -29,8 +29,10 @@ export default function CoordinatorLogin() {
       const data = await res.json()
       if (res.ok) {
         localStorage.setItem('coordinatorToken', data.token)
+          localStorage.setItem('userRole', 'COORDINATOR');
         localStorage.setItem('coordinatorDistrict', data.user?.district || '')
         router.push('/coordinator/dashboard')
+        // window.location.href = '/coordinator/dashboard'
       } else {
         setError(data.error || 'Login failed')
       }

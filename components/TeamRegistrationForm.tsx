@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form'
 import { Plus, Trash2 } from 'lucide-react'
 import DocumentUpload from '@/components/DocumentUpload'
 
+
 interface Player {
   name: string
   dateOfBirth: string
@@ -44,6 +45,7 @@ const districts = [
 const emptyPlayer = (): Player => ({ name: '', dateOfBirth: '', phone: '', aadhaarNo: '', role: '', aadhaarDoc: '', schoolIdDoc: '', dobProofDoc: '', photoDoc: '' })
 
 export default function TeamRegistrationForm() {
+
   const { register, handleSubmit, formState: { errors } } = useForm<TeamFormData>()
   const [players, setPlayers] = useState<Player[]>([emptyPlayer()])
   const [isSubmitting, setIsSubmitting] = useState(false)

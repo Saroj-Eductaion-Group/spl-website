@@ -29,6 +29,10 @@ export default function AdminLogin() {
       const data = await res.json()
       if (res.ok) {
         localStorage.setItem('adminToken', data.token)
+        localStorage.setItem('userRole', 'ADMIN');
+
+        // window.location.href = '/admin/dashboard'
+
         router.push('/admin/dashboard')
       } else {
         setError(data.error || 'Login failed')

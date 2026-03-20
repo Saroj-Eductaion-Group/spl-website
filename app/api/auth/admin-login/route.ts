@@ -28,6 +28,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 })
     }
 
+    console.log("Login data is"+admin.role);
+    
+
     return NextResponse.json({
       success: true,
       token: signToken({ userId: admin.id, role: 'ADMIN' }),
