@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { UserPlus, FileCheck } from 'lucide-react'
 
 interface Player {
   id: string; name: string; fatherName?: string; phone: string; district: string
@@ -10,6 +9,9 @@ interface Player {
   aadhaarDoc?: string; schoolIdDoc?: string; dobProofDoc?: string; photoDoc?: string
 }
 interface Team { id: string; name: string }
+
+const inputCls = "w-full bg-[#0b0b0f] border border-[#444650]/40 text-[#e4e1e9] px-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 transition-colors"
+const labelCls = "block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2"
 
 export default function CoordinatorPlayers() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -56,67 +58,82 @@ export default function CoordinatorPlayers() {
     loadData(district)
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Unassigned Players</h1>
-        <p className="text-gray-500">{district} District — {players.length} players waiting for team assignment</p>
+        <h1 className="font-headline font-black text-3xl italic uppercase tracking-tighter text-[#e4e1e9]">Unassigned <span className="text-[#ffd700]">Players</span></h1>
+        <p className="text-[#c4c6d0]/60 text-sm mt-1">{district} District — {players.length} players waiting for team assignment</p>
       </div>
-        {/* Assign Modal */}
-        {selectedPlayer && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl max-w-md w-full p-6">
-              <h2 className="text-xl font-bold mb-4 text-primary-600">Assign Player to Team</h2>
-              <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                <p className="font-semibold text-gray-900">{selectedPlayer.name}</p>
-                <p className="text-sm text-gray-500">{selectedPlayer.role} • {selectedPlayer.schoolCollege}</p>
-              </div>
-              <div className="mb-4">
-                <label className="form-label">Select Team</label>
-                <select className="form-input" value={assignTeamId} onChange={e => setAssignTeamId(e.target.value)}>
-                  <option value="">Choose a team</option>
-                  {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                </select>
-              </div>
-              <div className="flex gap-3">
-                <button onClick={assignPlayer} disabled={!assignTeamId || assigning} className="btn-primary disabled:opacity-50 flex-1">{assigning ? 'Assigning...' : 'Assign'}</button>
-                <button onClick={() => { setSelectedPlayer(null); setAssignTeamId('') }} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex-1">Cancel</button>
-              </div>
-            </div>
-          </div>
-        )}
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {players.map(player => (
-            <div key={player.id} className="card">
-              <div className="flex justify-between items-start mb-3">
-                <div>
-                  <h3 className="font-semibold text-gray-900">{player.name}</h3>
-                  {player.fatherName && <p className="text-xs text-gray-500">S/O {player.fatherName}</p>}
-                </div>
-                <span className="bg-primary-100 text-primary-700 text-xs font-semibold px-2 py-1 rounded-full">{player.role}</span>
-              </div>
-              <div className="space-y-1 text-sm text-gray-600 mb-4">
-                <p>📱 {player.phone}</p>
-                <p>🏫 {player.schoolCollege}</p>
-                {player.position && <p>🏏 {player.position.replace('_', ' ')}</p>}
-                {player.experience && <p>⭐ {player.experience}</p>}
-              </div>
-              <div className="flex gap-2 mb-3">
-                {player.aadhaarDoc && <a href={player.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 flex items-center gap-1"><FileCheck className="w-3 h-3" />Aadhaar</a>}
-                {player.schoolIdDoc && <a href={player.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 flex items-center gap-1"><FileCheck className="w-3 h-3" />School ID</a>}
-              </div>
-              <button onClick={() => setSelectedPlayer(player)} className="w-full btn-primary flex items-center justify-center gap-2 text-sm py-2">
-                <UserPlus className="w-4 h-4" /> Assign to Team
+      {/* Assign Modal */}
+      {selectedPlayer && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#131318] border border-[#444650]/30 max-w-md w-full p-6">
+            <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700] mb-5">Assign Player to Team</h2>
+            <div className="bg-[#0b0b0f] border border-[#444650]/20 p-4 mb-5">
+              <p className="font-headline font-bold text-[#e4e1e9]">{selectedPlayer.name}</p>
+              <p className="text-xs text-[#c4c6d0]/60 mt-1">{selectedPlayer.role} • {selectedPlayer.schoolCollege}</p>
+            </div>
+            <div className="mb-5">
+              <label className={labelCls}>Select Team</label>
+              <select className={inputCls} value={assignTeamId} onChange={e => setAssignTeamId(e.target.value)}>
+                <option value="">Choose a team</option>
+                {teams.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+              </select>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={assignPlayer} disabled={!assignTeamId || assigning}
+                className="flex-1 bg-[#ffd700] text-[#002366] py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50">
+                {assigning ? 'Assigning...' : 'Assign'}
+              </button>
+              <button onClick={() => { setSelectedPlayer(null); setAssignTeamId('') }}
+                className="flex-1 border border-[#444650]/40 text-[#c4c6d0] py-2.5 font-headline font-bold uppercase tracking-tight text-sm hover:border-[#ffd700] hover:text-[#ffd700] transition-all">
+                Cancel
               </button>
             </div>
-          ))}
-          {players.length === 0 && (
-            <div className="col-span-3 text-center py-12 text-gray-400">No unassigned players in {district} district</div>
-          )}
+          </div>
         </div>
+      )}
+
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {players.map(player => (
+          <div key={player.id} className="bg-[#131318] border border-[#444650]/20 p-5 hover:border-[#ffd700]/30 transition-colors">
+            <div className="flex justify-between items-start mb-3">
+              <div>
+                <h3 className="font-headline font-bold text-[#e4e1e9]">{player.name}</h3>
+                {player.fatherName && <p className="text-xs text-[#c4c6d0]/50 mt-0.5">S/O {player.fatherName}</p>}
+              </div>
+              <span className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#ffd700] border border-[#ffd700]/30 px-2 py-0.5">{player.role}</span>
+            </div>
+            <div className="space-y-1 text-sm text-[#c4c6d0] mb-4">
+              <p>📱 {player.phone}</p>
+              <p>🏫 {player.schoolCollege}</p>
+              {player.position && <p>🏏 {player.position.replace('_', ' ')}</p>}
+              {player.experience && <p>⭐ {player.experience}</p>}
+            </div>
+            <div className="flex gap-3 mb-4">
+              {player.aadhaarDoc && <a href={player.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ffd700] hover:underline flex items-center gap-1"><span className="material-symbols-outlined" style={{ fontSize: '12px' }}>fact_check</span>Aadhaar</a>}
+              {player.schoolIdDoc && <a href={player.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ffd700] hover:underline flex items-center gap-1"><span className="material-symbols-outlined" style={{ fontSize: '12px' }}>fact_check</span>School ID</a>}
+            </div>
+            <button onClick={() => setSelectedPlayer(player)}
+              className="w-full bg-[#ffd700] text-[#002366] py-2.5 font-headline font-black uppercase tracking-tight text-xs hover:brightness-110 transition-all flex items-center justify-center gap-2">
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>person_add</span> Assign to Team
+            </button>
+          </div>
+        ))}
+        {players.length === 0 && (
+          <div className="col-span-3 text-center py-16 border border-[#444650]/20 bg-[#131318]">
+            <span className="material-symbols-outlined text-[#ffd700]/20 block mb-3" style={{ fontSize: '48px' }}>person_search</span>
+            <p className="font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">No unassigned players in {district} district</p>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

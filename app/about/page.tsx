@@ -1,167 +1,144 @@
-import { Trophy, Users, Calendar, MapPin, Award, GraduationCap } from 'lucide-react'
+import Link from 'next/link'
+
+const stats = [
+  { value: '₹11L', label: 'Winner Prize' },
+  { value: '50%', label: 'Scholarship' },
+  { value: '1 Month', label: 'Duration' },
+  { value: 'Ekana', label: 'Grand Final' },
+]
+
+const features = [
+  { icon: '🏆', title: '₹11,00,000 Prize', desc: 'Massive winner prize money for the champion team' },
+  { icon: '🎓', title: '50% Scholarship', desc: 'All participating players eligible for university scholarship' },
+  { icon: '📅', title: '1 Month Duration', desc: 'Comprehensive tournament spanning across the state' },
+  { icon: '📍', title: 'Ekana Stadium Final', desc: "Grand finale at Lucknow's premier cricket venue" },
+  { icon: '👥', title: 'Statewide Participation', desc: 'Teams from all districts of Uttar Pradesh' },
+  { icon: '⭐', title: 'Professional Standards', desc: 'Tournament conducted with professional cricket standards' },
+]
+
+const reasons = [
+  { title: 'Educational Benefits', desc: '50% scholarship opportunity at Saroj International University' },
+  { title: 'Professional Exposure', desc: 'Play at professional venues with standard equipment' },
+  { title: 'Skill Development', desc: 'Learn from experienced coaches and mentors' },
+  { title: 'Network Building', desc: 'Connect with fellow cricketers and sports professionals' },
+  { title: 'Recognition', desc: 'State-level recognition and media coverage' },
+]
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Page Hero */}
-      <div className="page-hero">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="page-hero-title">About SPL</h1>
-          <p className="page-hero-sub">Uttar Pradesh's Premier Cricket Tournament for Under-19 Students</p>
+    <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
+
+      {/* Hero */}
+      <section className="spl-hero border-b border-[#ffd700]/15">
+        <div className="max-w-screen-xl mx-auto relative z-10">
+          <p className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-4">About SPL</p>
+          <h1 className="font-headline font-black text-5xl md:text-7xl italic uppercase tracking-tighter leading-[0.9] mb-6 text-white">
+            SAROJ <br /><span className="text-[#ffd700]">PREMIER LEAGUE</span>
+          </h1>
+          <p className="text-white/70 text-lg max-w-2xl leading-relaxed">
+            Uttar Pradesh's most prestigious Under-19 cricket tournament for Class 12 students, organized by Saroj Educational Group.
+          </p>
         </div>
-      </div>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-primary-600">Tournament Overview</h2>
-            <p className="text-gray-700 leading-relaxed mb-4">
-              The Saroj Premier League (SPL) is a prestigious Under-19 cricket tournament 
-              organized by Saroj Educational Group in partnership with Saroj International University. 
-              This statewide tournament is exclusively designed for Class 12 students across Uttar Pradesh, 
-              providing them with a platform to showcase their cricketing talent while pursuing their education.
+      </section>
+
+      {/* Stats */}
+      <section className="py-12 px-6 bg-[#131318] border-b border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-6">
+          {stats.map(s => (
+            <div key={s.label} className="text-center border border-[#444650]/20 p-6">
+              <div className="text-4xl font-headline font-black text-[#ffd700] mb-1">{s.value}</div>
+              <div className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Overview */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-8">Tournament Overview</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <p className="text-[#c4c6d0] leading-relaxed">
+              The Saroj Premier League (SPL) is a prestigious Under-19 cricket tournament organized by Saroj Educational Group in partnership with Saroj International University. This statewide tournament is exclusively designed for Class 12 students across Uttar Pradesh, providing them with a platform to showcase their cricketing talent while pursuing their education.
             </p>
-            <p className="text-gray-700 leading-relaxed">
-              With a duration of one month, SPL features simultaneous district-level matches 
-              culminating in a grand finale at the iconic Ekana Cricket Stadium in Lucknow.
+            <p className="text-[#c4c6d0] leading-relaxed">
+              With a duration of one month, SPL features simultaneous district-level matches culminating in a grand finale at the iconic Ekana Cricket Stadium in Lucknow. The tournament bridges sports and academics, offering every participant a 50% scholarship regardless of performance.
             </p>
-          </div>
-
-          {/* Key Features */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="card text-center">
-              <Trophy className="w-12 h-12 text-gold-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">₹11,00,000 Prize</h3>
-              <p className="text-gray-600 text-sm">
-                Massive winner prize money for the champion team
-              </p>
-            </div>
-            
-            <div className="card text-center">
-              <GraduationCap className="w-12 h-12 text-primary-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">50% Scholarship</h3>
-              <p className="text-gray-600 text-sm">
-                All participating players eligible for university scholarship
-              </p>
-            </div>
-            
-            <div className="card text-center">
-              <Calendar className="w-12 h-12 text-primary-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">1 Month Duration</h3>
-              <p className="text-gray-600 text-sm">
-                Comprehensive tournament spanning across the state
-              </p>
-            </div>
-            
-            <div className="card text-center">
-              <MapPin className="w-12 h-12 text-gold-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Ekana Stadium Final</h3>
-              <p className="text-gray-600 text-sm">
-                Grand finale at Lucknow's premier cricket venue
-              </p>
-            </div>
-            
-            <div className="card text-center">
-              <Users className="w-12 h-12 text-primary-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Statewide Participation</h3>
-              <p className="text-gray-600 text-sm">
-                Teams from all districts of Uttar Pradesh
-              </p>
-            </div>
-            
-            <div className="card text-center">
-              <Award className="w-12 h-12 text-gold-500 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold mb-2">Professional Standards</h3>
-              <p className="text-gray-600 text-sm">
-                Tournament conducted with professional cricket standards
-              </p>
-            </div>
-          </div>
-
-          {/* Mission & Vision */}
-          <div className="grid md:grid-cols-2 gap-8 mb-8">
-            <div className="card">
-              <h2 className="text-xl font-semibold mb-4 text-primary-600">Our Mission</h2>
-              <p className="text-gray-700 leading-relaxed">
-                To provide a premier platform for young cricketers in Uttar Pradesh 
-                to showcase their talent, develop their skills, and pursue their 
-                dreams while maintaining focus on their academic excellence.
-              </p>
-            </div>
-            
-            <div className="card">
-              <h2 className="text-xl font-semibold mb-4 text-gold-600">Our Vision</h2>
-              <p className="text-gray-700 leading-relaxed">
-                To become the most prestigious Under-19 cricket tournament in India, 
-                nurturing future cricket stars while promoting education and 
-                sportsmanship among the youth.
-              </p>
-            </div>
-          </div>
-
-          {/* Organizers */}
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-primary-600">Organizers</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold mb-2 text-gold-600">Saroj Educational Group</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  A leading educational institution committed to providing quality education 
-                  and holistic development opportunities for students across various disciplines.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="text-lg font-semibold mb-2 text-primary-600">Saroj International University</h3>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  Academic partner offering scholarships and educational opportunities 
-                  to tournament participants, bridging sports and academics.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Tournament Highlights */}
-          <div className="card">
-            <h2 className="text-2xl font-semibold mb-6 text-primary-600">Why Participate in SPL?</h2>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gold-500 rounded-full mt-2"></div>
-                <p className="text-gray-700">
-                  <strong>Educational Benefits:</strong> 50% scholarship opportunity at Saroj International University
-                </p>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-primary-500 rounded-full mt-2"></div>
-                <p className="text-gray-700">
-                  <strong>Professional Exposure:</strong> Play at professional venues with standard equipment
-                </p>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gold-500 rounded-full mt-2"></div>
-                <p className="text-gray-700">
-                  <strong>Skill Development:</strong> Learn from experienced coaches and mentors
-                </p>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-primary-500 rounded-full mt-2"></div>
-                <p className="text-gray-700">
-                  <strong>Network Building:</strong> Connect with fellow cricketers and sports professionals
-                </p>
-              </div>
-              
-              <div className="flex items-start space-x-3">
-                <div className="w-2 h-2 bg-gold-500 rounded-full mt-2"></div>
-                <p className="text-gray-700">
-                  <strong>Recognition:</strong> State-level recognition and media coverage
-                </p>
-              </div>
-            </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-16 px-6 bg-[#131318] border-y border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-10">Key Highlights</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {features.map(f => (
+              <div key={f.title} className="bg-[#0b0b0f] border border-[#444650]/20 p-6 hover:border-[#ffd700]/40 transition-colors">
+                <div className="text-3xl mb-4">{f.icon}</div>
+                <h3 className="font-headline font-black text-lg uppercase mb-2">{f.title}</h3>
+                <p className="text-[#c4c6d0] text-sm leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Mission & Vision */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-8">
+          <div className="border-l-4 border-[#ffd700] pl-8">
+            <h2 className="font-headline font-black text-2xl uppercase tracking-tighter italic mb-4 text-[#ffd700]">Our Mission</h2>
+            <p className="text-[#c4c6d0] leading-relaxed">
+              To provide a premier platform for young cricketers in Uttar Pradesh to showcase their talent, develop their skills, and pursue their dreams while maintaining focus on their academic excellence.
+            </p>
+          </div>
+          <div className="border-l-4 border-[#444650] pl-8">
+            <h2 className="font-headline font-black text-2xl uppercase tracking-tighter italic mb-4">Our Vision</h2>
+            <p className="text-[#c4c6d0] leading-relaxed">
+              To become the most prestigious Under-19 cricket tournament in India, nurturing future cricket stars while promoting education and sportsmanship among the youth.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Participate */}
+      <section className="py-16 px-6 bg-[#131318] border-y border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-10">Why Participate in SPL?</h2>
+          <div className="space-y-4">
+            {reasons.map((r, i) => (
+              <div key={r.title} className="flex items-start gap-6 border-b border-[#444650]/15 pb-4">
+                <span className="text-2xl font-headline font-black text-[#ffd700]/30 w-8 flex-shrink-0">0{i + 1}</span>
+                <div>
+                  <h3 className="font-headline font-bold uppercase tracking-tight mb-1">{r.title}</h3>
+                  <p className="text-[#c4c6d0] text-sm">{r.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20 text-center">
+        <div className="max-w-2xl mx-auto">
+          <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter mb-6 text-white">
+            Ready to <span className="text-[#ffd700]">Join?</span>
+          </h2>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/register?type=team" className="bg-[#ffd700] text-[#002366] px-8 py-3 font-headline font-black uppercase tracking-tight hover:brightness-110 transition-all">
+              Register Team
+            </Link>
+            <Link href="/register?type=individual" className="border-2 border-[#ffd700] text-[#ffd700] px-8 py-3 font-headline font-black uppercase tracking-tight hover:bg-[#ffd700] hover:text-[#002366] transition-all">
+              Register Individual
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   )
 }

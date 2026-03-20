@@ -1,94 +1,57 @@
 import Link from 'next/link'
-import Image from 'next/image'
-import { Mail, Phone, MapPin } from 'lucide-react'
 
 export default function Footer() {
   return (
-    <footer className="bg-gray-900 text-white py-12">
-      <div className="container mx-auto px-4">
-        <div className="grid md:grid-cols-4 gap-8">
-          {/* Logo & Description */}
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="relative w-10 h-10 rounded-xl overflow-hidden ring-2 ring-primary-500/40">
-                <Image src="/Hero.png" alt="SPL" fill className="object-cover" />
-              </div>
-              <div>
-                <div className="text-xl font-bold">SPL Under-19</div>
-                <div className="text-xs text-primary-400 tracking-widest uppercase">Saroj Premier League</div>
-              </div>
-            </div>
-            <p className="text-gray-400 text-sm">
-              Uttar Pradesh's premier cricket tournament for Class 12 students, 
-              organized by Saroj Educational Group.
-            </p>
-          </div>
+    <footer className="bg-[#001a4d] border-t border-[#ffd700]/15 pb-20 lg:pb-0">
+      {/* Gold top bar */}
+      <div className="w-full h-1 bg-gradient-to-r from-[#ffd700] via-[#ffe566] to-[#ffd700]" />
 
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
-            <div className="space-y-2">
-              <Link href="/about" className="block text-gray-400 hover:text-white transition-colors">
-                About SPL
-              </Link>
-              <Link href="/tournament-format" className="block text-gray-400 hover:text-white transition-colors">
-                Tournament Format
-              </Link>
-              <Link href="/eligibility" className="block text-gray-400 hover:text-white transition-colors">
-                Eligibility & Rules
-              </Link>
-              <Link href="/schedule" className="block text-gray-400 hover:text-white transition-colors">
-                Schedule
-              </Link>
-            </div>
-          </div>
+      <div className="max-w-screen-2xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 px-8 py-16">
 
-          {/* Registration */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Registration</h3>
-            <div className="space-y-2">
-              <Link href="/register?type=team" className="block text-gray-400 hover:text-white transition-colors">
-                Team Registration
-              </Link>
-              <Link href="/register?type=individual" className="block text-gray-400 hover:text-white transition-colors">
-                Individual Registration
-              </Link>
-              <Link href="/prizes" className="block text-gray-400 hover:text-white transition-colors">
-                Prize Money
-              </Link>
-              <Link href="/scholarships" className="block text-gray-400 hover:text-white transition-colors">
-                Scholarships
-              </Link>
-            </div>
+        <div>
+          <div className="flex items-center gap-2 mb-4">
+            <span className="w-8 h-8 bg-[#ffd700] flex items-center justify-center flex-shrink-0">
+              <span className="material-symbols-outlined text-[#002366]" style={{ fontSize: '16px' }}>sports_cricket</span>
+            </span>
+            <span className="text-xl font-headline font-black italic uppercase">
+              <span className="text-[#ffd700]">Saroj</span><span className="text-white"> Premier</span>
+            </span>
           </div>
-
-          {/* Contact Info */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Contact Us</h3>
-            <div className="space-y-3">
-              <div className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-gold-400" />
-                <span className="text-gray-400 text-sm">info@splcricket.com</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-gold-400" />
-                <span className="text-gray-400 text-sm">+91 XXXXX XXXXX</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <MapPin className="w-4 h-4 text-gold-400" />
-                <span className="text-gray-400 text-sm">Lucknow, Uttar Pradesh</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400 text-sm">
-            © 2026 Saroj Premier League. All rights reserved. | 
-            <span className="text-gold-400"> Organized by Saroj Educational Group</span>
+          <p className="text-white/50 text-sm font-body leading-relaxed mb-6">
+            Uttar Pradesh's premier cricket tournament for Class 12 students, organized by Saroj Educational Group.
           </p>
+          <div className="flex gap-3">
+            {['public', 'share', 'forum'].map(icon => (
+              <span key={icon} className="w-9 h-9 bg-[#002366] border border-[#ffd700]/20 flex items-center justify-center text-white/40 hover:text-[#ffd700] hover:border-[#ffd700]/60 cursor-pointer transition-colors">
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>{icon}</span>
+              </span>
+            ))}
+          </div>
         </div>
+
+        <nav className="flex flex-col gap-3 font-body text-sm">
+          <h5 className="text-[#ffd700] font-headline font-bold uppercase tracking-widest mb-2">League</h5>
+          <Link href="/about" className="text-white/50 hover:text-[#ffd700] transition-all">About SPL</Link>
+          <Link href="/tournament-format" className="text-white/50 hover:text-[#ffd700] transition-all">Tournament Format</Link>
+          <Link href="/eligibility" className="text-white/50 hover:text-[#ffd700] transition-all">Eligibility & Rules</Link>
+          <Link href="/scholarships" className="text-white/50 hover:text-[#ffd700] transition-all">Scholarship Info</Link>
+          <Link href="/sponsors" className="text-white/50 hover:text-[#ffd700] transition-all">Sponsors</Link>
+        </nav>
+
+        <nav className="flex flex-col gap-3 font-body text-sm">
+          <h5 className="text-[#ffd700] font-headline font-bold uppercase tracking-widest mb-2">Support</h5>
+          <Link href="/schedule" className="text-white/50 hover:text-[#ffd700] transition-all">Match Schedule</Link>
+          <Link href="/prizes" className="text-white/50 hover:text-[#ffd700] transition-all">Prize Money</Link>
+          <Link href="/contact" className="text-white/50 hover:text-[#ffd700] transition-all">Contact Us</Link>
+          <Link href="/admin/login" className="text-white/50 hover:text-[#ffd700] transition-all">Admin Login</Link>
+          <Link href="/coordinator/login" className="text-white/50 hover:text-[#ffd700] transition-all">Coordinator Login</Link>
+        </nav>
       </div>
+
+      <div className="w-full h-px bg-[#ffd700]/10 max-w-screen-2xl mx-auto" />
+      <p className="font-body text-xs uppercase tracking-widest text-white/30 text-center py-8">
+        © 2025 Saroj Premier League. All Rights Reserved. | Organized by Saroj Educational Group
+      </p>
     </footer>
   )
 }

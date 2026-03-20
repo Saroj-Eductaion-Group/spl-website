@@ -85,7 +85,10 @@ export const sendPaymentReceiptEmail = async (email: string, name: string, regis
   })
 }
 
-export const sendTeamAssignmentEmail = async (email: string, playerName: string, teamName: string, district: string) => {
+export const sendTeamAssignmentEmail = async (
+  email: string, playerName: string, teamName: string, district: string,
+  managerName?: string, managerPhone?: string, coachName?: string, coachPhone?: string, teamEmail?: string
+) => {
   await transporter.sendMail({
     from, to: email,
     subject: `SPL — You've Been Assigned to a Team!`,
@@ -97,7 +100,14 @@ export const sendTeamAssignmentEmail = async (email: string, playerName: string,
         <p><strong>Assigned Team:</strong> ${s(teamName)}</p>
         <p><strong>District:</strong> ${s(district)}</p>
       </div>
-      <p>Please stay in touch with your team manager for further details.</p>
+      ${(managerName || coachName || teamEmail) ? `
+      <div style="background:#eff6ff;padding:20px;border-radius:8px;margin:20px 0;border-left:4px solid #1e40af;">
+        <p style="font-weight:bold;margin-bottom:12px;">Team Contact Details</p>
+        ${managerName ? `<p>👤 <strong>Manager:</strong> ${s(managerName)}${managerPhone ? ` — <a href="tel:${s(managerPhone)}">${s(managerPhone)}</a>` : ''}</p>` : ''}
+        ${coachName ? `<p>🏏 <strong>Coach:</strong> ${s(coachName)}${coachPhone ? ` — <a href="tel:${s(coachPhone)}">${s(coachPhone)}</a>` : ''}</p>` : ''}
+        ${teamEmail ? `<p>✉️ <strong>Email:</strong> <a href="mailto:${s(teamEmail)}">${s(teamEmail)}</a></p>` : ''}
+      </div>` : ''}
+      <p>Please contact your team manager immediately to confirm your availability and get practice schedule details.</p>
       <p>Best regards,<br/>SPL Tournament Committee</p>
     </div>`
   })

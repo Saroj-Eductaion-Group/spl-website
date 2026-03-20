@@ -28,13 +28,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Update payment record — team or individual
-    if (teamId) {
+    if (teamId && teamId.length === 24) {
       await prisma.payment.updateMany({
         where: { teamId },
         data: { status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
       })
-    } else if (playerId) {
-      // Create a payment record for individual player
+    } else if (playerId && playerId.length === 24) {
       await prisma.payment.create({
         data: { amount: parseInt(amount), status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
       })

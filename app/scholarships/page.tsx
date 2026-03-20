@@ -1,161 +1,116 @@
-import { GraduationCap, CheckCircle, BookOpen, Award, Users, Star } from 'lucide-react'
 import Link from 'next/link'
+
+const benefits = ['50% reduction in tuition fees', 'Applicable to all undergraduate programs', 'Valid for entire course duration', 'Additional sports quota benefits', 'Priority admission consideration']
+const conditions = ['Must be a registered SPL U19 participant', 'Complete tournament participation', 'Meet university admission criteria', 'Maintain academic standards', 'No disciplinary issues during tournament']
+const steps = [
+  { n: '01', title: 'Register & Participate', desc: 'Register for SPL U19 and participate in tournament matches as per schedule.' },
+  { n: '02', title: 'Receive Certificate', desc: 'Get your official SPL participation certificate after tournament completion.' },
+  { n: '03', title: 'Apply to University', desc: 'Submit your application to Saroj International University along with your SPL certificate.' },
+  { n: '04', title: 'Scholarship Approved', desc: 'Receive 50% scholarship on tuition fees upon admission confirmation.' },
+]
 
 export default function Scholarships() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="page-hero">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="page-hero-title">Scholarship Program</h1>
-          <p className="page-hero-sub">50% Scholarship for Every SPL Participant</p>
+    <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
+
+      {/* Hero */}
+      <section className="spl-hero border-b border-[#ffd700]/15">
+        <div className="max-w-screen-xl mx-auto relative z-10">
+          <p className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-4">Scholarship</p>
+          <h1 className="font-headline font-black text-5xl md:text-7xl italic uppercase tracking-tighter leading-[0.9] mb-6 text-white">
+            50% <br /><span className="text-[#ffd700]">SCHOLARSHIP</span>
+          </h1>
+          <p className="text-white/70 text-lg max-w-2xl">For every SPL participant — regardless of performance</p>
         </div>
-      </div>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+      </section>
 
-          {/* Hero Banner */}
-          <div className="card mb-8 bg-gradient-to-r from-primary-600 to-primary-800 text-white text-center">
-            <div className="text-7xl font-bold mb-2">50%</div>
-            <h2 className="text-2xl font-bold mb-3">Scholarship on Tuition Fees</h2>
-            <p className="text-primary-100 text-lg">
-              Every player who participates in SPL U19 is eligible for a 50% scholarship
-              at <strong>Saroj International University</strong>
-            </p>
-            <p className="text-primary-200 text-sm mt-3">
-              Regardless of your team's performance — just participate and you qualify.
-            </p>
-          </div>
+      {/* Big Number */}
+      <section className="py-20 px-6 bg-[#131318] border-b border-[#444650]/15 text-center">
+        <div className="text-[12rem] font-headline font-black text-[#ffd700] leading-none tracking-tighter">50%</div>
+        <p className="text-2xl font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mt-4">Scholarship on Tuition Fees</p>
+        <p className="text-[#c4c6d0] mt-4 max-w-xl mx-auto">
+          Every player who participates in SPL U19 is eligible for a 50% scholarship at <strong className="text-[#e4e1e9]">Saroj International University</strong>
+        </p>
+      </section>
 
-          {/* Key Facts */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="card text-center">
-              <Users className="w-10 h-10 text-primary-500 mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">All Players</h3>
-              <p className="text-gray-600 text-sm">Every registered player — team or individual — is eligible</p>
-            </div>
-            <div className="card text-center">
-              <Award className="w-10 h-10 text-gold-500 mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">50% Off Tuition</h3>
-              <p className="text-gray-600 text-sm">Half the tuition fee waived for the entire course duration</p>
-            </div>
-            <div className="card text-center">
-              <BookOpen className="w-10 h-10 text-green-500 mx-auto mb-3" />
-              <h3 className="font-bold text-lg mb-1">All UG Programs</h3>
-              <p className="text-gray-600 text-sm">Applicable to all undergraduate programs at Saroj International University</p>
-            </div>
-          </div>
-
-          {/* Scholarship Details */}
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-primary-600">Scholarship Details</h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h3 className="font-semibold text-lg mb-3 text-primary-600">What You Get</h3>
-                <ul className="space-y-3">
-                  {[
-                    '50% reduction in tuition fees',
-                    'Applicable to all undergraduate programs',
-                    'Valid for entire course duration',
-                    'Additional sports quota benefits',
-                    'Priority admission consideration',
-                  ].map(item => (
-                    <li key={item} className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <h3 className="font-semibold text-lg mb-3 text-primary-600">Eligibility Conditions</h3>
-                <ul className="space-y-3">
-                  {[
-                    'Must be a registered SPL U19 participant',
-                    'Complete tournament participation',
-                    'Meet university admission criteria',
-                    'Maintain academic standards',
-                    'No disciplinary issues during tournament',
-                  ].map(item => (
-                    <li key={item} className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-primary-500 mt-0.5 flex-shrink-0" />
-                      <span className="text-gray-700">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-
-          {/* Scholarship Acknowledgement — from document Section G */}
-          <div className="card mb-8 bg-primary-50 border border-primary-200">
-            <h2 className="text-xl font-semibold mb-4 text-primary-700">Scholarship Acknowledgement</h2>
-            <p className="text-gray-700 mb-3">By participating in SPL, every player acknowledges that:</p>
-            <ul className="space-y-2 text-gray-700">
-              <li className="flex items-start gap-2">
-                <Star className="w-4 h-4 text-gold-500 mt-1 flex-shrink-0" />
-                Participation in SPL makes them eligible for 50% scholarship
-              </li>
-              <li className="flex items-start gap-2">
-                <Star className="w-4 h-4 text-gold-500 mt-1 flex-shrink-0" />
-                Scholarship is applicable at Saroj International University
-              </li>
-              <li className="flex items-start gap-2">
-                <Star className="w-4 h-4 text-gold-500 mt-1 flex-shrink-0" />
-                Admission is subject to university norms and eligibility criteria
-              </li>
+      {/* Details */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto grid md:grid-cols-2 gap-8">
+          <div className="bg-[#131318] border border-[#444650]/20 p-8">
+            <h3 className="font-headline font-black text-xl uppercase tracking-tighter text-[#ffd700] mb-6">What You Get</h3>
+            <ul className="space-y-4">
+              {benefits.map(b => (
+                <li key={b} className="flex items-start gap-4 border-b border-[#444650]/10 pb-4 last:border-0 last:pb-0">
+                  <span className="w-5 h-5 bg-[#ffd700] text-[#002366] rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black mt-0.5">✓</span>
+                  <span className="text-[#c4c6d0] text-sm">{b}</span>
+                </li>
+              ))}
             </ul>
           </div>
-
-          {/* How to Apply */}
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-primary-600">How to Claim Your Scholarship</h2>
-            <div className="space-y-5">
-              {[
-                { step: 1, title: 'Register & Participate', desc: 'Register for SPL U19 and participate in tournament matches as per schedule.' },
-                { step: 2, title: 'Receive Participation Certificate', desc: 'Get your official SPL participation certificate after tournament completion.' },
-                { step: 3, title: 'Apply to Saroj International University', desc: 'Submit your application to Saroj International University along with your SPL certificate.' },
-                { step: 4, title: 'Scholarship Approved', desc: 'Receive 50% scholarship on tuition fees upon admission confirmation.' },
-              ].map(item => (
-                <div key={item.step} className="flex items-start gap-4">
-                  <div className="w-9 h-9 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
-                    {item.step}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{item.title}</h3>
-                    <p className="text-gray-600 text-sm">{item.desc}</p>
-                  </div>
-                </div>
+          <div className="bg-[#131318] border border-[#444650]/20 p-8">
+            <h3 className="font-headline font-black text-xl uppercase tracking-tighter text-[#ffd700] mb-6">Eligibility Conditions</h3>
+            <ul className="space-y-4">
+              {conditions.map(c => (
+                <li key={c} className="flex items-start gap-4 border-b border-[#444650]/10 pb-4 last:border-0 last:pb-0">
+                  <span className="w-5 h-5 bg-[#444650] text-[#e4e1e9] rounded-full flex items-center justify-center flex-shrink-0 text-xs font-black mt-0.5">→</span>
+                  <span className="text-[#c4c6d0] text-sm">{c}</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
-
-          {/* About Saroj International University */}
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-4 text-primary-600">About Saroj International University</h2>
-            <p className="text-gray-700 mb-4">
-              Saroj International University is the academic partner of SPL, committed to nurturing
-              young talent both on and off the cricket field. The university offers a wide range of
-              undergraduate programs and provides a world-class learning environment.
-            </p>
-            <div className="bg-gold-50 border border-gold-200 rounded-lg p-4">
-              <p className="text-gold-800 font-medium text-sm">
-                🎓 This scholarship is exclusively for SPL U19 participants — one more reason to register and play!
-              </p>
-            </div>
-          </div>
-
-          {/* CTA */}
-          <div className="card text-center bg-gradient-to-r from-primary-50 to-gold-50">
-            <h2 className="text-2xl font-bold mb-3 text-primary-600">Ready to Play & Earn Your Scholarship?</h2>
-            <p className="text-gray-600 mb-6">Register for SPL U19 today and secure your 50% scholarship at Saroj International University.</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register?type=team" className="btn-primary px-8 py-3">Register as Team</Link>
-              <Link href="/register?type=individual" className="bg-gold-500 hover:bg-gold-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">Register as Individual</Link>
-            </div>
-          </div>
-
         </div>
-      </div>
+      </section>
+
+      {/* Acknowledgement */}
+      <section className="py-16 px-6 bg-[#131318] border-y border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-8">Scholarship Acknowledgement</h2>
+          <div className="bg-[#ffd700]/5 border border-[#ffd700]/20 p-8">
+            <p className="text-[#c4c6d0] mb-6">By participating in SPL, every player acknowledges that:</p>
+            <ul className="space-y-4">
+              {['Participation in SPL makes them eligible for 50% scholarship', 'Scholarship is applicable at Saroj International University', 'Admission is subject to university norms and eligibility criteria'].map(a => (
+                <li key={a} className="flex items-start gap-4 text-[#c4c6d0] text-sm">
+                  <span className="text-[#ffd700] font-black flex-shrink-0">★</span>{a}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Steps */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-10">How to Claim Your Scholarship</h2>
+          <div className="grid md:grid-cols-4 gap-0">
+            {steps.map((s, i) => (
+              <div key={s.n} className={`p-8 border-b md:border-b-0 md:border-r border-[#444650]/15 ${i === steps.length - 1 ? 'md:border-r-0' : ''}`}>
+                <div className="text-5xl font-headline font-black text-[#ffd700]/20 mb-4">{s.n}</div>
+                <h3 className="font-headline font-bold uppercase tracking-tight mb-2 text-sm">{s.title}</h3>
+                <p className="text-[#c4c6d0] text-xs leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20 text-center">
+        <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter mb-4 text-white">
+          Play & Earn Your <span className="text-[#ffd700]">Scholarship</span>
+        </h2>
+        <p className="text-white/70 mb-8 max-w-xl mx-auto">Register for SPL U19 today and secure your 50% scholarship at Saroj International University.</p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/register?type=team" className="bg-[#ffd700] text-[#002366] px-8 py-3 font-headline font-black uppercase tracking-tight hover:brightness-110 transition-all">
+            Register as Team
+          </Link>
+          <Link href="/register?type=individual" className="border-2 border-[#ffd700] text-[#ffd700] px-8 py-3 font-headline font-black uppercase tracking-tight hover:bg-[#ffd700] hover:text-[#002366] transition-all">
+            Register as Individual
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }

@@ -19,7 +19,8 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
       include: {
         _count: { select: { players: true } },
-        payments: { select: { status: true, transactionId: true, amount: true } }
+        payments: { select: { status: true, transactionId: true, amount: true } },
+        players: { select: { id: true, name: true, role: true, phone: true, district: true, schoolCollege: true, isIndividual: true }, orderBy: { createdAt: 'asc' } }
       }
     })
 
@@ -32,6 +33,7 @@ export async function GET(req: NextRequest) {
           district: team.district,
           status: team.status,
           playerCount: team._count.players,
+          players: team.players,
           payment: team.payments[0] || null,
           createdAt: team.createdAt
         }
@@ -42,7 +44,16 @@ export async function GET(req: NextRequest) {
     const player = await prisma.player.findFirst({
       where: { createdById: dbUser.id, isIndividual: true },
       orderBy: { createdAt: 'desc' },
-      include: { team: { select: { name: true, district: true } } }
+      include: {
+        team: {
+          select: {
+            name: true, district: true, schoolCollege: true,
+            managerName: true, managerPhone: true,
+            coachName: true, coachPhone: true,
+            contactEmail: true, registrationId: true
+          }
+        }
+      }
     })
 
     if (player) {

@@ -1,11 +1,8 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { CheckCircle, Copy, ArrowRight, Phone, Mail, Trophy, GraduationCap } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
-import { useState } from 'react'
 import SponsorStrip from '@/components/SponsorStrip'
 
 function SuccessContent() {
@@ -24,135 +21,127 @@ function SuccessContent() {
 
   const isTeam = type === 'team'
 
-  return (
-    <div className="min-h-screen bg-gray-50">
+  const nextSteps = isTeam ? [
+    'A confirmation email has been sent to your registered email address',
+    'Your team documents will be reviewed by the District Coordinator',
+    'You will receive an approval or rejection notification via email & SMS',
+    'Approved teams will receive match schedule notifications',
+  ] : [
+    'A confirmation email has been sent to your registered email address',
+    'Your profile has been submitted to the District Coordinator',
+    'You will be assigned to a district-level team based on your role & availability',
+    'You will be notified via email & SMS once a team is assigned',
+  ]
 
-      {/* Hero confirmation bar */}
-      <div className="bg-gradient-to-r from-green-600 to-green-700 py-3 text-center">
-        <p className="text-white text-sm font-semibold tracking-wide">
+  return (
+    <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
+
+      {/* Top bar */}
+      <div className="bg-emerald-600 py-3 text-center">
+        <p className="text-white text-sm font-headline font-bold uppercase tracking-widest">
           🎉 Registration Confirmed — Welcome to Saroj Premier League U19!
         </p>
       </div>
 
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto px-6 py-12">
 
-          {/* Main card */}
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden mb-8">
+        {/* Success Card */}
+        <div className="bg-[#131318] border border-[#444650]/20 overflow-hidden mb-6">
 
-            {/* Top success banner */}
-            <div className="bg-gradient-to-r from-green-500 to-green-600 px-8 py-10 text-center">
-              <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-12 h-12 text-white" />
+          {/* Top banner */}
+          <div className="bg-emerald-600 px-8 py-10 text-center">
+            <div className="w-20 h-20 bg-white/20 flex items-center justify-center mx-auto mb-4">
+              <span className="material-symbols-outlined text-white" style={{ fontSize: '48px' }}>check_circle</span>
+            </div>
+            <h1 className="font-headline font-black text-3xl italic uppercase tracking-tighter text-white mb-2">Payment Successful!</h1>
+            <p className="text-emerald-100 text-sm">
+              {isTeam ? `Team "${name}" is now registered for SPL U19` : `${name} is now registered as an individual player`}
+            </p>
+          </div>
+
+          <div className="px-8 py-8 space-y-6">
+
+            {/* Registration ID */}
+            <div className="bg-emerald-400/5 border border-emerald-400/20 p-6 text-center">
+              <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/60 mb-3">Your Registration ID</p>
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <span className="text-3xl font-headline font-black text-emerald-400 tracking-widest">{registrationId}</span>
+                <button onClick={copyId} className="w-9 h-9 bg-emerald-400/10 border border-emerald-400/30 flex items-center justify-center text-emerald-400 hover:bg-emerald-400/20 transition-colors" title="Copy ID">
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>content_copy</span>
+                </button>
               </div>
-              <h1 className="text-3xl font-extrabold text-white mb-2">Payment Successful!</h1>
-              <p className="text-green-100 text-base">
-                {isTeam
-                  ? `Team "${name}" is now registered for SPL U19`
-                  : `${name} is now registered as an individual player`}
+              {copied && <p className="text-xs text-emerald-400 font-headline font-bold">✓ Copied to clipboard</p>}
+              {txnid && <p className="text-xs text-[#c4c6d0]/50 mt-2">Transaction ID: {txnid}</p>}
+              <p className="text-xs text-[#c4c6d0]/60 mt-3 bg-[#ffd700]/5 border border-[#ffd700]/20 px-3 py-2">
+                ⚠️ Save this ID — you will need it for all future correspondence
               </p>
             </div>
 
-            <div className="px-8 py-8 space-y-6">
+            {/* Next Steps */}
+            <div className="bg-[#002366]/30 border border-[#ffd700]/15 p-6">
+              <h3 className="font-headline font-bold uppercase tracking-tight text-[#ffd700] mb-4 flex items-center gap-2">
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>arrow_forward</span> What Happens Next
+              </h3>
+              <ol className="space-y-3">
+                {nextSteps.map((step, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-[#c4c6d0]">
+                    <span className="w-5 h-5 bg-[#ffd700]/20 text-[#ffd700] font-headline font-black text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
 
-              {/* Registration ID */}
-              <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-6 text-center">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mb-2">Your Registration ID</p>
-                <div className="flex items-center justify-center gap-3 mb-2">
-                  <span className="text-3xl font-extrabold text-green-700 tracking-widest font-mono">{registrationId}</span>
-                  <button onClick={copyId} className="w-9 h-9 rounded-xl bg-green-100 hover:bg-green-200 flex items-center justify-center text-green-600 transition-colors" title="Copy ID">
-                    <Copy className="w-4 h-4" />
-                  </button>
-                </div>
-                {copied && <p className="text-xs text-green-600 font-semibold">✓ Copied to clipboard</p>}
-                {txnid && <p className="text-xs text-gray-400 mt-2">Transaction ID: {txnid}</p>}
-                <p className="text-xs text-gray-500 mt-2 bg-yellow-50 border border-yellow-200 rounded-lg px-3 py-2">
-                  ⚠️ Save this ID — you will need it for all future correspondence
+            {/* Scholarship */}
+            <div className="bg-[#131318] border border-[#ffd700]/20 p-5 flex items-start gap-4">
+              <div className="w-10 h-10 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center flex-shrink-0">
+                <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '20px' }}>school</span>
+              </div>
+              <div>
+                <p className="font-headline font-black uppercase tracking-tight text-[#ffd700] text-sm">50% Scholarship Unlocked!</p>
+                <p className="text-[#c4c6d0] text-xs mt-1">
+                  By participating in SPL U19, you are now eligible for a 50% scholarship at Saroj International University.{' '}
+                  <Link href="/scholarships" className="text-[#ffd700] underline font-semibold">Learn more →</Link>
                 </p>
               </div>
+            </div>
 
-              {/* Next steps */}
-              <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
-                <h3 className="font-bold text-blue-800 mb-4 flex items-center gap-2">
-                  <ArrowRight className="w-4 h-4" /> What Happens Next
-                </h3>
-                <ol className="space-y-3">
-                  {isTeam ? [
-                    'A confirmation email has been sent to your registered email address',
-                    'Your team documents will be reviewed by the District Coordinator',
-                    'You will receive an approval or rejection notification via email & SMS',
-                    'Approved teams will receive match schedule notifications',
-                  ] : [
-                    'A confirmation email has been sent to your registered email address',
-                    'Your profile has been submitted to the District Coordinator',
-                    'You will be assigned to a district-level team based on your role & availability',
-                    'You will be notified via email & SMS once a team is assigned',
-                  ].map((step, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-blue-700">
-                      <span className="w-5 h-5 rounded-full bg-blue-200 text-blue-700 font-bold text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                      {step}
-                    </li>
-                  ))}
-                </ol>
+            {/* Prize */}
+            <div className="bg-[#131318] border border-[#ffd700]/20 p-5 flex items-start gap-4">
+              <div className="w-10 h-10 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center flex-shrink-0">
+                <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '20px' }}>emoji_events</span>
               </div>
-
-              {/* Scholarship reminder */}
-              <div className="bg-gradient-to-r from-primary-50 to-gold-50 border border-primary-200 rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <GraduationCap className="w-5 h-5 text-primary-600" />
-                </div>
-                <div>
-                  <p className="font-bold text-primary-700 text-sm">50% Scholarship Unlocked!</p>
-                  <p className="text-primary-600 text-xs mt-1">
-                    By participating in SPL U19, you are now eligible for a 50% scholarship at Saroj International University.
-                    <Link href="/scholarships" className="underline ml-1 font-semibold">Learn more →</Link>
-                  </p>
-                </div>
+              <div>
+                <p className="font-headline font-black uppercase tracking-tight text-[#ffd700] text-sm">₹11,00,000 Winner Prize</p>
+                <p className="text-[#c4c6d0] text-xs mt-1">Grand Final at Ekana Cricket Stadium, Lucknow. Give it your best shot!</p>
               </div>
+            </div>
 
-              {/* Prize reminder */}
-              <div className="bg-gradient-to-r from-gold-50 to-yellow-50 border border-gold-200 rounded-2xl p-5 flex items-start gap-4">
-                <div className="w-10 h-10 bg-gold-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Trophy className="w-5 h-5 text-gold-600" />
-                </div>
-                <div>
-                  <p className="font-bold text-gold-700 text-sm">₹11,00,000 Winner Prize</p>
-                  <p className="text-gold-600 text-xs mt-1">
-                    Grand Final at Ekana Cricket Stadium, Lucknow. Give it your best shot!
-                  </p>
-                </div>
+            {/* Actions */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <Link href="/" className="flex-1 bg-[#ffd700] text-[#002366] py-3.5 font-headline font-black uppercase tracking-tight text-center hover:brightness-110 transition-all">
+                Back to Home
+              </Link>
+              <Link href="/schedule" className="flex-1 text-center py-3.5 border-2 border-[#ffd700] text-[#ffd700] font-headline font-black uppercase tracking-tight hover:bg-[#ffd700] hover:text-[#002366] transition-all">
+                View Schedule
+              </Link>
+            </div>
+
+            {/* Support */}
+            <div className="border-t border-[#444650]/20 pt-5 flex flex-col sm:flex-row gap-4 text-sm text-[#c4c6d0]/60">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>mail</span>
+                <span>support@splcricket.com</span>
               </div>
-
-              {/* Actions */}
-              <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                <Link href="/" className="flex-1 btn-primary text-center py-3.5">
-                  Back to Home
-                </Link>
-                <Link href="/schedule" className="flex-1 text-center py-3.5 rounded-xl border-2 border-primary-200 text-primary-600 font-semibold hover:bg-primary-50 transition-colors">
-                  View Schedule
-                </Link>
-              </div>
-
-              {/* Support */}
-              <div className="border-t border-gray-100 pt-5 flex flex-col sm:flex-row gap-4 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <Mail className="w-4 h-4 text-gray-400" />
-                  <span>support@splcricket.com</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Phone className="w-4 h-4 text-gray-400" />
-                  <span>+91 XXXXX XXXXX</span>
-                </div>
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>phone</span>
+                <span>+91 XXXXX XXXXX</span>
               </div>
             </div>
           </div>
-
-          {/* Logo */}
-          <div className="text-center mb-8">
-            <Image src="/Hero.png" alt="SPL" width={80} height={50} className="object-contain mx-auto opacity-60" />
-            <p className="text-xs text-gray-400 mt-2">© 2025 Saroj Premier League. All rights reserved.</p>
-          </div>
         </div>
+
+        <p className="text-center text-xs text-[#c4c6d0]/30 font-body">© 2025 Saroj Premier League. All rights reserved.</p>
       </div>
 
       <SponsorStrip />
@@ -162,7 +151,7 @@ function SuccessContent() {
 
 export default function PaymentSuccess() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" /></div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#0b0b0f] flex items-center justify-center"><span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" /></div>}>
       <SuccessContent />
     </Suspense>
   )

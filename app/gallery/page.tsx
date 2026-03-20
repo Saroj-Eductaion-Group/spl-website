@@ -1,20 +1,10 @@
 'use client'
 
-import { Camera, Play, Image as ImageIcon } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
-interface GalleryItem {
-  id: string; title: string; url: string; category: string; type: string; active: boolean
-}
+interface GalleryItem { id: string; title: string; url: string; category: string; type: string; active: boolean }
 
 const CATEGORIES = ['All', 'Events', 'Matches', 'Training', 'Registration', 'General']
-
-const gradients = [
-  'from-blue-500 to-blue-700', 'from-primary-500 to-primary-700',
-  'from-green-500 to-green-700', 'from-purple-500 to-purple-700',
-  'from-red-500 to-red-700', 'from-yellow-500 to-yellow-700',
-  'from-indigo-500 to-indigo-700', 'from-teal-500 to-teal-700',
-]
 
 export default function Gallery() {
   const [items, setItems] = useState<GalleryItem[]>([])
@@ -23,11 +13,9 @@ export default function Gallery() {
   const [lightbox, setLightbox] = useState<GalleryItem | null>(null)
 
   useEffect(() => {
-    fetch('/api/admin/gallery')
-      .then(r => r.json())
+    fetch('/api/admin/gallery').then(r => r.json())
       .then(data => { if (Array.isArray(data)) setItems(data.filter((i: GalleryItem) => i.active)) })
-      .catch(() => {})
-      .finally(() => setLoading(false))
+      .catch(() => {}).finally(() => setLoading(false))
   }, [])
 
   const photos = items.filter(i => i.type === 'photo')
@@ -35,137 +23,116 @@ export default function Gallery() {
   const filtered = activeCategory === 'All' ? photos : photos.filter(p => p.category === activeCategory)
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="page-hero">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="page-hero-title">Gallery</h1>
-          <p className="page-hero-sub">Capturing the Spirit of SPL Tournament</p>
+    <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
+
+      {/* Lightbox */}
+      {lightbox && (
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4" onClick={() => setLightbox(null)}>
+          <div className="max-w-4xl w-full" onClick={e => e.stopPropagation()}>
+            <img src={lightbox.url} alt={lightbox.title} className="w-full max-h-[80vh] object-contain" />
+            <p className="text-[#e4e1e9] text-center mt-4 font-headline font-bold uppercase">{lightbox.title}</p>
+            <button onClick={() => setLightbox(null)} className="absolute top-6 right-6 text-[#e4e1e9] text-4xl leading-none hover:text-[#ffd700]">&times;</button>
+          </div>
         </div>
-      </div>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-6xl mx-auto">
+      )}
 
-          {/* Lightbox */}
-          {lightbox && (
-            <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4" onClick={() => setLightbox(null)}>
-              <div className="max-w-4xl w-full" onClick={e => e.stopPropagation()}>
-                <img src={lightbox.url} alt={lightbox.title} className="w-full max-h-[80vh] object-contain rounded-lg" />
-                <p className="text-white text-center mt-3 font-medium">{lightbox.title}</p>
-                <button onClick={() => setLightbox(null)} className="absolute top-4 right-4 text-white text-3xl leading-none">&times;</button>
-              </div>
+      {/* Hero */}
+      <section className="spl-hero border-b border-[#ffd700]/15">
+        <div className="max-w-screen-xl mx-auto relative z-10">
+          <p className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-4">Media</p>
+          <h1 className="font-headline font-black text-5xl md:text-7xl italic uppercase tracking-tighter leading-[0.9] mb-6 text-white">
+            SPL <br /><span className="text-[#ffd700]">GALLERY</span>
+          </h1>
+          <p className="text-white/70 text-lg max-w-2xl">Capturing the spirit of SPL Tournament</p>
+        </div>
+      </section>
+
+      {/* Photos */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+            <div>
+              <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+              <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic">Photo Gallery <span className="text-[#c4c6d0]/40 text-xl">({photos.length})</span></h2>
             </div>
-          )}
-
-          {items.length === 0 && !loading && (
-            <div className="bg-primary-50 border border-primary-200 rounded-xl p-6 mb-8 text-center">
-              <ImageIcon className="w-10 h-10 text-primary-400 mx-auto mb-3" />
-              <h2 className="text-lg font-semibold text-primary-700 mb-1">Photos & Videos Coming Soon</h2>
-              <p className="text-sm text-primary-600">Tournament media will be uploaded here during and after the event.</p>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.filter(c => c === 'All' || photos.some(p => p.category === c)).map(cat => (
+                <button key={cat} onClick={() => setActiveCategory(cat)}
+                  className={`px-4 py-2 text-xs font-headline font-black uppercase tracking-widest transition-all ${activeCategory === cat ? 'bg-[#ffd700] text-[#002366]' : 'border border-[#444650]/40 text-[#c4c6d0] hover:border-[#ffd700] hover:text-[#ffd700]'}`}>
+                  {cat}
+                </button>
+              ))}
             </div>
-          )}
-
-          {/* Photo Gallery */}
-          <div className="card mb-8">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <div className="flex items-center">
-                <Camera className="w-8 h-8 text-primary-500 mr-3" />
-                <h2 className="text-2xl font-semibold text-primary-600">Photo Gallery</h2>
-                <span className="ml-2 text-sm text-gray-500">({photos.length})</span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {CATEGORIES.filter(c => c === 'All' || photos.some(p => p.category === c)).map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${activeCategory === cat ? 'bg-primary-500 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {loading ? (
-              <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary-500"></div></div>
-            ) : filtered.length > 0 ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {filtered.map((item, i) => (
-                  <div key={item.id} className="group relative overflow-hidden rounded-lg aspect-square cursor-pointer" onClick={() => setLightbox(item)}>
-                    <img
-                      src={item.url}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                      onError={e => {
-                        const el = e.currentTarget
-                        el.style.display = 'none'
-                        el.nextElementSibling?.classList.remove('hidden')
-                      }}
-                    />
-                    <div className={`hidden w-full h-full bg-gradient-to-br ${gradients[i % gradients.length]} flex flex-col items-center justify-center absolute inset-0`}>
-                      <Camera className="w-10 h-10 text-white opacity-40 mb-2" />
-                    </div>
-                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <h3 className="text-white font-medium text-sm">{item.title}</h3>
-                      <p className="text-gray-300 text-xs">{item.category}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[...Array(8)].map((_, i) => (
-                  <div key={i} className={`relative overflow-hidden rounded-lg aspect-square bg-gradient-to-br ${gradients[i % gradients.length]} flex flex-col items-center justify-center`}>
-                    <Camera className="w-10 h-10 text-white opacity-30 mb-2" />
-                    <span className="text-white text-xs opacity-50">Coming Soon</span>
-                  </div>
-                ))}
-              </div>
-            )}
           </div>
 
-          {/* Video Gallery */}
-          {videos.length > 0 && (
-            <div className="card mb-8">
-              <div className="flex items-center mb-6">
-                <Play className="w-8 h-8 text-gold-500 mr-3" />
-                <h2 className="text-2xl font-semibold text-gold-600">Video Gallery</h2>
-                <span className="ml-2 text-sm text-gray-500">({videos.length})</span>
-              </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {videos.map((video, i) => (
-                  <a key={video.id} href={video.url} target="_blank" rel="noopener noreferrer" className="group cursor-pointer">
-                    <div className={`relative overflow-hidden rounded-lg aspect-video mb-3 bg-gradient-to-br ${gradients[(i + 2) % gradients.length]} flex items-center justify-center`}>
-                      <div className="w-14 h-14 bg-white bg-opacity-20 rounded-full flex items-center justify-center group-hover:bg-opacity-30 transition-all">
-                        <Play className="w-6 h-6 text-white ml-1" />
-                      </div>
-                    </div>
-                    <h3 className="font-medium text-gray-900 group-hover:text-primary-600 transition-colors text-sm">{video.title}</h3>
-                    <p className="text-xs text-gray-400 mt-0.5">{video.category}</p>
-                  </a>
-                ))}
-              </div>
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-10 h-10 border-2 border-[#ffd700] border-t-transparent rounded-full animate-spin" />
             </div>
-          )}
-
-          {/* Live Stream placeholder */}
-          <div className="card text-center bg-gradient-to-r from-red-50 to-pink-50">
-            <div className="flex items-center justify-center mb-4">
-              <div className="w-3 h-3 bg-red-400 rounded-full mr-2 animate-pulse"></div>
-              <h2 className="text-2xl font-semibold text-red-600">Live Stream</h2>
-            </div>
-            <p className="text-gray-600 mb-4">Watch SPL matches live during the tournament period</p>
-            <div className="bg-white p-8 rounded-lg max-w-2xl mx-auto">
-              <div className="aspect-video bg-gray-900 rounded-lg flex items-center justify-center">
-                <div className="text-center text-white">
-                  <Play className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                  <p className="text-lg">Live Stream Will Start During Tournament</p>
-                  <p className="text-sm opacity-60 mt-1">Stay tuned for schedule updates</p>
+          ) : filtered.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
+              {filtered.map(item => (
+                <div key={item.id} className="group relative overflow-hidden aspect-square cursor-pointer border border-[#444650]/10 hover:border-[#ffd700]/40 transition-colors" onClick={() => setLightbox(item)}>
+                  <img src={item.url} alt={item.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 grayscale group-hover:grayscale-0" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0f] to-transparent opacity-0 group-hover:opacity-100 transition-opacity p-4 flex flex-col justify-end">
+                    <h3 className="text-white font-headline font-bold uppercase text-sm">{item.title}</h3>
+                    <p className="text-[#ffd700] text-xs font-headline">{item.category}</p>
+                  </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="aspect-square bg-[#131318] border border-[#444650]/10 flex flex-col items-center justify-center">
+                  <span className="text-4xl opacity-20">📷</span>
+                  <span className="text-[#c4c6d0]/30 text-xs font-headline uppercase mt-2">Coming Soon</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Videos */}
+      {videos.length > 0 && (
+        <section className="py-16 px-6 bg-[#131318] border-y border-[#444650]/15">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+            <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-10">Video Gallery <span className="text-[#c4c6d0]/40 text-xl">({videos.length})</span></h2>
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {videos.map(video => (
+                <a key={video.id} href={video.url} target="_blank" rel="noopener noreferrer" className="group">
+                  <div className="aspect-video bg-[#0b0b0f] border border-[#444650]/20 flex items-center justify-center mb-3 hover:border-[#ffd700]/40 transition-colors">
+                    <div className="w-14 h-14 border-2 border-[#ffd700]/40 rounded-full flex items-center justify-center group-hover:border-[#ffd700] group-hover:bg-[#ffd700]/10 transition-all">
+                      <span className="text-[#ffd700] text-xl ml-1">▶</span>
+                    </div>
+                  </div>
+                  <h3 className="font-headline font-bold uppercase text-sm group-hover:text-[#ffd700] transition-colors">{video.title}</h3>
+                  <p className="text-xs text-[#c4c6d0]/50 mt-0.5">{video.category}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Live Stream */}
+      <section className="py-20 px-6 text-center">
+        <div className="max-w-2xl mx-auto">
+          <div className="flex items-center justify-center gap-3 mb-6">
+            <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+            <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic">Live Stream</h2>
+          </div>
+          <div className="bg-[#131318] border border-[#444650]/20 aspect-video flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-5xl mb-4 opacity-20">▶</div>
+              <p className="font-headline font-bold uppercase tracking-widest text-[#c4c6d0]">Live Stream During Tournament</p>
+              <p className="text-[#c4c6d0]/50 text-sm mt-2">Stay tuned for schedule updates</p>
             </div>
           </div>
         </div>
-      </div>
+      </section>
     </div>
   )
 }

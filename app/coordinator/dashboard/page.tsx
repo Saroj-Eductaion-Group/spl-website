@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Users, FileCheck, Trophy, Calendar } from 'lucide-react'
 
 export default function CoordinatorDashboard() {
   const [stats, setStats] = useState({ districtTeams: 0, pendingVerifications: 0, approvedTeams: 0, individualPlayers: 0 })
@@ -43,54 +42,60 @@ export default function CoordinatorDashboard() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500" />
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
     </div>
   )
 
+  const metrics = [
+    { label: 'District Teams',    value: stats.districtTeams,        icon: 'groups',      color: 'text-[#ffd700]',   bg: 'bg-[#ffd700]/10',   border: 'border-[#ffd700]/20'   },
+    { label: 'Pending Approvals', value: stats.pendingVerifications,  icon: 'pending',     color: 'text-orange-400',  bg: 'bg-orange-400/10',  border: 'border-orange-400/20'  },
+    { label: 'Approved Teams',    value: stats.approvedTeams,         icon: 'check_circle',color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
+    { label: 'Unassigned Players',value: stats.individualPlayers,     icon: 'person_add',  color: 'text-violet-400',  bg: 'bg-violet-400/10',  border: 'border-violet-400/20'  },
+  ]
+
+  const actions = [
+    { href: '/coordinator/teams',   icon: 'groups',      label: 'Manage Teams',       desc: 'View, approve or reject district teams',    badge: stats.districtTeams,       badgeColor: 'text-[#ffd700] bg-[#ffd700]/10'     },
+    { href: '/coordinator/players', icon: 'person_check',label: 'Individual Players', desc: 'Assign unassigned players to teams',         badge: stats.individualPlayers,   badgeColor: 'text-violet-400 bg-violet-400/10'   },
+    { href: '/coordinator/results', icon: 'scoreboard',  label: 'Match Results',      desc: 'Update scores and match results',            badge: 'Update',                  badgeColor: 'text-emerald-400 bg-emerald-400/10' },
+    { href: '/coordinator/teams',   icon: 'pending',     label: 'Pending Approvals',  desc: `${stats.pendingVerifications} teams waiting`, badge: stats.pendingVerifications, badgeColor: 'text-orange-400 bg-orange-400/10'   },
+  ]
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-1">Coordinator Dashboard</h1>
-        <p className="text-gray-500">{district} District — Team Management</p>
+    <div className="max-w-7xl mx-auto space-y-8">
+      <div>
+        <h1 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">
+          Coordinator <span className="text-[#ffd700]">Dashboard</span>
+        </h1>
+        <p className="text-[#c4c6d0]/60 text-sm mt-1 font-body">{district} District — Team Management</p>
       </div>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="card"><div className="flex items-center"><Users className="h-8 w-8 text-primary-500" /><div className="ml-4"><p className="text-sm font-medium text-gray-600">District Teams</p><p className="text-2xl font-bold text-gray-900">{stats.districtTeams}</p></div></div></div>
-        <div className="card"><div className="flex items-center"><FileCheck className="h-8 w-8 text-orange-500" /><div className="ml-4"><p className="text-sm font-medium text-gray-600">Pending Approvals</p><p className="text-2xl font-bold text-gray-900">{stats.pendingVerifications}</p></div></div></div>
-        <div className="card"><div className="flex items-center"><Trophy className="h-8 w-8 text-green-500" /><div className="ml-4"><p className="text-sm font-medium text-gray-600">Approved Teams</p><p className="text-2xl font-bold text-gray-900">{stats.approvedTeams}</p></div></div></div>
-        <div className="card"><div className="flex items-center"><Calendar className="h-8 w-8 text-yellow-500" /><div className="ml-4"><p className="text-sm font-medium text-gray-600">Unassigned Players</p><p className="text-2xl font-bold text-gray-900">{stats.individualPlayers}</p></div></div></div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {metrics.map(m => (
+          <div key={m.label} className="bg-[#131318] border border-[#444650]/20 p-5">
+            <div className={`w-10 h-10 ${m.bg} border ${m.border} flex items-center justify-center mb-4`}>
+              <span className={`material-symbols-outlined ${m.color}`} style={{ fontSize: '20px' }}>{m.icon}</span>
+            </div>
+            <div className={`text-3xl font-headline font-black ${m.color} mb-1`}>{m.value}</div>
+            <div className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">{m.label}</div>
+          </div>
+        ))}
       </div>
 
-      {/* Action Cards */}
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <button onClick={() => router.push('/coordinator/teams')} className="card hover:shadow-lg transition-shadow text-center group">
-          <Users className="h-10 w-10 text-primary-500 mx-auto mb-3 group-hover:text-primary-600" />
-          <h3 className="text-lg font-semibold mb-2">Manage Teams</h3>
-          <p className="text-gray-600 text-sm mb-4">View, approve or reject district teams</p>
-          <span className="btn-primary text-sm py-2 px-4">View Teams</span>
-        </button>
-
-        <button onClick={() => router.push('/coordinator/players')} className="card hover:shadow-lg transition-shadow text-center group">
-          <FileCheck className="h-10 w-10 text-orange-500 mx-auto mb-3 group-hover:text-orange-600" />
-          <h3 className="text-lg font-semibold mb-2">Individual Players</h3>
-          <p className="text-gray-600 text-sm mb-4">Assign unassigned players to teams</p>
-          <span className="btn-primary text-sm py-2 px-4">Manage Players</span>
-        </button>
-
-        <button onClick={() => router.push('/coordinator/results')} className="card hover:shadow-lg transition-shadow text-center group">
-          <Trophy className="h-10 w-10 text-green-500 mx-auto mb-3 group-hover:text-green-600" />
-          <h3 className="text-lg font-semibold mb-2">Match Results</h3>
-          <p className="text-gray-600 text-sm mb-4">Update scores and match results</p>
-          <span className="btn-primary text-sm py-2 px-4">Update Results</span>
-        </button>
-
-        <button onClick={() => router.push('/coordinator/teams')} className="card hover:shadow-lg transition-shadow text-center group bg-orange-50 border-2 border-orange-200">
-          <Calendar className="h-10 w-10 text-orange-500 mx-auto mb-3" />
-          <h3 className="text-lg font-semibold mb-2">Pending Approvals</h3>
-          <p className="text-gray-600 text-sm mb-4">{stats.pendingVerifications} teams waiting for review</p>
-          <span className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold">Review Now</span>
-        </button>
+      <div>
+        <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#e4e1e9] mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {actions.map(a => (
+            <button key={a.href + a.label} onClick={() => router.push(a.href)}
+              className="bg-[#131318] border border-[#444650]/20 p-5 hover:border-[#ffd700]/30 hover:bg-[#1c1c21] transition-all group text-left">
+              <div className="flex items-center justify-between mb-4">
+                <span className="material-symbols-outlined text-[#ffd700]/60 group-hover:text-[#ffd700] transition-colors" style={{ fontSize: '28px' }}>{a.icon}</span>
+                <span className={`text-xs font-headline font-bold px-2 py-0.5 ${a.badgeColor}`}>{a.badge}</span>
+              </div>
+              <h3 className="font-headline font-black text-sm uppercase tracking-tight text-[#e4e1e9] mb-1 group-hover:text-[#ffd700] transition-colors">{a.label}</h3>
+              <p className="text-xs text-[#c4c6d0]/50 font-body leading-relaxed">{a.desc}</p>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )

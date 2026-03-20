@@ -21,7 +21,12 @@ export async function POST(request: NextRequest) {
         ? await prisma.user.findUnique({ where: { id: player.createdById }, select: { email: true } })
         : null
       if (dbUser?.email && player && team) {
-        await sendTeamAssignmentEmail(dbUser.email, player.name, team.name, team.district)
+        await sendTeamAssignmentEmail(
+          dbUser.email, player.name, team.name, team.district,
+          team.managerName || undefined, team.managerPhone || undefined,
+          team.coachName || undefined, team.coachPhone || undefined,
+          team.contactEmail || undefined
+        )
       }
     } catch { }
     return NextResponse.json({ success: true })

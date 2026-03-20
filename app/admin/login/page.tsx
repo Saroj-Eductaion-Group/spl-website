@@ -1,20 +1,18 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { Lock, Mail, Shield, Trophy, GraduationCap } from 'lucide-react'
-import Image from 'next/image'
 import Link from 'next/link'
-
-const leftPanelStyle = { background: 'linear-gradient(135deg, #1e3270 0%, #1d4ed8 60%, #1e3270 100%)' }
-const overlayStyle = { backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(218,167,55,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(218,167,55,0.1) 0%, transparent 50%)' }
-const iconBgStyle = { background: 'rgba(218,167,55,0.2)' }
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  useEffect(() => {
+    if (localStorage.getItem('adminToken')) router.replace('/admin/dashboard')
+  }, [router])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,30 +39,32 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="min-h-screen -mt-20 flex">
+    <div className="min-h-screen bg-[#0b0b0f] flex -mt-20">
 
       {/* Left — Branding */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col items-center justify-center p-12" style={leftPanelStyle}>
-        <div className="absolute inset-0" style={overlayStyle} />
-        <div className="absolute top-0 right-0 w-96 h-96 rounded-full -translate-y-1/2 translate-x-1/2" style={{ background: 'rgba(218,167,55,0.08)' }} />
-        <div className="absolute bottom-0 left-0 w-64 h-64 rounded-full translate-y-1/2 -translate-x-1/2" style={{ background: 'rgba(218,167,55,0.06)' }} />
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col items-center justify-center p-16 bg-[#002366]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,215,0,0.15)_0%,transparent_60%)]" />
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-[#ffd700]/5 rounded-full translate-x-1/2 translate-y-1/2 blur-3xl" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ffd700] via-[#ffe566] to-[#ffd700]" />
 
-        <div className="relative z-10 text-center">
-          <Image src="/Hero.png" alt="SPL Logo" width={180} height={100} className="object-contain mx-auto mb-8" />
-          <h1 className="text-4xl font-extrabold text-white mb-3">Admin Portal</h1>
-          <p className="text-blue-200 text-lg mb-12">SPL Tournament Management System</p>
+        <div className="relative z-10 text-center max-w-sm">
+          <div className="w-20 h-20 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center mx-auto mb-8">
+            <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '40px' }}>admin_panel_settings</span>
+          </div>
+          <h1 className="font-headline font-black text-5xl italic uppercase tracking-tighter text-[#e4e1e9] mb-3">
+            Admin <span className="text-[#ffd700]">Portal</span>
+          </h1>
+          <p className="text-[#c4c6d0] text-sm mb-12 font-body">SPL Tournament Management System</p>
 
-          <div className="space-y-5 text-left max-w-xs mx-auto">
+          <div className="space-y-4 text-left">
             {[
-              { icon: Shield, text: 'Full tournament control & management' },
-              { icon: Trophy, text: 'Fixtures, results & team management' },
-              { icon: GraduationCap, text: 'Reports, exports & coordinator access' },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={iconBgStyle}>
-                  <Icon className="w-5 h-5 text-yellow-400" />
-                </div>
-                <span className="text-blue-100 text-sm font-medium">{text}</span>
+              { icon: 'shield', text: 'Full tournament control & management' },
+              { icon: 'emoji_events', text: 'Fixtures, results & team management' },
+              { icon: 'description', text: 'Reports, exports & coordinator access' },
+            ].map(({ icon, text }) => (
+              <div key={text} className="flex items-center gap-4 bg-white/10 border border-[#ffd700]/20 px-4 py-3">
+                <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '20px' }}>{icon}</span>
+                <span className="text-white/80 text-sm font-body">{text}</span>
               </div>
             ))}
           </div>
@@ -72,65 +72,82 @@ export default function AdminLogin() {
       </div>
 
       {/* Right — Login Form */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center bg-gray-50 px-6 py-12">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-[#0b0b0f]">
         <div className="w-full max-w-md">
 
-          <div className="lg:hidden text-center mb-8">
-            <Image src="/Hero.png" alt="SPL" width={120} height={70} className="object-contain mx-auto mb-3" />
+          {/* Mobile logo */}
+          <div className="lg:hidden text-center mb-10">
+            <span className="font-headline font-black text-3xl italic uppercase text-[#ffd700]">SPL Admin</span>
           </div>
 
           <div className="mb-8">
-            <div className="w-14 h-14 bg-primary-600 rounded-2xl flex items-center justify-center mb-5 shadow-lg">
-              <Shield className="w-7 h-7 text-white" />
+            <div className="w-12 h-12 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '24px' }}>lock</span>
             </div>
-            <h2 className="text-3xl font-extrabold text-gray-900">Admin Login</h2>
-            <p className="text-gray-500 mt-1">SPL Tournament Management System</p>
+            <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">Admin Login</h2>
+            <p className="text-[#c4c6d0] text-sm mt-1 font-body">Saroj Premier League — HQ Access</p>
           </div>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-6 flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-red-500 text-white flex items-center justify-center text-xs flex-shrink-0">!</span>
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 text-sm mb-6 flex items-center gap-2 font-body">
+              <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>error</span>
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="form-label">Email Address</label>
+              <label className="block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2">
+                Email Address
+              </label>
               <div className="relative">
-                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type="email" required className="form-input pl-10" placeholder="admin@spl.com"
-                  value={credentials.email} onChange={e => setCredentials({ ...credentials, email: e.target.value })} />
+                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#444650]" style={{ fontSize: '18px' }}>mail</span>
+                <input
+                  type="email" required
+                  placeholder="admin@spl.com"
+                  value={credentials.email}
+                  onChange={e => setCredentials({ ...credentials, email: e.target.value })}
+                  className="w-full bg-[#131318] border border-[#444650]/40 text-[#e4e1e9] pl-10 pr-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 focus:bg-[#1c1c21] transition-colors"
+                />
               </div>
             </div>
 
             <div>
-              <label className="form-label">Password</label>
+              <label className="block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2">
+                Password
+              </label>
               <div className="relative">
-                <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input type="password" required className="form-input pl-10" placeholder="Enter your password"
-                  value={credentials.password} onChange={e => setCredentials({ ...credentials, password: e.target.value })} />
+                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#444650]" style={{ fontSize: '18px' }}>lock</span>
+                <input
+                  type="password" required
+                  placeholder="Enter your password"
+                  value={credentials.password}
+                  onChange={e => setCredentials({ ...credentials, password: e.target.value })}
+                  className="w-full bg-[#131318] border border-[#444650]/40 text-[#e4e1e9] pl-10 pr-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 focus:bg-[#1c1c21] transition-colors"
+                />
               </div>
             </div>
 
-            <button type="submit" disabled={loading}
-              className="w-full btn-primary py-3.5 text-base disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0">
+            <button
+              type="submit" disabled={loading}
+              className="w-full bg-[#ffd700] text-[#002366] py-3.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+            >
               {loading ? (
                 <span className="flex items-center gap-2 justify-center">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-[#002366]/30 border-t-[#002366] rounded-full animate-spin" />
                   Signing in...
                 </span>
               ) : 'Sign In to Admin Panel'}
             </button>
           </form>
 
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
-            <Link href="/coordinator/login" className="text-sm text-gray-500 hover:text-primary-600 transition-colors">
-              District Coordinator? <span className="font-semibold text-primary-600">Login here →</span>
+          <div className="mt-8 pt-6 border-t border-[#444650]/20 flex flex-col gap-3 text-center">
+            <Link href="/coordinator/login" className="text-sm font-body text-[#c4c6d0]/60 hover:text-[#ffd700] transition-colors">
+              District Coordinator? <span className="text-[#ffd700] font-semibold">Login here →</span>
             </Link>
-          </div>
-          <div className="mt-4 text-center">
-            <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">← Back to SPL Website</Link>
+            <Link href="/" className="text-xs font-body text-[#444650] hover:text-[#c4c6d0] transition-colors">
+              ← Back to SPL Website
+            </Link>
           </div>
         </div>
       </div>

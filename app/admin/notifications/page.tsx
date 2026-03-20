@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Send, Users, Trophy, Bell } from 'lucide-react'
 
-interface Team {
-  id: string; name: string; district: string; contactEmail?: string; status: string
-}
+interface Team { id: string; name: string; district: string; contactEmail?: string; status: string }
+
+const inputCls = "w-full bg-[#0b0b0f] border border-[#444650]/40 text-[#e4e1e9] px-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 transition-colors"
+const labelCls = "block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2"
 
 export default function AdminNotifications() {
   const [teams, setTeams] = useState<Team[]>([])
@@ -30,13 +30,12 @@ export default function AdminNotifications() {
     return []
   }
 
-  const sendNotification = async () => {
+  const send = async () => {
     if (!form.subject || !form.message) return alert('Subject and message are required')
     const targets = getTargets()
     if (targets.length === 0) return alert('No teams with email found for selected target')
     if (!confirm(`Send email to ${targets.length} team(s)?`)) return
-    setSending(true)
-    setResult(null)
+    setSending(true); setResult(null)
     const token = localStorage.getItem('adminToken') || ''
     const res = await fetch('/api/admin/notifications', {
       method: 'POST',
@@ -45,65 +44,68 @@ export default function AdminNotifications() {
     })
     const data = await res.json()
     setSending(false)
-    if (data.success) {
-      setResult({ sent: data.sent, failed: data.failed })
-      setForm(f => ({ ...f, subject: '', message: '' }))
-    } else {
-      alert(data.error || 'Failed to send')
-    }
+    if (data.success) { setResult({ sent: data.sent, failed: data.failed }); setForm(f => ({ ...f, subject: '', message: '' })) }
+    else alert(data.error || 'Failed to send')
   }
-
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
 
   const targetCount = getTargets().length
 
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
+
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary-600">Notification Management</h1>
-        <p className="text-gray-600">Send email notifications to teams</p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">
+          Notification <span className="text-[#ffd700]">Management</span>
+        </h1>
+        <p className="text-[#c4c6d0]/60 text-sm mt-1">Send email notifications to teams</p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-8">
-        <div className="card text-center">
-          <Trophy className="w-8 h-8 text-primary-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">{teams.length}</p>
-          <p className="text-sm text-gray-500">Total Teams</p>
-        </div>
-        <div className="card text-center">
-          <Users className="w-8 h-8 text-green-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">{teams.filter(t => t.contactEmail).length}</p>
-          <p className="text-sm text-gray-500">Teams with Email</p>
-        </div>
-        <div className="card text-center">
-          <Bell className="w-8 h-8 text-gold-500 mx-auto mb-2" />
-          <p className="text-2xl font-bold">{targetCount}</p>
-          <p className="text-sm text-gray-500">Selected Recipients</p>
-        </div>
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4">
+        {[
+          { icon: 'emoji_events', color: 'text-[#ffd700]', bg: 'bg-[#ffd700]/10', border: 'border-[#ffd700]/20', value: teams.length, label: 'Total Teams' },
+          { icon: 'mail',         color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20', value: teams.filter(t => t.contactEmail).length, label: 'Teams with Email' },
+          { icon: 'send',         color: 'text-violet-400', bg: 'bg-violet-400/10', border: 'border-violet-400/20', value: targetCount, label: 'Selected Recipients' },
+        ].map(s => (
+          <div key={s.label} className="bg-[#131318] border border-[#444650]/20 p-5 text-center">
+            <div className={`w-10 h-10 ${s.bg} border ${s.border} flex items-center justify-center mx-auto mb-3`}>
+              <span className={`material-symbols-outlined ${s.color}`} style={{ fontSize: '20px' }}>{s.icon}</span>
+            </div>
+            <p className={`text-3xl font-headline font-black ${s.color}`}>{s.value}</p>
+            <p className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 mt-1">{s.label}</p>
+          </div>
+        ))}
       </div>
 
       {result && (
-        <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <p className="text-green-700 font-semibold">✅ Notification sent!</p>
-          <p className="text-sm text-green-600">Sent: {result.sent} | Failed: {result.failed}</p>
+        <div className="bg-emerald-400/10 border border-emerald-400/30 p-4 flex items-center gap-3">
+          <span className="material-symbols-outlined text-emerald-400" style={{ fontSize: '20px' }}>check_circle</span>
+          <p className="text-emerald-400 font-headline font-bold uppercase tracking-tight text-sm">
+            Sent: {result.sent} &nbsp;|&nbsp; Failed: {result.failed}
+          </p>
         </div>
       )}
 
-      <div className="card space-y-6">
-        <h2 className="text-xl font-semibold text-primary-600">Compose Notification</h2>
+      {/* Compose */}
+      <div className="bg-[#131318] border border-[#444650]/20 p-6 space-y-5">
+        <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700]">Compose Notification</h2>
 
         <div>
-          <label className="form-label">Send To *</label>
+          <label className={labelCls}>Send To *</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             {[
               { value: 'ALL_TEAMS', label: 'All Teams' },
-              { value: 'APPROVED', label: 'Approved' },
-              { value: 'PENDING', label: 'Pending' },
-              { value: 'DISTRICT', label: 'By District' },
+              { value: 'APPROVED',  label: 'Approved'  },
+              { value: 'PENDING',   label: 'Pending'   },
+              { value: 'DISTRICT',  label: 'By District'},
             ].map(opt => (
-              <button key={opt.value} type="button"
-                onClick={() => setForm(f => ({ ...f, target: opt.value }))}
-                className={`p-3 rounded-lg border-2 text-sm font-medium transition-colors ${form.target === opt.value ? 'border-primary-500 bg-primary-50 text-primary-700' : 'border-gray-200 text-gray-600 hover:border-gray-300'}`}>
+              <button key={opt.value} type="button" onClick={() => setForm(f => ({ ...f, target: opt.value }))}
+                className={`py-2.5 text-xs font-headline font-bold uppercase tracking-widest border-2 transition-colors ${form.target === opt.value ? 'border-[#ffd700] bg-[#ffd700]/10 text-[#ffd700]' : 'border-[#444650]/30 text-[#c4c6d0]/60 hover:border-[#ffd700]/40'}`}>
                 {opt.label}
               </button>
             ))}
@@ -112,68 +114,62 @@ export default function AdminNotifications() {
 
         {form.target === 'DISTRICT' && (
           <div>
-            <label className="form-label">Select District *</label>
-            <select className="form-input" value={form.district} onChange={e => setForm(f => ({ ...f, district: e.target.value }))}>
+            <label className={labelCls}>Select District *</label>
+            <select className={inputCls} value={form.district} onChange={e => setForm(f => ({ ...f, district: e.target.value }))}>
               <option value="">Choose district</option>
               {districts.map(d => <option key={d} value={d}>{d}</option>)}
             </select>
           </div>
         )}
 
-        <div className="bg-primary-50 rounded-lg px-4 py-2 text-sm text-primary-700">
-          📧 This will send email to <strong>{targetCount}</strong> team(s)
+        <div className="bg-[#002366]/40 border border-[#ffd700]/20 px-4 py-2.5 text-sm text-[#ffd700] font-headline font-bold flex items-center gap-2">
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>info</span>
+          This will send email to <strong>{targetCount}</strong> team(s)
         </div>
 
-        <div>
-          <label className="form-label">Subject *</label>
-          <input className="form-input" placeholder="e.g. Match Schedule Update — SPL U19"
-            value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} />
-        </div>
+        <div><label className={labelCls}>Subject *</label><input className={inputCls} placeholder="e.g. Match Schedule Update — SPL U19" value={form.subject} onChange={e => setForm(f => ({ ...f, subject: e.target.value }))} /></div>
+        <div><label className={labelCls}>Message *</label><textarea className={inputCls} rows={6} placeholder="Write your message here..." value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} /></div>
 
-        <div>
-          <label className="form-label">Message *</label>
-          <textarea className="form-input" rows={6} placeholder="Write your message here..."
-            value={form.message} onChange={e => setForm(f => ({ ...f, message: e.target.value }))} />
-        </div>
-
-        <button onClick={sendNotification} disabled={sending || targetCount === 0}
-          className="btn-primary flex items-center gap-2 disabled:opacity-50">
-          <Send className="w-4 h-4" />
+        <button onClick={send} disabled={sending || targetCount === 0}
+          className="flex items-center gap-2 bg-[#ffd700] text-[#002366] px-6 py-3 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50">
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>send</span>
           {sending ? 'Sending...' : `Send to ${targetCount} Team(s)`}
         </button>
       </div>
 
-      <div className="card mt-8">
-        <h3 className="font-semibold text-gray-800 mb-4">Recipients Preview</h3>
+      {/* Recipients Preview */}
+      <div className="bg-[#131318] border border-[#444650]/20 overflow-hidden">
+        <div className="px-5 py-4 border-b border-[#444650]/20">
+          <h3 className="font-headline font-bold uppercase tracking-tight text-[#e4e1e9] text-sm">Recipients Preview</h3>
+        </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
+          <table className="min-w-full">
+            <thead className="bg-[#0b0b0f]">
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">District</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                {['Team', 'District', 'Email', 'Status'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-200">
+            <tbody className="divide-y divide-[#444650]/10">
               {getTargets().slice(0, 10).map(team => (
-                <tr key={team.id}>
-                  <td className="px-4 py-2 font-medium text-gray-900">{team.name}</td>
-                  <td className="px-4 py-2 text-gray-600">{team.district}</td>
-                  <td className="px-4 py-2 text-gray-600">{team.contactEmail || '—'}</td>
-                  <td className="px-4 py-2">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${team.status === 'APPROVED' ? 'bg-green-100 text-green-700' : team.status === 'REJECTED' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                <tr key={team.id} className="hover:bg-[#1c1c21] transition-colors">
+                  <td className="px-4 py-3 font-headline font-bold text-[#e4e1e9] text-sm">{team.name}</td>
+                  <td className="px-4 py-3 text-sm text-[#c4c6d0]/60">{team.district}</td>
+                  <td className="px-4 py-3 text-sm text-[#c4c6d0]/60">{team.contactEmail || '—'}</td>
+                  <td className="px-4 py-3">
+                    <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${team.status === 'APPROVED' ? 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10' : team.status === 'REJECTED' ? 'text-red-400 border-red-400/30 bg-red-400/10' : 'text-[#ffd700] border-[#ffd700]/30 bg-[#ffd700]/10'}`}>
                       {team.status}
                     </span>
                   </td>
                 </tr>
               ))}
               {getTargets().length === 0 && (
-                <tr><td colSpan={4} className="px-4 py-6 text-center text-gray-400">No recipients selected</td></tr>
+                <tr><td colSpan={4} className="px-4 py-8 text-center text-[#c4c6d0]/30 font-headline uppercase tracking-widest text-sm">No recipients selected</td></tr>
               )}
             </tbody>
           </table>
-          {getTargets().length > 10 && <p className="text-xs text-gray-400 px-4 py-2">...and {getTargets().length - 10} more</p>}
+          {getTargets().length > 10 && <p className="text-xs text-[#c4c6d0]/30 px-4 py-2">...and {getTargets().length - 10} more</p>}
         </div>
       </div>
     </div>

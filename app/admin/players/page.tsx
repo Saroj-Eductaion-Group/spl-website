@@ -1,24 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { FileCheck, Users, Eye, X } from 'lucide-react'
 
 interface Player {
-  id: string
-  name: string
-  district: string
-  schoolCollege: string
-  role: string
-  isIndividual: boolean
-  teamAssigned: boolean
-  createdAt: string
-  aadhaarDoc?: string
-  schoolIdDoc?: string
-  dobProofDoc?: string
-  photoDoc?: string
+  id: string; name: string; district: string; schoolCollege: string
+  role: string; isIndividual: boolean; teamAssigned: boolean; createdAt: string
+  aadhaarDoc?: string; schoolIdDoc?: string; dobProofDoc?: string; photoDoc?: string
 }
-
 interface Team { id: string; name: string; district: string }
+
+const inputCls = "w-full bg-[#0b0b0f] border border-[#444650]/40 text-[#e4e1e9] px-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 transition-colors"
+const labelCls = "block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2"
 
 export default function AdminPlayers() {
   const [players, setPlayers] = useState<Player[]>([])
@@ -31,9 +23,7 @@ export default function AdminPlayers() {
   const [assignTeamId, setAssignTeamId] = useState('')
   const [assigning, setAssigning] = useState(false)
 
-  useEffect(() => {
-    loadPlayers()
-  }, [])
+  useEffect(() => { loadPlayers() }, [])
 
   const loadPlayers = async () => {
     try {
@@ -73,31 +63,32 @@ export default function AdminPlayers() {
     return true
   })
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-      </div>
-    )
-  }
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
+
       {/* Assign Modal */}
       {assignPlayer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-primary-600">Assign Player to Team</h2>
-              <button onClick={() => { setAssignPlayer(null); setAssignTeamId('') }}><X className="w-5 h-5 text-gray-400" /></button>
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#131318] border border-[#444650]/30 max-w-md w-full p-6">
+            <div className="flex justify-between items-center mb-5">
+              <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700]">Assign Player to Team</h2>
+              <button onClick={() => { setAssignPlayer(null); setAssignTeamId('') }} className="text-[#c4c6d0]/40 hover:text-[#ffd700] transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="font-semibold text-gray-900">{assignPlayer.name}</p>
-              <p className="text-sm text-gray-500">{assignPlayer.role} • {assignPlayer.district} • {assignPlayer.schoolCollege}</p>
+            <div className="bg-[#0b0b0f] border border-[#444650]/20 p-4 mb-5">
+              <p className="font-headline font-bold text-[#e4e1e9]">{assignPlayer.name}</p>
+              <p className="text-xs text-[#c4c6d0]/60 mt-1">{assignPlayer.role} • {assignPlayer.district} • {assignPlayer.schoolCollege}</p>
             </div>
-            <div className="mb-4">
-              <label className="form-label">Select Team</label>
-              <select className="form-input" value={assignTeamId} onChange={e => setAssignTeamId(e.target.value)}>
+            <div className="mb-5">
+              <label className={labelCls}>Select Team</label>
+              <select className={inputCls} value={assignTeamId} onChange={e => setAssignTeamId(e.target.value)}>
                 <option value="">Choose a team</option>
                 {teams.filter(t => t.district === assignPlayer.district).map(t => (
                   <option key={t.id} value={t.id}>{t.name}</option>
@@ -112,98 +103,89 @@ export default function AdminPlayers() {
               </select>
             </div>
             <div className="flex gap-3">
-              <button onClick={doAssign} disabled={!assignTeamId || assigning} className="btn-primary disabled:opacity-50 flex-1">
+              <button onClick={doAssign} disabled={!assignTeamId || assigning}
+                className="flex-1 bg-[#ffd700] text-[#002366] py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50">
                 {assigning ? 'Assigning...' : 'Assign'}
               </button>
-              <button onClick={() => { setAssignPlayer(null); setAssignTeamId('') }} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 flex-1">Cancel</button>
+              <button onClick={() => { setAssignPlayer(null); setAssignTeamId('') }}
+                className="flex-1 border border-[#444650]/40 text-[#c4c6d0] py-2.5 font-headline font-bold uppercase tracking-tight text-sm hover:border-[#ffd700] hover:text-[#ffd700] transition-all">
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
 
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary-600">Player Management</h1>
-        <p className="text-gray-600">Manage individual players and team assignments</p>
+        <h1 className="font-headline font-black text-3xl italic uppercase tracking-tighter text-[#e4e1e9]">Player <span className="text-[#ffd700]">Management</span></h1>
+        <p className="text-[#c4c6d0]/60 text-sm mt-1">Manage individual players and team assignments</p>
       </div>
 
       {/* Filters */}
-      <div className="mb-6">
-        <div className="flex space-x-4">
-            {[
-              { key: 'ALL', label: 'All Players' },
-              { key: 'INDIVIDUAL', label: 'Unassigned Individual' },
-              { key: 'ASSIGNED', label: 'Assigned Individual' },
-              { key: 'TEAM_PLAYERS', label: 'Team Players' }
-            ].map(filterOption => (
-              <button
-                key={filterOption.key}
-                onClick={() => setFilter(filterOption.key)}
-                className={`px-4 py-2 rounded-lg ${
-                  filter === filterOption.key
-                    ? 'bg-primary-500 text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-              >
-                {filterOption.label} ({players.filter(p => {
-                  if (filterOption.key === 'INDIVIDUAL') return p.isIndividual && !p.teamAssigned
-                  if (filterOption.key === 'ASSIGNED') return p.isIndividual && p.teamAssigned
-                  if (filterOption.key === 'TEAM_PLAYERS') return !p.isIndividual
-                  return true
-                }).length})
-              </button>
-            ))}
-          </div>
-        </div>
+      <div className="flex flex-wrap gap-3 mb-6">
+        {[
+          { key: 'ALL', label: 'All Players' },
+          { key: 'INDIVIDUAL', label: 'Unassigned Individual' },
+          { key: 'ASSIGNED', label: 'Assigned Individual' },
+          { key: 'TEAM_PLAYERS', label: 'Team Players' }
+        ].map(f => (
+          <button key={f.key} onClick={() => setFilter(f.key)}
+            className={`px-4 py-2 text-xs font-headline font-black uppercase tracking-widest transition-all ${filter === f.key ? 'bg-[#ffd700] text-[#002366]' : 'border border-[#444650]/40 text-[#c4c6d0] hover:border-[#ffd700] hover:text-[#ffd700]'}`}>
+            {f.label} ({players.filter(p => {
+              if (f.key === 'INDIVIDUAL') return p.isIndividual && !p.teamAssigned
+              if (f.key === 'ASSIGNED') return p.isIndividual && p.teamAssigned
+              if (f.key === 'TEAM_PLAYERS') return !p.isIndividual
+              return true
+            }).length})
+          </button>
+        ))}
+      </div>
 
-      {/* Players Table */}
-      <div className="card overflow-hidden">
+      {/* Table */}
+      <div className="bg-[#131318] border border-[#444650]/20 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full">
+            <thead className="bg-[#0b0b0f] border-b border-[#444650]/20">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Player</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">District</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                {['Player', 'District', 'Role', 'Type', 'Status', 'Actions'].map(h => (
+                  <th key={h} className="px-6 py-3 text-left text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-[#444650]/10">
               {filteredPlayers.map(player => (
-                <tr key={player.id}>
+                <tr key={player.id} className="hover:bg-[#1c1c21] transition-colors">
                   <td className="px-6 py-4">
-                    <div className="text-sm font-medium text-gray-900">{player.name}</div>
-                    <div className="text-sm text-gray-500">{player.schoolCollege}</div>
+                    <div className="font-headline font-bold text-[#e4e1e9] text-sm">{player.name}</div>
+                    <div className="text-xs text-[#c4c6d0]/50">{player.schoolCollege}</div>
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{player.district}</td>
-                  <td className="px-6 py-4 text-sm text-gray-900">{player.role}</td>
+                  <td className="px-6 py-4 text-sm text-[#c4c6d0]">{player.district}</td>
+                  <td className="px-6 py-4 text-sm text-[#c4c6d0]">{player.role}</td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      player.isIndividual ? 'bg-gold-100 text-gold-800' : 'bg-blue-100 text-blue-800'
-                    }`}>
+                    <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${player.isIndividual ? 'text-[#ffd700] border-[#ffd700]/30' : 'text-violet-400 border-violet-400/30'}`}>
                       {player.isIndividual ? 'Individual' : 'Team Player'}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      player.isIndividual && !player.teamAssigned ? 'bg-orange-100 text-orange-800' :
-                      player.teamAssigned ? 'bg-green-100 text-green-800' :
-                      'bg-gray-100 text-gray-800'
+                    <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${
+                      player.isIndividual && !player.teamAssigned ? 'text-orange-400 border-orange-400/30' :
+                      player.teamAssigned ? 'text-emerald-400 border-emerald-400/30' :
+                      'text-[#c4c6d0] border-[#444650]/30'
                     }`}>
-                      {player.isIndividual && !player.teamAssigned ? 'Unassigned' :
-                       player.teamAssigned ? 'Assigned' : 'In Team'}
+                      {player.isIndividual && !player.teamAssigned ? 'Unassigned' : player.teamAssigned ? 'Assigned' : 'In Team'}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-medium space-x-2">
-                    <button onClick={() => { setSelectedPlayer(player); setShowModal(true) }} className="text-blue-600 hover:text-blue-900">
-                      <Eye className="w-4 h-4" />
-                    </button>
-                    {player.isIndividual && !player.teamAssigned && (
-                      <button onClick={() => { setAssignPlayer(player); setAssignTeamId('') }} className="text-green-600 hover:text-green-900" title="Assign to Team">
-                        <Users className="w-4 h-4" />
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => { setSelectedPlayer(player); setShowModal(true) }} className="text-[#c4c6d0]/40 hover:text-[#ffd700] transition-colors" title="View Details">
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>visibility</span>
                       </button>
-                    )}
+                      {player.isIndividual && !player.teamAssigned && (
+                        <button onClick={() => { setAssignPlayer(player); setAssignTeamId('') }} className="text-emerald-400/60 hover:text-emerald-400 transition-colors" title="Assign to Team">
+                          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>person_add</span>
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -214,55 +196,45 @@ export default function AdminPlayers() {
 
       {/* Player Details Modal */}
       {showModal && selectedPlayer && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#131318] border border-[#444650]/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-primary-600">Player Details</h2>
-                <button onClick={() => setShowModal(false)} className="text-gray-500 hover:text-gray-700">✕</button>
+                <h2 className="font-headline font-black text-2xl uppercase tracking-tighter text-[#ffd700]">Player Details</h2>
+                <button onClick={() => setShowModal(false)} className="text-[#c4c6d0]/40 hover:text-[#ffd700] transition-colors">
+                  <span className="material-symbols-outlined">close</span>
+                </button>
               </div>
               <div className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div><label className="text-sm font-semibold text-gray-600">Name</label><p className="text-gray-900">{selectedPlayer.name}</p></div>
-                  <div><label className="text-sm font-semibold text-gray-600">District</label><p className="text-gray-900">{selectedPlayer.district}</p></div>
-                  <div><label className="text-sm font-semibold text-gray-600">School/College</label><p className="text-gray-900">{selectedPlayer.schoolCollege}</p></div>
-                  <div><label className="text-sm font-semibold text-gray-600">Role</label><p className="text-gray-900">{selectedPlayer.role}</p></div>
+                <div className="grid md:grid-cols-2 gap-4 bg-[#0b0b0f] border border-[#444650]/20 p-4">
+                  {[
+                    { label: 'Name', value: selectedPlayer.name },
+                    { label: 'District', value: selectedPlayer.district },
+                    { label: 'School/College', value: selectedPlayer.schoolCollege },
+                    { label: 'Role', value: selectedPlayer.role },
+                  ].map(item => (
+                    <div key={item.label}>
+                      <label className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">{item.label}</label>
+                      <p className="text-[#e4e1e9] font-semibold mt-1">{item.value}</p>
+                    </div>
+                  ))}
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Uploaded Documents</h3>
+                  <h3 className="font-headline font-bold uppercase tracking-tight text-[#c4c6d0] mb-4 text-sm">Uploaded Documents</h3>
                   <div className="grid md:grid-cols-2 gap-4">
-                    {selectedPlayer.aadhaarDoc && (
-                      <div className="border rounded-lg p-4">
-                        <label className="text-sm font-semibold text-gray-600 block mb-2">Aadhaar Card</label>
-                        <a href={selectedPlayer.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center">
-                          <FileCheck className="w-4 h-4 mr-2" />View Document
+                    {[
+                      { label: 'Aadhaar Card', url: selectedPlayer.aadhaarDoc },
+                      { label: 'School/College ID', url: selectedPlayer.schoolIdDoc },
+                      { label: 'Date of Birth Proof', url: selectedPlayer.dobProofDoc },
+                      { label: 'Photograph', url: selectedPlayer.photoDoc },
+                    ].filter(d => d.url).map(doc => (
+                      <div key={doc.label} className="border border-[#444650]/20 bg-[#0b0b0f] p-4">
+                        <label className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 block mb-2">{doc.label}</label>
+                        <a href={doc.url} target="_blank" rel="noopener noreferrer" className="text-[#ffd700] hover:underline flex items-center gap-2 text-sm">
+                          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>fact_check</span> View Document
                         </a>
                       </div>
-                    )}
-                    {selectedPlayer.schoolIdDoc && (
-                      <div className="border rounded-lg p-4">
-                        <label className="text-sm font-semibold text-gray-600 block mb-2">School/College ID</label>
-                        <a href={selectedPlayer.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center">
-                          <FileCheck className="w-4 h-4 mr-2" />View Document
-                        </a>
-                      </div>
-                    )}
-                    {selectedPlayer.dobProofDoc && (
-                      <div className="border rounded-lg p-4">
-                        <label className="text-sm font-semibold text-gray-600 block mb-2">Date of Birth Proof</label>
-                        <a href={selectedPlayer.dobProofDoc} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center">
-                          <FileCheck className="w-4 h-4 mr-2" />View Document
-                        </a>
-                      </div>
-                    )}
-                    {selectedPlayer.photoDoc && (
-                      <div className="border rounded-lg p-4">
-                        <label className="text-sm font-semibold text-gray-600 block mb-2">Photograph</label>
-                        <a href={selectedPlayer.photoDoc} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline flex items-center">
-                          <FileCheck className="w-4 h-4 mr-2" />View Document
-                        </a>
-                      </div>
-                    )}
+                    ))}
                   </div>
                 </div>
               </div>

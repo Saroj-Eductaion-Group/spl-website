@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 import { useUser } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, Clock, XCircle, Users, User, Trophy, ArrowRight, Copy } from 'lucide-react'
 import Link from 'next/link'
 
 interface Registration {
@@ -13,18 +12,29 @@ interface Registration {
   district: string
   status?: string
   playerCount?: number
+  players?: { id: string; name: string; role: string; phone: string; district: string; schoolCollege: string; isIndividual: boolean }[]
   payment?: { status: string; transactionId: string; amount: number } | null
   role?: string
   teamAssigned?: boolean
-  assignedTeam?: { name: string; district: string } | null
+  assignedTeam?: {
+    name: string
+    district: string
+    schoolCollege: string
+    managerName: string | null
+    managerPhone: string | null
+    coachName: string | null
+    coachPhone: string | null
+    contactEmail: string | null
+    registrationId: string
+  } | null
   createdAt: string
 }
 
-const statusConfig: Record<string, { color: string; bg: string; icon: typeof CheckCircle; label: string }> = {
-  APPROVED: { color: 'text-green-700', bg: 'bg-green-50 border-green-200', icon: CheckCircle, label: 'Approved' },
-  PENDING:  { color: 'text-yellow-700', bg: 'bg-yellow-50 border-yellow-200', icon: Clock, label: 'Pending Review' },
-  REJECTED: { color: 'text-red-700', bg: 'bg-red-50 border-red-200', icon: XCircle, label: 'Rejected' },
-  COMPLETED:{ color: 'text-green-700', bg: 'bg-green-50 border-green-200', icon: CheckCircle, label: 'Completed' },
+const statusMap: Record<string, { icon: string; color: string; bg: string; label: string }> = {
+  APPROVED:  { icon: 'check_circle',  color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30', label: 'Approved'      },
+  PENDING:   { icon: 'schedule',      color: 'text-[#ffd700]',   bg: 'bg-[#ffd700]/10 border-[#ffd700]/30',     label: 'Pending Review'},
+  REJECTED:  { icon: 'cancel',        color: 'text-red-400',     bg: 'bg-red-400/10 border-red-400/30',         label: 'Rejected'      },
+  COMPLETED: { icon: 'verified',      color: 'text-emerald-400', bg: 'bg-emerald-400/10 border-emerald-400/30', label: 'Completed'     },
 }
 
 export default function MyRegistrationPage() {
@@ -50,174 +60,287 @@ export default function MyRegistrationPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  if (!isLoaded || loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin" />
-      </div>
-    )
-  }
+  if (!isLoaded || loading) return (
+    <div className="min-h-screen bg-[#0b0b0f] flex items-center justify-center">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="page-hero">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="page-hero-title">My Registration</h1>
-          <p className="page-hero-sub">Track your SPL registration status</p>
-        </div>
-      </div>
+    <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
 
-      <div className="container mx-auto px-4 py-12 max-w-2xl">
+      {/* Hero */}
+      <section className="spl-hero border-b border-[#ffd700]/15">
+        <div className="max-w-screen-xl mx-auto relative z-10 text-center">
+          <p className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-4">Dashboard</p>
+          <h1 className="font-headline font-black text-5xl md:text-6xl italic uppercase tracking-tighter leading-[0.9] mb-4 text-white">
+            My <span className="text-[#ffd700]">Registration</span>
+          </h1>
+          <p className="text-white/70 text-lg">Track your SPL registration status</p>
+        </div>
+      </section>
+
+      <div className="max-w-2xl mx-auto px-6 py-12">
 
         {!registration ? (
-          <div className="card text-center py-12">
-            <Trophy className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">No Registration Found</h2>
-            <p className="text-gray-500 mb-8">You haven't registered for SPL yet. Join the tournament today!</p>
+          <div className="bg-[#131318] border border-[#444650]/20 p-12 text-center">
+            <span className="material-symbols-outlined text-[#ffd700]/20 mb-4 block" style={{ fontSize: '64px' }}>emoji_events</span>
+            <h2 className="font-headline font-black text-2xl uppercase tracking-tight mb-2">No Registration Found</h2>
+            <p className="text-[#c4c6d0] mb-8">You haven't registered for SPL yet. Join the tournament today!</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register?type=team" className="btn-primary flex items-center justify-center gap-2">
-                <Users className="w-4 h-4" /> Register as Team
+              <Link href="/register?type=team" className="bg-[#ffd700] text-[#002366] px-6 py-3 font-headline font-black uppercase tracking-tight hover:brightness-110 transition-all">
+                Register as Team
               </Link>
-              <Link href="/register?type=individual" className="btn-gold flex items-center justify-center gap-2">
-                <User className="w-4 h-4" /> Register as Individual
+              <Link href="/register?type=individual" className="border-2 border-[#ffd700] text-[#ffd700] px-6 py-3 font-headline font-black uppercase tracking-tight hover:bg-[#ffd700] hover:text-[#002366] transition-all">
+                Register as Individual
               </Link>
             </div>
           </div>
         ) : (
-          <div className="space-y-6">
+          <div className="space-y-4">
 
-            {/* Registration ID Card */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-semibold text-gray-800">Registration Details</h2>
-                <span className={`text-xs font-bold px-3 py-1 rounded-full ${registration.type === 'team' ? 'bg-primary-100 text-primary-700' : 'bg-gold-100 text-gold-700'}`}>
-                  {registration.type === 'team' ? 'Team Registration' : 'Individual Registration'}
+            {/* Registration ID */}
+            <div className="bg-[#131318] border border-[#444650]/20 p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h2 className="font-headline font-black uppercase tracking-tight text-[#e4e1e9]">Registration Details</h2>
+                <span className={`text-[0.6rem] font-headline font-black uppercase tracking-widest px-3 py-1 border ${registration.type === 'team' ? 'text-[#ffd700] border-[#ffd700]/30 bg-[#ffd700]/10' : 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10'}`}>
+                  {registration.type === 'team' ? 'Team' : 'Individual'}
                 </span>
               </div>
 
-              <div className="bg-gray-50 rounded-xl p-4 flex items-center justify-between mb-4">
+              <div className="bg-[#002366]/40 border border-[#ffd700]/20 p-4 flex items-center justify-between mb-5">
                 <div>
-                  <p className="text-xs text-gray-500 mb-1">Registration ID</p>
-                  <p className="text-xl font-bold font-mono text-primary-700">{registration.registrationId}</p>
+                  <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/60 mb-1">Registration ID</p>
+                  <p className="text-xl font-headline font-black text-[#ffd700] tracking-wider">{registration.registrationId}</p>
                 </div>
-                <button onClick={copyId} className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-600 transition-colors">
-                  <Copy className="w-4 h-4" />
+                <button onClick={copyId} className="flex items-center gap-1.5 text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/60 hover:text-[#ffd700] transition-colors">
+                  <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>content_copy</span>
                   {copied ? 'Copied!' : 'Copy'}
                 </button>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
-                  <p className="text-gray-500">Name</p>
-                  <p className="font-semibold text-gray-800">{registration.name}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">District</p>
-                  <p className="font-semibold text-gray-800">{registration.district}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Registered On</p>
-                  <p className="font-semibold text-gray-800">{new Date(registration.createdAt).toLocaleDateString('en-IN')}</p>
-                </div>
-                {registration.type === 'team' && (
-                  <div>
-                    <p className="text-gray-500">Players</p>
-                    <p className="font-semibold text-gray-800">{registration.playerCount} / 15</p>
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { label: 'Name', value: registration.name },
+                  { label: 'District', value: registration.district },
+                  { label: 'Registered On', value: new Date(registration.createdAt).toLocaleDateString('en-IN') },
+                  registration.type === 'team'
+                    ? { label: 'Players', value: `${registration.playerCount} / 15` }
+                    : { label: 'Playing Role', value: registration.role?.replace('_', ' ') || '—' },
+                ].map(item => (
+                  <div key={item.label} className="border-b border-[#444650]/15 pb-3">
+                    <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 mb-1">{item.label}</p>
+                    <p className="font-headline font-bold text-[#e4e1e9]">{item.value}</p>
                   </div>
-                )}
-                {registration.type === 'individual' && registration.role && (
-                  <div>
-                    <p className="text-gray-500">Playing Role</p>
-                    <p className="font-semibold text-gray-800">{registration.role.replace('_', ' ')}</p>
-                  </div>
-                )}
+                ))}
               </div>
+
+              {/* Player List for team */}
+              {registration.type === 'team' && registration.players && registration.players.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 mb-3">Squad</p>
+                  <div className="space-y-1.5">
+                    {registration.players.map((p, i) => (
+                      <div key={p.id} className={`border px-3 py-2.5 ${
+                        p.isIndividual ? 'bg-violet-400/5 border-violet-400/20' : 'bg-[#0b0b0f] border-[#444650]/15'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[0.6rem] font-headline font-bold text-[#c4c6d0]/30 w-5">{i + 1}</span>
+                            <span className="text-sm font-headline font-bold text-[#e4e1e9]">{p.name}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            {p.isIndividual && (
+                              <span className="text-[0.55rem] font-headline font-bold uppercase tracking-widest text-violet-400 border border-violet-400/30 bg-violet-400/10 px-1.5 py-0.5">Assigned</span>
+                            )}
+                            <span className="text-[0.55rem] font-headline font-bold uppercase tracking-widest text-[#ffd700]/70">{p.role.replace('_', ' ')}</span>
+                          </div>
+                        </div>
+                        {p.isIndividual && (
+                          <div className="mt-2 ml-7 flex flex-wrap gap-2">
+                            <a href={`tel:${p.phone}`}
+                              className="flex items-center gap-1.5 bg-violet-400/10 border border-violet-400/30 text-violet-400 px-2.5 py-1 text-xs font-headline font-black uppercase tracking-wide hover:bg-violet-400/20 transition-colors">
+                              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>call</span>
+                              {p.phone}
+                            </a>
+                            <span className="flex items-center gap-1 text-xs text-[#c4c6d0]/50 font-body">
+                              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>school</span>
+                              {p.schoolCollege}
+                            </span>
+                            <span className="flex items-center gap-1 text-xs text-[#c4c6d0]/50 font-body">
+                              <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>location_on</span>
+                              {p.district}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Status Card */}
+            {/* Team Status */}
             {registration.type === 'team' && registration.status && (() => {
-              const cfg = statusConfig[registration.status] || statusConfig.PENDING
-              const Icon = cfg.icon
+              const s = statusMap[registration.status] || statusMap.PENDING
               return (
-                <div className={`card border ${cfg.bg}`}>
-                  <div className="flex items-center gap-3">
-                    <Icon className={`w-6 h-6 ${cfg.color}`} />
+                <div className={`bg-[#131318] border p-6 ${s.bg}`}>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className={`material-symbols-outlined ${s.color}`} style={{ fontSize: '24px' }}>{s.icon}</span>
                     <div>
-                      <p className="text-xs text-gray-500">Registration Status</p>
-                      <p className={`font-bold text-lg ${cfg.color}`}>{cfg.label}</p>
+                      <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">Registration Status</p>
+                      <p className={`font-headline font-black text-lg uppercase ${s.color}`}>{s.label}</p>
                     </div>
                   </div>
-                  {registration.status === 'PENDING' && (
-                    <p className="text-sm text-gray-600 mt-3">Your registration is under review by the district coordinator. You will be notified via email/SMS once approved.</p>
-                  )}
-                  {registration.status === 'REJECTED' && (
-                    <p className="text-sm text-red-600 mt-3">Your registration was rejected. Please contact us at info@splcricket.com for more information.</p>
+                  {registration.status === 'PENDING' && <p className="text-[#c4c6d0] text-sm mt-2">Your registration is under review. You will be notified via email once approved.</p>}
+                  {registration.status === 'REJECTED' && <p className="text-red-400 text-sm mt-2">Your registration was rejected. Contact info@splcricket.com for details.</p>}
+                </div>
+              )
+            })()}
+
+            {/* Individual Team Assignment */}
+            {registration.type === 'individual' && (() => {
+              const assigned = registration.teamAssigned
+              const team = registration.assignedTeam
+              return (
+                <div className={`bg-[#131318] border p-6 ${
+                  assigned ? 'border-emerald-400/30' : 'border-[#ffd700]/30'
+                }`}>
+                  {/* Header */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className={`material-symbols-outlined ${
+                      assigned ? 'text-emerald-400' : 'text-[#ffd700]'
+                    }`} style={{ fontSize: '24px' }}>
+                      {assigned ? 'check_circle' : 'schedule'}
+                    </span>
+                    <div>
+                      <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">Team Assignment</p>
+                      <p className={`font-headline font-black text-lg uppercase ${
+                        assigned ? 'text-emerald-400' : 'text-[#ffd700]'
+                      }`}>
+                        {assigned ? 'Team Assigned' : 'Awaiting Assignment'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {assigned && team ? (
+                    <div className="space-y-3">
+                      {/* Team name banner */}
+                      <div className="bg-[#002366]/50 border border-[#ffd700]/20 px-5 py-4 flex items-center justify-between">
+                        <div>
+                          <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 mb-1">Assigned Team</p>
+                          <p className="font-headline font-black text-xl text-[#ffd700]">{team.name}</p>
+                          <p className="text-[#c4c6d0] text-sm">{team.district} · {team.schoolCollege}</p>
+                        </div>
+                        <span className="material-symbols-outlined text-[#ffd700]/20" style={{ fontSize: '48px' }}>groups</span>
+                      </div>
+
+                      {/* Contact details */}
+                      <div className="bg-[#0b0b0f] border border-[#444650]/20 p-4">
+                        <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 mb-3">Contact Information</p>
+                        <div className="space-y-3">
+                          {team.managerName && (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[#ffd700]/60" style={{ fontSize: '16px' }}>manage_accounts</span>
+                                <div>
+                                  <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">Team Manager</p>
+                                  <p className="text-sm font-headline font-bold text-[#e4e1e9]">{team.managerName}</p>
+                                </div>
+                              </div>
+                              {team.managerPhone && (
+                                <a href={`tel:${team.managerPhone}`}
+                                  className="flex items-center gap-1.5 bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700] px-3 py-1.5 text-xs font-headline font-black uppercase tracking-wide hover:bg-[#ffd700]/20 transition-colors">
+                                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>call</span>
+                                  {team.managerPhone}
+                                </a>
+                              )}
+                            </div>
+                          )}
+
+                          {team.coachName && (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[#ffd700]/60" style={{ fontSize: '16px' }}>sports</span>
+                                <div>
+                                  <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">Coach</p>
+                                  <p className="text-sm font-headline font-bold text-[#e4e1e9]">{team.coachName}</p>
+                                </div>
+                              </div>
+                              {team.coachPhone && (
+                                <a href={`tel:${team.coachPhone}`}
+                                  className="flex items-center gap-1.5 bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700] px-3 py-1.5 text-xs font-headline font-black uppercase tracking-wide hover:bg-[#ffd700]/20 transition-colors">
+                                  <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>call</span>
+                                  {team.coachPhone}
+                                </a>
+                              )}
+                            </div>
+                          )}
+
+                          {team.contactEmail && (
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <span className="material-symbols-outlined text-[#ffd700]/60" style={{ fontSize: '16px' }}>mail</span>
+                                <div>
+                                  <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">Team Email</p>
+                                  <p className="text-sm font-headline font-bold text-[#e4e1e9]">{team.contactEmail}</p>
+                                </div>
+                              </div>
+                              <a href={`mailto:${team.contactEmail}`}
+                                className="flex items-center gap-1.5 bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700] px-3 py-1.5 text-xs font-headline font-black uppercase tracking-wide hover:bg-[#ffd700]/20 transition-colors">
+                                <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>send</span>
+                                Email
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="bg-emerald-400/5 border border-emerald-400/20 px-4 py-3 flex items-start gap-2">
+                        <span className="material-symbols-outlined text-emerald-400 mt-0.5" style={{ fontSize: '16px' }}>info</span>
+                        <p className="text-emerald-400/80 text-xs font-body">Contact your team manager immediately to confirm your availability and get practice schedule details.</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-[#c4c6d0] text-sm">The SPL committee will assign you to a team based on your district and playing role. You will receive an email notification once assigned.</p>
                   )}
                 </div>
               )
             })()}
 
-            {/* Individual — Team Assignment Status */}
-            {registration.type === 'individual' && (
-              <div className={`card border ${registration.teamAssigned ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}`}>
-                <div className="flex items-center gap-3">
-                  {registration.teamAssigned
-                    ? <CheckCircle className="w-6 h-6 text-green-600" />
-                    : <Clock className="w-6 h-6 text-yellow-600" />
-                  }
-                  <div>
-                    <p className="text-xs text-gray-500">Team Assignment</p>
-                    <p className={`font-bold text-lg ${registration.teamAssigned ? 'text-green-700' : 'text-yellow-700'}`}>
-                      {registration.teamAssigned ? 'Team Assigned' : 'Awaiting Assignment'}
-                    </p>
-                  </div>
-                </div>
-                {registration.teamAssigned && registration.assignedTeam && (
-                  <div className="mt-3 bg-white rounded-lg p-3 text-sm">
-                    <p className="text-gray-500">Assigned Team</p>
-                    <p className="font-bold text-gray-800">{registration.assignedTeam.name}</p>
-                    <p className="text-gray-500">{registration.assignedTeam.district}</p>
-                  </div>
-                )}
-                {!registration.teamAssigned && (
-                  <p className="text-sm text-gray-600 mt-3">The SPL district committee will assign you to a team based on your district and playing role. You will be notified once assigned.</p>
-                )}
-              </div>
-            )}
-
-            {/* Payment Status */}
+            {/* Payment */}
             {registration.type === 'team' && (
-              <div className="card">
-                <h3 className="font-semibold text-gray-800 mb-3">Payment Status</h3>
+              <div className="bg-[#131318] border border-[#444650]/20 p-6">
+                <h3 className="font-headline font-black uppercase tracking-tight text-[#e4e1e9] mb-4">Payment Status</h3>
                 {registration.payment ? (() => {
-                  const cfg = statusConfig[registration.payment.status] || statusConfig.PENDING
-                  const Icon = cfg.icon
+                  const s = statusMap[registration.payment.status] || statusMap.PENDING
                   return (
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Icon className={`w-5 h-5 ${cfg.color}`} />
-                        <span className={`font-semibold ${cfg.color}`}>{cfg.label}</span>
+                        <span className={`material-symbols-outlined ${s.color}`} style={{ fontSize: '20px' }}>{s.icon}</span>
+                        <span className={`font-headline font-bold uppercase ${s.color}`}>{s.label}</span>
                       </div>
-                      <span className="font-bold text-gray-800">₹{registration.payment.amount.toLocaleString('en-IN')}</span>
+                      <span className="font-headline font-black text-[#ffd700]">₹{registration.payment.amount.toLocaleString('en-IN')}</span>
                     </div>
                   )
                 })() : (
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-yellow-600" />
-                      <span className="font-semibold text-yellow-700">Payment Pending</span>
+                      <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '20px' }}>schedule</span>
+                      <span className="font-headline font-bold uppercase text-[#ffd700]">Payment Pending</span>
                     </div>
-                    <Link href="/register" className="text-sm text-primary-600 font-semibold flex items-center gap-1 hover:underline">
-                      Complete Payment <ArrowRight className="w-3 h-3" />
+                    <Link href="/register" className="text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700] hover:underline flex items-center gap-1">
+                      Complete <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>arrow_forward</span>
                     </Link>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Contact */}
-            <div className="bg-primary-50 border border-primary-100 rounded-xl p-4 text-sm text-center text-gray-600">
-              Need help? Contact us at <a href="mailto:info@splcricket.com" className="text-primary-600 font-semibold">info@splcricket.com</a>
+            {/* Help */}
+            <div className="bg-[#002366]/30 border border-[#ffd700]/15 p-4 text-center text-sm text-[#c4c6d0]">
+              Need help? Contact us at{' '}
+              <a href="mailto:info@splcricket.com" className="text-[#ffd700] font-semibold hover:underline">info@splcricket.com</a>
             </div>
 
           </div>

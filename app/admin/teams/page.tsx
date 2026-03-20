@@ -1,13 +1,11 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { CheckCircle, XCircle, Eye, Users, X, FileText } from 'lucide-react'
 
 interface Player {
-  id: string; name: string; phone: string; role: string
+  id: string; name: string; phone: string; role: string; isIndividual?: boolean
   aadhaarDoc?: string; schoolIdDoc?: string; dobProofDoc?: string; photoDoc?: string
 }
-
 interface Team {
   id: string; name: string; district: string; schoolCollege: string
   status: string; registrationId: string; createdAt: string
@@ -16,6 +14,12 @@ interface Team {
   _count: { players: number }
   payments: { status: string; amount: number }[]
   players: Player[]
+}
+
+const statusCls: Record<string, string> = {
+  APPROVED: 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10',
+  REJECTED:  'text-red-400 border-red-400/30 bg-red-400/10',
+  PENDING:   'text-[#ffd700] border-[#ffd700]/30 bg-[#ffd700]/10',
 }
 
 export default function AdminTeams() {
@@ -47,81 +51,79 @@ export default function AdminTeams() {
 
   const filtered = teams.filter(t => filter === 'ALL' || t.status === filter)
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary-600">Team Management</h1>
-        <p className="text-gray-600">Manage team registrations, documents and approvals</p>
+        <h1 className="font-headline font-black text-3xl italic uppercase tracking-tighter text-[#e4e1e9]">Team <span className="text-[#ffd700]">Management</span></h1>
+        <p className="text-[#c4c6d0]/60 text-sm mt-1">Manage team registrations, documents and approvals</p>
       </div>
 
-      {/* Doc Viewer Modal */}
+      {/* Modal */}
       {viewTeam && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white">
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#131318] border border-[#444650]/30 max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b border-[#444650]/20 sticky top-0 bg-[#131318]">
               <div>
-                <h2 className="text-xl font-bold text-primary-600">{viewTeam.name}</h2>
-                <p className="text-sm text-gray-500">{viewTeam.registrationId} • {viewTeam.district} • {viewTeam.schoolCollege}</p>
+                <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700]">{viewTeam.name}</h2>
+                <p className="text-xs text-[#c4c6d0]/60 mt-1">{viewTeam.registrationId} • {viewTeam.district} • {viewTeam.schoolCollege}</p>
               </div>
-              <button onClick={() => setViewTeam(null)} className="text-gray-400 hover:text-gray-600"><X className="w-6 h-6" /></button>
+              <button onClick={() => setViewTeam(null)} className="text-[#c4c6d0]/40 hover:text-[#ffd700] transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
             </div>
             <div className="p-6 space-y-6">
-              {/* Team Info */}
-              <div className="grid grid-cols-2 gap-3 text-sm bg-gray-50 rounded-lg p-4">
-                {viewTeam.coachName && <div><span className="text-gray-500">Coach:</span> <span className="font-medium">{viewTeam.coachName}</span> {viewTeam.coachPhone && `(${viewTeam.coachPhone})`}</div>}
-                {viewTeam.managerName && <div><span className="text-gray-500">Manager:</span> <span className="font-medium">{viewTeam.managerName}</span> {viewTeam.managerPhone && `(${viewTeam.managerPhone})`}</div>}
-                {viewTeam.contactEmail && <div><span className="text-gray-500">Email:</span> <span className="font-medium">{viewTeam.contactEmail}</span></div>}
-                <div><span className="text-gray-500">Payment:</span> <span className={`font-semibold ${viewTeam.payments?.[0]?.status === 'COMPLETED' ? 'text-green-600' : 'text-yellow-600'}`}>{viewTeam.payments?.[0]?.status || 'PENDING'}</span></div>
+              <div className="grid grid-cols-2 gap-3 text-sm bg-[#0b0b0f] border border-[#444650]/20 p-4">
+                {viewTeam.coachName && <div><span className="text-[#c4c6d0]/50">Coach:</span> <span className="text-[#e4e1e9] font-semibold">{viewTeam.coachName}</span> {viewTeam.coachPhone && <span className="text-[#c4c6d0]/50">({viewTeam.coachPhone})</span>}</div>}
+                {viewTeam.managerName && <div><span className="text-[#c4c6d0]/50">Manager:</span> <span className="text-[#e4e1e9] font-semibold">{viewTeam.managerName}</span> {viewTeam.managerPhone && <span className="text-[#c4c6d0]/50">({viewTeam.managerPhone})</span>}</div>}
+                {viewTeam.contactEmail && <div><span className="text-[#c4c6d0]/50">Email:</span> <span className="text-[#e4e1e9] font-semibold">{viewTeam.contactEmail}</span></div>}
+                <div><span className="text-[#c4c6d0]/50">Payment:</span> <span className={`font-semibold ${viewTeam.payments?.[0]?.status === 'COMPLETED' ? 'text-emerald-400' : 'text-[#ffd700]'}`}>{viewTeam.payments?.[0]?.status || 'PENDING'}</span></div>
               </div>
-
-              {/* Players & Docs */}
               <div>
-                <h3 className="font-semibold text-gray-800 mb-3">Players & Documents ({viewTeam.players?.length || 0})</h3>
+                <h3 className="font-headline font-bold uppercase tracking-tight text-[#c4c6d0] mb-3 text-sm">Players & Documents ({viewTeam.players?.length || 0}){viewTeam.players?.some(p => p.isIndividual) && <span className="ml-2 text-[0.6rem] text-violet-400 border border-violet-400/30 px-2 py-0.5">+{viewTeam.players.filter(p => p.isIndividual).length} assigned</span>}</h3>
                 <div className="space-y-3">
                   {viewTeam.players?.map((player, i) => (
-                    <div key={player.id} className="border border-gray-200 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
+                    <div key={player.id} className="border border-[#444650]/20 bg-[#0b0b0f] p-4">
+                      <div className="flex justify-between items-start mb-3">
                         <div>
-                          <span className="font-medium text-gray-900">{i + 1}. {player.name}</span>
-                          <span className="ml-2 text-xs text-gray-500">{player.phone}</span>
+                          <span className="font-headline font-bold text-[#e4e1e9]">{i + 1}. {player.name}</span>
+                          <span className="ml-2 text-xs text-[#c4c6d0]/50">{player.phone}</span>
                         </div>
-                        <span className="text-xs bg-primary-100 text-primary-700 px-2 py-0.5 rounded-full">{player.role}</span>
+                        <div className="flex items-center gap-2">
+                          {player.isIndividual && (
+                            <span className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-violet-400 border border-violet-400/30 bg-violet-400/10 px-2 py-0.5">Individual</span>
+                          )}
+                          <span className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#ffd700] border border-[#ffd700]/30 px-2 py-0.5">{player.role}</span>
+                        </div>
                       </div>
                       <div className="flex flex-wrap gap-2">
-                        {player.aadhaarDoc
-                          ? <a href={player.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 Aadhaar</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ Aadhaar missing</span>}
-                        {player.schoolIdDoc
-                          ? <a href={player.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 School ID</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ School ID missing</span>}
-                        {player.dobProofDoc
-                          ? <a href={player.dobProofDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 DOB Proof</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ DOB Proof missing</span>}
-                        {player.photoDoc
-                          ? <a href={player.photoDoc} target="_blank" rel="noopener noreferrer" className="text-xs bg-blue-50 text-blue-600 border border-blue-200 px-2 py-1 rounded hover:bg-blue-100">📄 Photo</a>
-                          : <span className="text-xs bg-red-50 text-red-400 border border-red-200 px-2 py-1 rounded">❌ Photo missing</span>}
+                        {player.aadhaarDoc ? <a href={player.aadhaarDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ffd700] border border-[#ffd700]/30 px-2 py-1 hover:bg-[#ffd700]/10 transition-colors">📄 Aadhaar</a> : <span className="text-xs text-red-400 border border-red-400/30 px-2 py-1">❌ Aadhaar missing</span>}
+                        {player.schoolIdDoc ? <a href={player.schoolIdDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ffd700] border border-[#ffd700]/30 px-2 py-1 hover:bg-[#ffd700]/10 transition-colors">📄 School ID</a> : <span className="text-xs text-red-400 border border-red-400/30 px-2 py-1">❌ School ID missing</span>}
+                        {player.dobProofDoc ? <a href={player.dobProofDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ffd700] border border-[#ffd700]/30 px-2 py-1 hover:bg-[#ffd700]/10 transition-colors">📄 DOB Proof</a> : <span className="text-xs text-red-400 border border-red-400/30 px-2 py-1">❌ DOB Proof missing</span>}
+                        {player.photoDoc ? <a href={player.photoDoc} target="_blank" rel="noopener noreferrer" className="text-xs text-[#ffd700] border border-[#ffd700]/30 px-2 py-1 hover:bg-[#ffd700]/10 transition-colors">📄 Photo</a> : <span className="text-xs text-red-400 border border-red-400/30 px-2 py-1">❌ Photo missing</span>}
                       </div>
                     </div>
                   ))}
-                  {(!viewTeam.players || viewTeam.players.length === 0) && <p className="text-sm text-gray-400">No players found</p>}
+                  {(!viewTeam.players || viewTeam.players.length === 0) && <p className="text-sm text-[#c4c6d0]/40">No players found</p>}
                 </div>
               </div>
-
-              {/* Actions */}
               {viewTeam.status === 'PENDING' && (
-                <div className="flex gap-3 pt-2 border-t">
-                  <button onClick={() => updateTeamStatus(viewTeam.id, 'APPROVED')} className="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2">
-                    <CheckCircle className="w-4 h-4" /> Approve Team
+                <div className="flex gap-3 pt-2 border-t border-[#444650]/20">
+                  <button onClick={() => updateTeamStatus(viewTeam.id, 'APPROVED')} className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-headline font-black uppercase tracking-tight py-2.5 flex items-center justify-center gap-2 transition-colors">
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span> Approve Team
                   </button>
-                  <button onClick={() => updateTeamStatus(viewTeam.id, 'REJECTED')} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg flex items-center justify-center gap-2">
-                    <XCircle className="w-4 h-4" /> Reject Team
+                  <button onClick={() => updateTeamStatus(viewTeam.id, 'REJECTED')} className="flex-1 bg-red-500 hover:bg-red-600 text-white font-headline font-black uppercase tracking-tight py-2.5 flex items-center justify-center gap-2 transition-colors">
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cancel</span> Reject Team
                   </button>
                 </div>
               )}
               {viewTeam.status !== 'PENDING' && (
-                <div className={`text-center py-2 rounded-lg font-semibold text-sm ${viewTeam.status === 'APPROVED' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                <div className={`text-center py-2.5 font-headline font-black uppercase tracking-tight text-sm border ${statusCls[viewTeam.status] || statusCls.PENDING}`}>
                   Team is {viewTeam.status}
                 </div>
               )}
@@ -133,64 +135,74 @@ export default function AdminTeams() {
       {/* Filters */}
       <div className="flex flex-wrap gap-3 mb-6">
         {['ALL', 'PENDING', 'APPROVED', 'REJECTED'].map(s => (
-          <button key={s} onClick={() => setFilter(s)} className={`px-4 py-2 rounded-lg text-sm font-medium ${filter === s ? 'bg-primary-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50 border border-gray-200'}`}>
+          <button key={s} onClick={() => setFilter(s)}
+            className={`px-4 py-2 text-xs font-headline font-black uppercase tracking-widest transition-all ${filter === s ? 'bg-[#ffd700] text-[#002366]' : 'border border-[#444650]/40 text-[#c4c6d0] hover:border-[#ffd700] hover:text-[#ffd700]'}`}>
             {s} ({teams.filter(t => s === 'ALL' || t.status === s).length})
           </button>
         ))}
       </div>
 
       {/* Table */}
-      <div className="card overflow-hidden">
+      <div className="bg-[#131318] border border-[#444650]/20 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full">
+            <thead className="bg-[#0b0b0f] border-b border-[#444650]/20">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Team</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">District</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Players</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Payment</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                {['Team', 'District', 'Players', 'Payment', 'Status', 'Actions'].map(h => (
+                  <th key={h} className="px-4 py-3 text-left text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">{h}</th>
+                ))}
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-[#444650]/10">
               {filtered.map(team => (
-                <tr key={team.id}>
+                <tr key={team.id} className="hover:bg-[#1c1c21] transition-colors">
                   <td className="px-4 py-4">
-                    <div className="font-medium text-gray-900 text-sm">{team.name}</div>
-                    <div className="text-xs text-gray-500">{team.registrationId}</div>
-                    <div className="text-xs text-gray-500">{team.schoolCollege}</div>
+                    <div className="font-headline font-bold text-[#e4e1e9] text-sm">{team.name}</div>
+                    <div className="text-xs text-[#c4c6d0]/50">{team.registrationId}</div>
+                    <div className="text-xs text-[#c4c6d0]/50">{team.schoolCollege}</div>
                   </td>
-                  <td className="px-4 py-4 text-sm text-gray-700">{team.district}</td>
+                  <td className="px-4 py-4 text-sm text-[#c4c6d0]">{team.district}</td>
                   <td className="px-4 py-4">
-                    <div className="flex items-center gap-1 text-sm text-gray-700">
-                      <Users className="w-4 h-4" /> {team._count?.players || 0}
+                    <div className="flex items-center gap-1.5 text-sm text-[#c4c6d0]">
+                      <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>groups</span>
+                      {team._count?.players || 0}
+                      {(team.players?.filter(p => p.isIndividual).length || 0) > 0 && (
+                        <span className="text-[0.6rem] text-violet-400">+{team.players.filter(p => p.isIndividual).length}</span>
+                      )}
                     </div>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${team.payments?.[0]?.status === 'COMPLETED' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                    <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${team.payments?.[0]?.status === 'COMPLETED' ? 'text-emerald-400 border-emerald-400/30' : 'text-[#ffd700] border-[#ffd700]/30'}`}>
                       {team.payments?.[0]?.status || 'PENDING'}
                     </span>
                   </td>
                   <td className="px-4 py-4">
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-full ${team.status === 'APPROVED' ? 'bg-green-100 text-green-800' : team.status === 'REJECTED' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                    <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${statusCls[team.status] || statusCls.PENDING}`}>
                       {team.status}
                     </span>
                   </td>
-                  <td className="px-4 py-4 space-x-2 whitespace-nowrap">
-                    <button onClick={() => setViewTeam(team)} className="text-blue-600 hover:text-blue-800" title="View Documents">
-                      <FileText className="w-5 h-5" />
-                    </button>
-                    {team.status === 'PENDING' && (
-                      <>
-                        <button onClick={() => updateTeamStatus(team.id, 'APPROVED')} className="text-green-600 hover:text-green-800" title="Approve"><CheckCircle className="w-5 h-5" /></button>
-                        <button onClick={() => updateTeamStatus(team.id, 'REJECTED')} className="text-red-500 hover:text-red-700" title="Reject"><XCircle className="w-5 h-5" /></button>
-                      </>
-                    )}
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => setViewTeam(team)} className="text-[#c4c6d0]/40 hover:text-[#ffd700] transition-colors" title="View Documents">
+                        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>description</span>
+                      </button>
+                      {team.status === 'PENDING' && (
+                        <>
+                          <button onClick={() => updateTeamStatus(team.id, 'APPROVED')} className="text-emerald-400/60 hover:text-emerald-400 transition-colors" title="Approve">
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>check_circle</span>
+                          </button>
+                          <button onClick={() => updateTeamStatus(team.id, 'REJECTED')} className="text-red-400/60 hover:text-red-400 transition-colors" title="Reject">
+                            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>cancel</span>
+                          </button>
+                        </>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
-              {filtered.length === 0 && <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-400">No teams found</td></tr>}
+              {filtered.length === 0 && (
+                <tr><td colSpan={6} className="px-4 py-12 text-center text-[#c4c6d0]/40 font-headline uppercase tracking-widest text-sm">No teams found</td></tr>
+              )}
             </tbody>
           </table>
         </div>

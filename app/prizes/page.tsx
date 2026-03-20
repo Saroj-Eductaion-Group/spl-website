@@ -1,121 +1,145 @@
-import { Trophy, GraduationCap, Award, Star } from 'lucide-react'
+import Link from 'next/link'
+
+const prizes = [
+  { place: '1st', label: 'Champion', amount: '₹11,00,000', icon: '🥇', color: '#ffd700' },
+  { place: '2nd', label: 'Runner-Up', amount: '₹5,00,000', icon: '🥈', color: '#c4c6d0' },
+  { place: '3rd', label: 'Third Place', amount: '₹2,00,000', icon: '🥉', color: '#cd7f32' },
+]
+
+const individual = [
+  { title: 'Best Batsman', amount: '₹50,000' },
+  { title: 'Best Bowler', amount: '₹50,000' },
+  { title: 'Best All-Rounder', amount: '₹50,000' },
+  { title: 'Player of Tournament', amount: '₹1,00,000' },
+]
+
+const scholarshipSteps = [
+  { step: '01', title: 'Complete Tournament', desc: 'Participate in SPL matches as per tournament schedule' },
+  { step: '02', title: 'Receive Certificate', desc: 'Get SPL participation certificate after tournament completion' },
+  { step: '03', title: 'University Application', desc: 'Apply to Saroj International University with SPL certificate' },
+  { step: '04', title: 'Scholarship Approved', desc: 'Receive 50% scholarship upon admission confirmation' },
+]
 
 export default function Prizes() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="page-hero">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="page-hero-title">Prize Money & Scholarships</h1>
-          <p className="page-hero-sub">Rewards for Excellence in Cricket and Academics</p>
+    <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
+
+      {/* Hero */}
+      <section className="spl-hero border-b border-[#ffd700]/15">
+        <div className="max-w-screen-xl mx-auto relative z-10">
+          <p className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-4">Rewards</p>
+          <h1 className="font-headline font-black text-5xl md:text-7xl italic uppercase tracking-tighter leading-[0.9] mb-6 text-white">
+            PRIZE MONEY <br /><span className="text-[#ffd700]">& SCHOLARSHIPS</span>
+          </h1>
+          <p className="text-white/70 text-lg max-w-2xl">Rewards for excellence in cricket and academics</p>
         </div>
-      </div>
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto">
+      </section>
 
-          <div className="card mb-8 text-center bg-gradient-to-r from-gold-400 to-gold-600 text-white">
-            <Trophy className="w-16 h-16 mx-auto mb-6" />
-            <h2 className="text-3xl font-bold mb-4">Championship Prize</h2>
-            <div className="text-6xl font-bold mb-4">₹11,00,000</div>
-            <p className="text-xl">Winner Prize Money</p>
-            <p className="mt-4 text-gold-100">The ultimate reward for SPL champions</p>
-          </div>
+      {/* Champion Prize */}
+      <section className="py-20 px-6 bg-[#131318] border-b border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto text-center">
+          <div className="text-8xl mb-6">🏆</div>
+          <p className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-4">Championship Prize</p>
+          <div className="text-8xl md:text-[10rem] font-headline font-black text-[#ffd700] leading-none tracking-tighter">₹11L</div>
+          <p className="text-2xl font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mt-4">Winner Prize Money</p>
+        </div>
+      </section>
 
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-primary-600">Prize Distribution</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center p-6 bg-gold-50 rounded-lg">
-                <Trophy className="w-12 h-12 text-gold-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gold-600 mb-2">1st Place</h3>
-                <div className="text-3xl font-bold text-gold-600 mb-2">₹11,00,000</div>
-                <p className="text-gray-600">Championship Trophy + Cash Prize</p>
+      {/* Prize Distribution */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-10">Prize Distribution</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {prizes.map(p => (
+              <div key={p.place} className="bg-[#131318] border border-[#444650]/20 p-8 text-center hover:border-[#ffd700]/40 transition-colors">
+                <div className="text-5xl mb-4">{p.icon}</div>
+                <div className="text-xs font-headline font-bold uppercase tracking-widest mb-2" style={{ color: p.color }}>{p.place} Place</div>
+                <h3 className="font-headline font-black text-xl uppercase mb-4" style={{ color: p.color }}>{p.label}</h3>
+                <div className="text-4xl font-headline font-black" style={{ color: p.color }}>{p.amount}</div>
+                <p className="text-[#c4c6d0] text-xs mt-2">+ Trophy</p>
               </div>
-              <div className="text-center p-6 bg-gray-50 rounded-lg">
-                <Award className="w-12 h-12 text-gray-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-gray-600 mb-2">2nd Place</h3>
-                <div className="text-3xl font-bold text-gray-600 mb-2">₹5,00,000</div>
-                <p className="text-gray-600">Runner-up Trophy + Cash Prize</p>
-              </div>
-              <div className="text-center p-6 bg-orange-50 rounded-lg">
-                <Star className="w-12 h-12 text-orange-500 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-orange-600 mb-2">3rd Place</h3>
-                <div className="text-3xl font-bold text-orange-600 mb-2">₹2,00,000</div>
-                <p className="text-gray-600">Third Place Trophy + Cash Prize</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="card mb-8">
-            <h2 className="text-2xl font-semibold mb-6 text-gold-600">Individual Awards</h2>
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[
-                { title: 'Best Batsman', amount: '₹50,000', bg: '#fefce8', color: '#a16207' },
-                { title: 'Best Bowler', amount: '₹50,000', bg: '#eff6ff', color: '#1d4ed8' },
-                { title: 'Best All-Rounder', amount: '₹50,000', bg: '#f0fdf4', color: '#15803d' },
-                { title: 'Player of Tournament', amount: '₹1,00,000', bg: '#faf5ff', color: '#7e22ce' },
-              ].map(a => (
-                <div key={a.title} className="text-center p-4 rounded-lg" style={{ background: a.bg }}>
-                  <h3 className="font-semibold mb-2" style={{ color: a.color }}>{a.title}</h3>
-                  <p className="text-2xl font-bold" style={{ color: a.color }}>{a.amount}</p>
-                  <p className="text-sm text-gray-600">+ Trophy</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="card mb-8">
-            <div className="flex items-center mb-6">
-              <GraduationCap className="w-8 h-8 text-primary-500 mr-3" />
-              <h2 className="text-2xl font-semibold text-primary-600">50% Scholarship Program</h2>
-            </div>
-            <div className="bg-primary-50 p-6 rounded-lg">
-              <p className="text-gray-700 mb-4">
-                Every player who participates in SPL becomes eligible for a 50% scholarship
-                at Saroj International University, regardless of their team's performance.
-              </p>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-semibold mb-2 text-primary-600">Scholarship Benefits</h4>
-                  <ul className="space-y-2 text-gray-700 text-sm">
-                    <li>• 50% reduction in tuition fees</li>
-                    <li>• Applicable to all undergraduate programs</li>
-                    <li>• Valid for entire course duration</li>
-                    <li>• Additional sports quota benefits</li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-semibold mb-2 text-primary-600">Eligibility Conditions</h4>
-                  <ul className="space-y-2 text-gray-700 text-sm">
-                    <li>• Complete SPL tournament participation</li>
-                    <li>• Meet university admission criteria</li>
-                    <li>• Maintain academic standards</li>
-                    <li>• No disciplinary issues during tournament</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="card">
-            <h2 className="text-2xl font-semibold mb-6 text-primary-600">How to Apply for Scholarship</h2>
-            <div className="space-y-4">
-              {[
-                ['Complete Tournament', 'Participate in SPL matches as per tournament schedule'],
-                ['Receive Certificate', 'Get SPL participation certificate after tournament completion'],
-                ['University Application', 'Apply to Saroj International University with SPL certificate'],
-                ['Scholarship Approval', 'Receive 50% scholarship upon admission confirmation'],
-              ].map(([title, desc], i) => (
-                <div key={title} className="flex items-start space-x-4">
-                  <div className="w-8 h-8 bg-primary-500 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">{i + 1}</div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{title}</h3>
-                    <p className="text-gray-600">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            ))}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Individual Awards */}
+      <section className="py-16 px-6 bg-[#131318] border-y border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-10">Individual Awards</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {individual.map(a => (
+              <div key={a.title} className="bg-[#0b0b0f] border border-[#444650]/20 p-6 text-center hover:border-[#ffd700]/40 transition-colors">
+                <h3 className="font-headline font-bold uppercase tracking-tight text-[#c4c6d0] mb-3 text-sm">{a.title}</h3>
+                <div className="text-3xl font-headline font-black text-[#ffd700]">{a.amount}</div>
+                <p className="text-[#c4c6d0] text-xs mt-1">+ Trophy</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Scholarship */}
+      <section className="py-16 px-6">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-4">50% Scholarship Program</h2>
+          <p className="text-[#c4c6d0] max-w-2xl mb-12">
+            Every player who participates in SPL becomes eligible for a 50% scholarship at Saroj International University, regardless of their team's performance.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-[#131318] border border-[#444650]/20 p-8">
+              <h3 className="font-headline font-bold uppercase tracking-tight text-[#ffd700] mb-6">What You Get</h3>
+              <ul className="space-y-3 text-[#c4c6d0] text-sm">
+                {['50% reduction in tuition fees', 'Applicable to all undergraduate programs', 'Valid for entire course duration', 'Additional sports quota benefits'].map(i => (
+                  <li key={i} className="flex items-center gap-3 border-b border-[#444650]/10 pb-3">
+                    <span className="w-1.5 h-1.5 bg-[#ffd700] rounded-full flex-shrink-0" />{i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="bg-[#131318] border border-[#444650]/20 p-8">
+              <h3 className="font-headline font-bold uppercase tracking-tight text-[#ffd700] mb-6">Eligibility Conditions</h3>
+              <ul className="space-y-3 text-[#c4c6d0] text-sm">
+                {['Complete SPL tournament participation', 'Meet university admission criteria', 'Maintain academic standards', 'No disciplinary issues during tournament'].map(i => (
+                  <li key={i} className="flex items-center gap-3 border-b border-[#444650]/10 pb-3">
+                    <span className="w-1.5 h-1.5 bg-[#444650] rounded-full flex-shrink-0" />{i}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          {/* Steps */}
+          <div className="grid md:grid-cols-4 gap-6">
+            {scholarshipSteps.map(s => (
+              <div key={s.step} className="bg-[#131318] border border-[#444650]/20 p-6">
+                <div className="text-4xl font-headline font-black text-[#ffd700]/20 mb-3">{s.step}</div>
+                <h3 className="font-headline font-bold uppercase tracking-tight mb-2 text-sm">{s.title}</h3>
+                <p className="text-[#c4c6d0] text-xs leading-relaxed">{s.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20 text-center">
+        <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter mb-6 text-white">
+          Compete for <span className="text-[#ffd700]">Glory</span>
+        </h2>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <Link href="/register?type=team" className="bg-[#ffd700] text-[#002366] px-8 py-3 font-headline font-black uppercase tracking-tight hover:brightness-110 transition-all">
+            Register Team — ₹11,000
+          </Link>
+          <Link href="/register?type=individual" className="border-2 border-[#ffd700] text-[#ffd700] px-8 py-3 font-headline font-black uppercase tracking-tight hover:bg-[#ffd700] hover:text-[#002366] transition-all">
+            Register Individual — ₹1,000
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }

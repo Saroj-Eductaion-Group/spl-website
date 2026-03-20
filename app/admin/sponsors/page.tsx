@@ -1,19 +1,19 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, ToggleLeft, ToggleRight, ExternalLink } from 'lucide-react'
 
 interface Sponsor {
   id: string; name: string; tier: string; logoUrl?: string; website?: string; active: boolean; createdAt: string
 }
 
-const tierColors: Record<string, string> = {
-  TITLE: 'bg-yellow-100 text-yellow-800',
-  OFFICIAL: 'bg-blue-100 text-blue-800',
-  ASSOCIATE: 'bg-gray-100 text-gray-700',
+const tierStyle: Record<string, string> = {
+  TITLE:    'text-[#ffd700] border-[#ffd700]/30 bg-[#ffd700]/10',
+  OFFICIAL: 'text-violet-400 border-violet-400/30 bg-violet-400/10',
+  ASSOCIATE:'text-[#c4c6d0] border-[#444650]/40 bg-[#444650]/10',
 }
-
 const tierOrder = ['TITLE', 'OFFICIAL', 'ASSOCIATE']
+const inputCls = "w-full bg-[#0b0b0f] border border-[#444650]/40 text-[#e4e1e9] px-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 transition-colors"
+const labelCls = "block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2"
 
 export default function AdminSponsors() {
   const [sponsors, setSponsors] = useState<Sponsor[]>([])
@@ -22,15 +22,16 @@ export default function AdminSponsors() {
   const [form, setForm] = useState({ name: '', tier: 'ASSOCIATE', logoUrl: '', website: '' })
   const [saving, setSaving] = useState(false)
 
-  useEffect(() => { loadSponsors() }, [])
+  useEffect(() => { load() }, [])
 
-  const loadSponsors = async () => {
+  const load = async () => {
     const res = await fetch('/api/admin/sponsors')
-    setSponsors(await res.json())
+    const data = await res.json()
+    setSponsors(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
-  const createSponsor = async () => {
+  const create = async () => {
     if (!form.name) return alert('Sponsor name is required')
     setSaving(true)
     const token = localStorage.getItem('adminToken') || ''
@@ -40,24 +41,20 @@ export default function AdminSponsors() {
       body: JSON.stringify(form)
     })
     setSaving(false)
-    if ((await res.json()).success) {
-      setShowForm(false)
-      setForm({ name: '', tier: 'ASSOCIATE', logoUrl: '', website: '' })
-      loadSponsors()
-    }
+    if ((await res.json()).success) { setShowForm(false); setForm({ name: '', tier: 'ASSOCIATE', logoUrl: '', website: '' }); load() }
   }
 
-  const toggleActive = async (id: string, active: boolean) => {
+  const toggle = async (id: string, active: boolean) => {
     const token = localStorage.getItem('adminToken') || ''
     await fetch('/api/admin/sponsors', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ id, active: !active })
     })
-    loadSponsors()
+    load()
   }
 
-  const deleteSponsor = async (id: string) => {
+  const del = async (id: string) => {
     if (!confirm('Delete this sponsor?')) return
     const token = localStorage.getItem('adminToken') || ''
     await fetch('/api/admin/sponsors', {
@@ -65,95 +62,108 @@ export default function AdminSponsors() {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ id })
     })
-    loadSponsors()
+    load()
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="max-w-5xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-600">Sponsors</h1>
-          <p className="text-gray-600">Manage sponsors shown on the website</p>
+          <h1 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">
+            Sponsor <span className="text-[#ffd700]">Management</span>
+          </h1>
+          <p className="text-[#c4c6d0]/60 text-sm mt-1">Manage sponsors shown on the website</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Sponsor
+        <button onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-[#ffd700] text-[#002366] px-5 py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all">
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
+          Add Sponsor
         </button>
       </div>
 
       {showForm && (
-        <div className="card mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-primary-600">New Sponsor</h2>
+        <div className="bg-[#131318] border border-[#444650]/20 p-6">
+          <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700] mb-5">New Sponsor</h2>
           <div className="grid md:grid-cols-2 gap-4">
+            <div><label className={labelCls}>Sponsor Name *</label><input className={inputCls} placeholder="e.g. Saroj International University" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
             <div>
-              <label className="form-label">Sponsor Name *</label>
-              <input className="form-input" placeholder="e.g. Saroj International University" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            </div>
-            <div>
-              <label className="form-label">Tier</label>
-              <select className="form-input" value={form.tier} onChange={e => setForm({ ...form, tier: e.target.value })}>
+              <label className={labelCls}>Tier</label>
+              <select className={inputCls} value={form.tier} onChange={e => setForm({ ...form, tier: e.target.value })}>
                 <option value="TITLE">Title Sponsor</option>
                 <option value="OFFICIAL">Official Partner</option>
                 <option value="ASSOCIATE">Associate Sponsor</option>
               </select>
             </div>
-            <div>
-              <label className="form-label">Logo URL (optional)</label>
-              <input className="form-input" placeholder="https://example.com/logo.png" value={form.logoUrl} onChange={e => setForm({ ...form, logoUrl: e.target.value })} />
-            </div>
-            <div>
-              <label className="form-label">Website (optional)</label>
-              <input className="form-input" placeholder="https://example.com" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} />
-            </div>
+            <div><label className={labelCls}>Logo URL (optional)</label><input className={inputCls} placeholder="https://example.com/logo.png" value={form.logoUrl} onChange={e => setForm({ ...form, logoUrl: e.target.value })} /></div>
+            <div><label className={labelCls}>Website (optional)</label><input className={inputCls} placeholder="https://example.com" value={form.website} onChange={e => setForm({ ...form, website: e.target.value })} /></div>
           </div>
-          <div className="flex gap-3 mt-4">
-            <button onClick={createSponsor} disabled={saving} className="btn-primary disabled:opacity-50">{saving ? 'Saving...' : 'Add Sponsor'}</button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+          <div className="flex gap-3 mt-5">
+            <button onClick={create} disabled={saving}
+              className="bg-[#ffd700] text-[#002366] px-6 py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50">
+              {saving ? 'Saving...' : 'Add Sponsor'}
+            </button>
+            <button onClick={() => setShowForm(false)}
+              className="border border-[#444650]/40 text-[#c4c6d0] px-6 py-2.5 font-headline font-bold uppercase tracking-tight text-sm hover:border-[#ffd700] hover:text-[#ffd700] transition-all">
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
       {tierOrder.map(tier => {
-        const tierSponsors = sponsors.filter(s => s.tier === tier)
-        if (tierSponsors.length === 0) return null
+        const list = sponsors.filter(s => s.tier === tier)
+        if (list.length === 0) return null
         return (
-          <div key={tier} className="mb-8">
-            <h2 className="text-lg font-semibold text-gray-700 mb-3 flex items-center gap-2">
-              <span className={`text-xs font-bold px-2 py-1 rounded-full ${tierColors[tier]}`}>{tier}</span>
-              {tier === 'TITLE' ? 'Title Sponsors' : tier === 'OFFICIAL' ? 'Official Partners' : 'Associate Sponsors'}
-            </h2>
+          <div key={tier}>
+            <div className="flex items-center gap-3 mb-3">
+              <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${tierStyle[tier]}`}>{tier}</span>
+              <span className="text-sm font-headline font-bold uppercase tracking-tight text-[#c4c6d0]/60">
+                {tier === 'TITLE' ? 'Title Sponsors' : tier === 'OFFICIAL' ? 'Official Partners' : 'Associate Sponsors'}
+              </span>
+            </div>
             <div className="space-y-3">
-              {tierSponsors.map(sponsor => (
-                <div key={sponsor.id} className={`card border-l-4 ${sponsor.active ? 'border-green-400' : 'border-gray-300 opacity-60'}`}>
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                      {sponsor.logoUrl ? (
-                        <img src={sponsor.logoUrl} alt={sponsor.name} className="h-10 w-20 object-contain rounded border border-gray-200 bg-white p-1" />
-                      ) : (
-                        <div className="h-10 w-20 bg-gray-100 rounded border border-gray-200 flex items-center justify-center text-xs text-gray-400">No Logo</div>
-                      )}
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{sponsor.name}</h3>
-                        <div className="flex items-center gap-2 mt-0.5">
-                          <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${tierColors[sponsor.tier]}`}>{sponsor.tier}</span>
-                          <span className={`text-xs px-2 py-0.5 rounded-full ${sponsor.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{sponsor.active ? 'Visible' : 'Hidden'}</span>
-                          {sponsor.website && (
-                            <a href={sponsor.website} target="_blank" rel="noopener noreferrer" className="text-xs text-primary-600 flex items-center gap-1 hover:underline">
-                              <ExternalLink className="w-3 h-3" /> Website
-                            </a>
-                          )}
-                        </div>
+              {list.map(sponsor => (
+                <div key={sponsor.id} className={`bg-[#131318] border border-l-4 p-5 flex justify-between items-center transition-opacity ${sponsor.active ? 'border-[#444650]/20 border-l-[#ffd700]' : 'border-[#444650]/10 border-l-[#444650]/30 opacity-50'}`}>
+                  <div className="flex items-center gap-4">
+                    {sponsor.logoUrl ? (
+                      <img src={sponsor.logoUrl} alt={sponsor.name} className="h-10 w-20 object-contain bg-white/5 border border-[#444650]/20 p-1" />
+                    ) : (
+                      <div className="h-10 w-20 bg-[#0b0b0f] border border-[#444650]/20 flex items-center justify-center">
+                        <span className="material-symbols-outlined text-[#444650]" style={{ fontSize: '20px' }}>image</span>
+                      </div>
+                    )}
+                    <div>
+                      <h3 className="font-headline font-black text-[#e4e1e9] uppercase tracking-tight">{sponsor.name}</h3>
+                      <div className="flex items-center gap-2 mt-1 flex-wrap">
+                        <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${tierStyle[sponsor.tier]}`}>{sponsor.tier}</span>
+                        <span className={`text-[0.6rem] font-headline font-bold uppercase tracking-widest border px-2 py-0.5 ${sponsor.active ? 'text-emerald-400 border-emerald-400/30 bg-emerald-400/10' : 'text-[#c4c6d0]/30 border-[#444650]/20'}`}>
+                          {sponsor.active ? 'Visible' : 'Hidden'}
+                        </span>
+                        {sponsor.website && (
+                          <a href={sponsor.website} target="_blank" rel="noopener noreferrer"
+                            className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#ffd700]/60 hover:text-[#ffd700] flex items-center gap-1 transition-colors">
+                            <span className="material-symbols-outlined" style={{ fontSize: '12px' }}>open_in_new</span>
+                            Website
+                          </a>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button onClick={() => toggleActive(sponsor.id, sponsor.active)} className={sponsor.active ? 'text-green-600 hover:text-green-800' : 'text-gray-400 hover:text-gray-600'} title={sponsor.active ? 'Hide' : 'Show'}>
-                        {sponsor.active ? <ToggleRight className="w-6 h-6" /> : <ToggleLeft className="w-6 h-6" />}
-                      </button>
-                      <button onClick={() => deleteSponsor(sponsor.id)} className="text-red-400 hover:text-red-600">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button onClick={() => toggle(sponsor.id, sponsor.active)}
+                      className={`transition-colors ${sponsor.active ? 'text-emerald-400 hover:text-emerald-300' : 'text-[#c4c6d0]/30 hover:text-[#ffd700]'}`}
+                      title={sponsor.active ? 'Hide' : 'Show'}>
+                      <span className="material-symbols-outlined" style={{ fontSize: '24px' }}>{sponsor.active ? 'toggle_on' : 'toggle_off'}</span>
+                    </button>
+                    <button onClick={() => del(sponsor.id)} className="text-[#c4c6d0]/30 hover:text-red-400 transition-colors">
+                      <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                    </button>
                   </div>
                 </div>
               ))}
@@ -163,7 +173,9 @@ export default function AdminSponsors() {
       })}
 
       {sponsors.length === 0 && (
-        <div className="text-center py-12 text-gray-400">No sponsors added yet. Click "Add Sponsor" to get started.</div>
+        <div className="text-center py-12 text-[#c4c6d0]/30 font-headline uppercase tracking-widest text-sm">
+          No sponsors added yet
+        </div>
       )}
     </div>
   )

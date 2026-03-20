@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
       include: {
         _count: { select: { players: true } },
         payments: { select: { status: true, amount: true } },
-        players: { select: { id: true, name: true, phone: true, role: true, aadhaarDoc: true, schoolIdDoc: true, dobProofDoc: true, photoDoc: true } }
+        players: { select: { id: true, name: true, phone: true, role: true, isIndividual: true, aadhaarDoc: true, schoolIdDoc: true, dobProofDoc: true, photoDoc: true } }
       },
       orderBy: { createdAt: 'desc' }
     })

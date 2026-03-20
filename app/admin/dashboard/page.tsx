@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Users, Trophy, CreditCard, Calendar, CheckCircle, XCircle, Clock } from 'lucide-react'
+import Link from 'next/link'
 
 interface DashboardStats {
   totalTeams: number
@@ -20,171 +20,96 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     const token = localStorage.getItem('adminToken')
-    if (!token) {
-      router.push('/admin/login')
-      return
-    }
-    loadDashboardData()
-  }, [])
-
-  const loadDashboardData = async () => {
-    try {
-      const token = localStorage.getItem('adminToken') || ''
-      const response = await fetch('/api/admin/dashboard', { headers: { Authorization: `Bearer ${token}` } })
-      const data = await response.json()
-      setStats(data)
-    } catch (error) {
-      console.error('Failed to load dashboard data:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleLogout = () => {
-    localStorage.removeItem('adminToken')
-    router.push('/admin/login')
-  }
+    if (!token) { router.push('/admin/login'); return }
+    fetch('/api/admin/dashboard', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json()).then(setStats).catch(console.error).finally(() => setLoading(false))
+  }, [router])
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+      <div className="flex items-center justify-center h-64">
+        <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
       </div>
     )
   }
 
+  const metrics = [
+    { label: 'Total Teams',       value: stats?.totalTeams ?? 0,       icon: 'emoji_events',  color: 'text-[#ffd700]',  bg: 'bg-[#ffd700]/10',  border: 'border-[#ffd700]/20' },
+    { label: 'Total Players',     value: stats?.totalPlayers ?? 0,     icon: 'groups',        color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
+    { label: 'Total Revenue',     value: `₹${((stats?.totalPayments ?? 0) / 100000).toFixed(1)}L`, icon: 'payments', color: 'text-violet-400', bg: 'bg-violet-400/10', border: 'border-violet-400/20' },
+    { label: 'Pending Approvals', value: stats?.pendingApprovals ?? 0, icon: 'pending',       color: 'text-orange-400', bg: 'bg-orange-400/10',  border: 'border-orange-400/20' },
+  ]
+
+  const statusCards = [
+    { label: 'Approved Teams', value: stats?.approvedTeams ?? 0,    icon: 'check_circle', color: 'text-emerald-400', border: 'border-l-emerald-400' },
+    { label: 'Pending Review',  value: stats?.pendingApprovals ?? 0, icon: 'schedule',     color: 'text-orange-400',  border: 'border-l-orange-400'  },
+    { label: 'Rejected Teams',  value: stats?.rejectedTeams ?? 0,   icon: 'cancel',       color: 'text-red-400',     border: 'border-l-red-400'     },
+  ]
+
+  const quickActions = [
+    { href: '/admin/teams',              icon: 'emoji_events',  label: 'Manage Teams',       desc: 'Approve, reject & manage registrations', badge: stats?.totalTeams ?? 0,       badgeColor: 'text-[#ffd700] bg-[#ffd700]/10'   },
+    { href: '/admin/players',            icon: 'groups',        label: 'Manage Players',     desc: 'Verify documents & individual players',  badge: stats?.totalPlayers ?? 0,     badgeColor: 'text-emerald-400 bg-emerald-400/10' },
+    { href: '/admin/reports',            icon: 'bar_chart',     label: 'Reports',            desc: 'Export team lists, payments & analytics', badge: 'Export',                    badgeColor: 'text-violet-400 bg-violet-400/10'   },
+    { href: '/admin/teams?filter=PENDING', icon: 'pending',    label: 'Pending Approvals',  desc: 'Review pending team registrations',       badge: stats?.pendingApprovals ?? 0, badgeColor: 'text-orange-400 bg-orange-400/10'   },
+  ]
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-primary-600 mb-2">Dashboard Overview</h1>
-        <p className="text-gray-600">Welcome to SPL Tournament Management System</p>
+    <div className="max-w-7xl mx-auto space-y-8">
+
+      {/* Header */}
+      <div>
+        <h1 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">
+          Dashboard <span className="text-[#ffd700]">Overview</span>
+        </h1>
+        <p className="text-[#c4c6d0]/60 text-sm mt-1 font-body">Welcome to SPL Tournament Management System</p>
       </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <Trophy className="h-10 w-10 opacity-80" />
-            <span className="text-3xl font-bold">{stats?.totalTeams || 0}</span>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {metrics.map(m => (
+          <div key={m.label} className="bg-[#131318] border border-[#444650]/20 p-5">
+            <div className={`w-10 h-10 ${m.bg} border ${m.border} flex items-center justify-center mb-4`}>
+              <span className={`material-symbols-outlined ${m.color}`} style={{ fontSize: '20px' }}>{m.icon}</span>
+            </div>
+            <div className={`text-3xl font-headline font-black ${m.color} mb-1`}>{m.value}</div>
+            <div className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50">{m.label}</div>
           </div>
-          <p className="text-primary-100 text-sm font-medium">Total Teams</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <Users className="h-10 w-10 opacity-80" />
-            <span className="text-3xl font-bold">{stats?.totalPlayers || 0}</span>
-          </div>
-          <p className="text-green-100 text-sm font-medium">Total Players</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <CreditCard className="h-10 w-10 opacity-80" />
-            <span className="text-3xl font-bold">₹{((stats?.totalPayments || 0) / 100000).toFixed(1)}L</span>
-          </div>
-          <p className="text-purple-100 text-sm font-medium">Total Revenue</p>
-        </div>
-
-        <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 text-white">
-          <div className="flex items-center justify-between mb-4">
-            <Clock className="h-10 w-10 opacity-80" />
-            <span className="text-3xl font-bold">{stats?.pendingApprovals || 0}</span>
-          </div>
-          <p className="text-orange-100 text-sm font-medium">Pending Approvals</p>
-        </div>
+        ))}
       </div>
 
-      {/* Team Status Overview */}
-      <div className="mb-8">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Team Status</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card border-l-4 border-green-500">
-            <div className="flex items-center justify-between">
+      {/* Team Status */}
+      <div>
+        <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#e4e1e9] mb-4">Team Status</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {statusCards.map(s => (
+            <div key={s.label} className={`bg-[#131318] border border-[#444650]/20 border-l-4 ${s.border} p-5 flex items-center justify-between`}>
               <div>
-                <p className="text-sm text-gray-600 mb-1">Approved Teams</p>
-                <p className="text-3xl font-bold text-green-600">{stats?.approvedTeams || 0}</p>
+                <p className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/50 mb-1">{s.label}</p>
+                <p className={`text-4xl font-headline font-black ${s.color}`}>{s.value}</p>
               </div>
-              <CheckCircle className="h-12 w-12 text-green-500" />
+              <span className={`material-symbols-outlined ${s.color} opacity-30`} style={{ fontSize: '48px' }}>{s.icon}</span>
             </div>
-          </div>
-
-          <div className="card border-l-4 border-orange-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Pending Review</p>
-                <p className="text-3xl font-bold text-orange-600">{stats?.pendingApprovals || 0}</p>
-              </div>
-              <Clock className="h-12 w-12 text-orange-500" />
-            </div>
-          </div>
-
-          <div className="card border-l-4 border-red-500">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Rejected Teams</p>
-                <p className="text-3xl font-bold text-red-600">{stats?.rejectedTeams || 0}</p>
-              </div>
-              <XCircle className="h-12 w-12 text-red-500" />
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
       {/* Quick Actions */}
       <div>
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <button
-            onClick={() => router.push('/admin/teams')}
-            className="card hover:shadow-xl transition-all hover:scale-105 text-left group"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <Trophy className="h-8 w-8 text-primary-500 group-hover:text-primary-600" />
-              <span className="text-xs bg-primary-100 text-primary-600 px-2 py-1 rounded-full">{stats?.totalTeams || 0}</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2 group-hover:text-primary-600">Manage Teams</h3>
-            <p className="text-gray-600 text-sm">Approve, reject, and manage team registrations</p>
-          </button>
-
-          <button
-            onClick={() => router.push('/admin/players')}
-            className="card hover:shadow-xl transition-all hover:scale-105 text-left group"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <Users className="h-8 w-8 text-green-500 group-hover:text-green-600" />
-              <span className="text-xs bg-green-100 text-green-600 px-2 py-1 rounded-full">{stats?.totalPlayers || 0}</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2 group-hover:text-green-600">Manage Players</h3>
-            <p className="text-gray-600 text-sm">Verify documents and manage individual players</p>
-          </button>
-
-          <button
-            onClick={() => router.push('/admin/reports')}
-            className="card hover:shadow-xl transition-all hover:scale-105 text-left group"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <Calendar className="h-8 w-8 text-purple-500 group-hover:text-purple-600" />
-              <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-full">New</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2 group-hover:text-purple-600">Reports</h3>
-            <p className="text-gray-600 text-sm">Export team lists, payments, and analytics</p>
-          </button>
-
-          <button
-            onClick={() => router.push('/admin/teams?filter=PENDING')}
-            className="card hover:shadow-xl transition-all hover:scale-105 text-left group bg-orange-50 border-2 border-orange-200"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <Clock className="h-8 w-8 text-orange-500 group-hover:text-orange-600" />
-              <span className="text-xs bg-orange-200 text-orange-700 px-2 py-1 rounded-full font-semibold">{stats?.pendingApprovals || 0}</span>
-            </div>
-            <h3 className="text-lg font-semibold mb-2 group-hover:text-orange-600">Pending Approvals</h3>
-            <p className="text-gray-600 text-sm">Review and approve pending team registrations</p>
-          </button>
+        <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#e4e1e9] mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {quickActions.map(a => (
+            <Link key={a.href} href={a.href}
+              className="bg-[#131318] border border-[#444650]/20 p-5 hover:border-[#ffd700]/30 hover:bg-[#1c1c21] transition-all group">
+              <div className="flex items-center justify-between mb-4">
+                <span className="material-symbols-outlined text-[#ffd700]/60 group-hover:text-[#ffd700] transition-colors" style={{ fontSize: '28px' }}>{a.icon}</span>
+                <span className={`text-xs font-headline font-bold px-2 py-0.5 ${a.badgeColor}`}>{a.badge}</span>
+              </div>
+              <h3 className="font-headline font-black text-sm uppercase tracking-tight text-[#e4e1e9] mb-1 group-hover:text-[#ffd700] transition-colors">{a.label}</h3>
+              <p className="text-xs text-[#c4c6d0]/50 font-body leading-relaxed">{a.desc}</p>
+            </Link>
+          ))}
         </div>
       </div>
-      </div>
+    </div>
   )
 }

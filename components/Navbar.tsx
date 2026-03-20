@@ -1,222 +1,344 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useEffect } from 'react'
-import { Menu, X, Shield } from 'lucide-react'
-import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs'
-import Image from 'next/image'
+import { useState, useRef, useEffect } from 'react'
+import { SignedIn, SignedOut, useUser, useClerk } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 
-const navLinks = [
-  { href: '/', label: 'Home' },
+function useHasRegistration() {
+  const { isSignedIn, isLoaded } = useUser()
+  const [hasReg, setHasReg] = useState<boolean>(false)
+  const [checked, setChecked] = useState(false)
+
+  useEffect(() => {
+    if (!isLoaded) return
+    if (!isSignedIn) { setHasReg(false); setChecked(true); return }
+    fetch('/api/my-registration')
+      .then(r => { if (!r.ok) throw new Error(); return r.json() })
+      .then(d => { setHasReg(!!d.registration); setChecked(true) })
+      .catch(() => { setHasReg(false); setChecked(true) })
+  }, [isLoaded, isSignedIn])
+
+  return { hasReg, checked }
+}
+
+function useAdminToken() {
+  const [isAdmin, setIsAdmin] = useState(false)
+  useEffect(() => {
+    setIsAdmin(!!localStorage.getItem('adminToken') || !!localStorage.getItem('coordinatorToken'))
+  }, [])
+  return isAdmin
+}
+
+const mainLinks = [
+  { href: '/schedule', label: 'Schedule' },
+  { href: '/tournament-format', label: 'Format' },
   { href: '/about', label: 'About' },
-  { href: '/tournament-format', label: 'Tournament' },
+  { href: '/news', label: 'News' },
+]
+
+const moreLinks = [
   { href: '/eligibility', label: 'Rules' },
   { href: '/prizes', label: 'Prizes' },
   { href: '/scholarships', label: 'Scholarship' },
-  { href: '/schedule', label: 'Schedule' },
-  { href: '/news', label: 'News' },
   { href: '/gallery', label: 'Gallery' },
   { href: '/contact', label: 'Contact' },
+  { href: '/sponsors', label: 'Sponsors' },
 ]
 
+function AccountDropdown() {
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+  return (
+    <div ref={ref} className="relative hidden md:block">
+      <button onClick={() => setOpen(!open)}
+        className="flex items-center gap-1 text-sm font-headline font-bold uppercase tracking-tight text-[#e4e1e9]/70 hover:text-[#ffd700] transition-colors">
+        Account
+        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>{open ? 'expand_less' : 'expand_more'}</span>
+      </button>
+      {open && (
+        <div className="absolute top-full right-0 mt-3 w-48 bg-[#131318] border border-[#444650]/30 shadow-2xl flex flex-col py-2 z-50">
+          <Link href="/sign-in" onClick={() => setOpen(false)}
+            className="px-5 py-2.5 text-xs font-headline font-bold uppercase tracking-widest text-[#e4e1e9]/70 hover:text-[#ffd700] hover:bg-[#1c1c21] transition-colors flex items-center gap-2">
+            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>login</span>
+            Player Sign In
+          </Link>
+          <div className="h-px bg-[#444650]/20 my-1" />
+          <p className="px-5 pt-1 pb-0.5 text-[0.55rem] font-headline font-bold uppercase tracking-widest text-[#444650]">Staff Access</p>
+          <Link href="/admin/login" onClick={() => setOpen(false)}
+            className="px-5 py-2.5 text-xs font-headline font-bold uppercase tracking-widest text-[#e4e1e9]/70 hover:text-[#ffd700] hover:bg-[#1c1c21] transition-colors flex items-center gap-2">
+            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>admin_panel_settings</span>
+            Admin Login
+          </Link>
+          <Link href="/coordinator/login" onClick={() => setOpen(false)}
+            className="px-5 py-2.5 text-xs font-headline font-bold uppercase tracking-widest text-[#e4e1e9]/70 hover:text-[#ffd700] hover:bg-[#1c1c21] transition-colors flex items-center gap-2">
+            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>shield_person</span>
+            Coordinator Login
+          </Link>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function UserDropdown() {
+  const { user } = useUser()
+  const { signOut } = useClerk()
+  const [open, setOpen] = useState(false)
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const h = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false) }
+    document.addEventListener('mousedown', h)
+    return () => document.removeEventListener('mousedown', h)
+  }, [])
+  return (
+    <div ref={ref} className="relative hidden md:flex items-center gap-2">
+      <button onClick={() => setOpen(!open)}
+        className="flex items-center gap-1.5 text-sm font-headline font-bold uppercase tracking-tight text-[#e4e1e9]/70 hover:text-[#ffd700] transition-colors">
+        <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>account_circle</span>
+        {user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || 'Account'}
+        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>{open ? 'expand_less' : 'expand_more'}</span>
+      </button>
+      {open && (
+        <div className="absolute top-full right-0 mt-3 w-52 bg-[#131318] border border-[#444650]/30 shadow-2xl flex flex-col py-2 z-50">
+          {/* User info */}
+          <div className="px-5 py-3 border-b border-[#444650]/20">
+            <p className="text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700] truncate">
+              {user?.firstName} {user?.lastName}
+            </p>
+            <p className="text-[11px] text-[#c4c6d0]/50 font-body truncate mt-0.5">
+              {user?.emailAddresses?.[0]?.emailAddress}
+            </p>
+          </div>
+          <div className="h-px bg-[#444650]/20 my-1" />
+          <button
+            onClick={() => { setOpen(false); signOut().then(() => { window.location.href = '/' }) }}
+            className="px-5 py-2.5 text-xs font-headline font-bold uppercase tracking-widest text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-colors flex items-center gap-2 w-full text-left">
+            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>logout</span>
+            Sign Out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function MobileUserSection({ onClose, hasReg }: { onClose: () => void; hasReg: boolean }) {
+  const { user } = useUser()
+  const { signOut } = useClerk()
+  return (
+    <>
+      <div className="py-2 border-t border-[#444650]/20">
+        <p className="text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700]">
+          {user?.firstName} {user?.lastName}
+        </p>
+        <p className="text-[11px] text-[#c4c6d0]/50 font-body mt-0.5">
+          {user?.emailAddresses?.[0]?.emailAddress}
+        </p>
+      </div>
+      {hasReg ? (
+        <Link href="/my-registration" onClick={onClose}
+          className="font-headline font-bold uppercase tracking-tight text-sm text-[#ffd700] flex items-center gap-2">
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>assignment</span>
+          My Registration
+        </Link>
+      ) : (
+        <Link href="/register" onClick={onClose}
+          className="font-headline font-bold uppercase tracking-tight text-sm text-[#ffd700] flex items-center gap-2">
+          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>app_registration</span>
+          Register
+        </Link>
+      )}
+      <button
+        onClick={() => { onClose(); signOut().then(() => { window.location.href = '/' }) }}
+        className="font-headline font-bold uppercase tracking-tight text-sm text-red-400/80 hover:text-red-400 transition-colors flex items-center gap-2 w-full text-left">
+        <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>logout</span>
+        Sign Out
+      </button>
+    </>
+  )
+}
+
+function RegisterButton({ hasReg }: { hasReg: boolean }) {
+  const { isSignedIn } = useUser()
+  if (isSignedIn && hasReg) {
+    return (
+      <Link href="/my-registration"
+        className="bg-[#ffd700] text-[#002366] px-4 md:px-6 py-2 font-headline font-bold uppercase tracking-tight text-sm scale-95 hover:scale-100 active:scale-90 transition-all duration-200 flex items-center gap-1.5">
+        <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>assignment</span>
+        My Registration
+      </Link>
+    )
+  }
+  return (
+    <Link href="/register"
+      className="bg-[#ffd700] text-[#002366] px-4 md:px-6 py-2 font-headline font-bold uppercase tracking-tight text-sm scale-95 hover:scale-100 active:scale-90 transition-all duration-200">
+      Register
+    </Link>
+  )
+}
+
+function AdminBadge() {
+  const isAdmin = useAdminToken()
+  if (!isAdmin) return null
+  const isCoord = typeof window !== 'undefined' && !!localStorage.getItem('coordinatorToken')
+  const href = isCoord ? '/coordinator/dashboard' : '/admin/dashboard'
+  const label = isCoord ? 'Coordinator Panel' : 'Admin Panel'
+  return (
+    <Link href={href}
+      className="hidden md:flex items-center gap-1.5 border border-[#ffd700]/40 text-[#ffd700] px-3 py-1.5 text-[0.6rem] font-headline font-black uppercase tracking-widest hover:bg-[#ffd700]/10 transition-colors">
+      <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>admin_panel_settings</span>
+      {label}
+      <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>arrow_forward</span>
+    </Link>
+  )
+}
+
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const [moreOpen, setMoreOpen] = useState(false)
   const pathname = usePathname()
+  const moreRef = useRef<HTMLDivElement>(null)
+  const isStaff = useAdminToken()
+  const { hasReg } = useHasRegistration()
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 60)
-    window.addEventListener('scroll', onScroll)
-    return () => window.removeEventListener('scroll', onScroll)
+    function handleClick(e: MouseEvent) {
+      if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
+        setMoreOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  useEffect(() => { setIsOpen(false) }, [pathname])
-
-  const linkClass = scrolled
-    ? 'text-gray-300 hover:text-white hover:bg-white/10'
-    : 'text-gray-700 hover:text-primary-600 hover:bg-primary-50'
-
-  const activeLinkClass = scrolled ? 'text-primary-400' : 'text-primary-600'
+  const isMoreActive = moreLinks.some(l => l.href === pathname)
 
   return (
     <>
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled
-          ? 'bg-gray-950/95 backdrop-blur-xl border-b border-white/10 shadow-2xl'
-          : 'bg-white/80 backdrop-blur-md border-b border-gray-200/60 shadow-sm'
-      }`}>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-20">
+      <header className="bg-[#131318]/70 backdrop-blur-xl border-b border-[#444650]/15 shadow-[0_20px_40px_rgba(179,197,255,0.08)] fixed top-0 w-full z-50">
+        <div className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-screen-2xl mx-auto">
 
-            {/* Logo */}
-            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-              <div className={`relative w-11 h-11 rounded-xl overflow-hidden transition-all duration-300 ring-2 ${scrolled ? 'ring-primary-500/40 group-hover:ring-primary-400' : 'ring-primary-300 group-hover:ring-primary-500'}`}>
-                <Image src="/Hero.png" alt="SPL" fill className="object-cover" />
-              </div>
-              <div className="hidden sm:block leading-tight">
-                <div className={`text-xl font-extrabold tracking-wide transition-colors duration-300 ${scrolled ? 'text-white' : 'text-gray-900'}`}>SPL</div>
-                <div className="text-[11px] text-primary-500 font-semibold tracking-widest uppercase">Under-19</div>
-              </div>
-            </Link>
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2">
+            <span className="w-7 h-7 bg-[#002366] border border-[#ffd700]/40 flex items-center justify-center flex-shrink-0">
+              <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '14px' }}>sports_cricket</span>
+            </span>
+            <span className="text-xl md:text-2xl font-black tracking-tight font-headline italic uppercase">
+              <span className="text-[#ffd700]">Saroj</span><span className="text-[#e4e1e9]"> Premier</span>
+            </span>
+          </Link>
 
-            {/* Desktop Nav Links */}
-            <div className="hidden lg:flex items-center gap-0.5">
-              {navLinks.map((link) => {
-                const active = pathname === link.href
-                return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`relative px-4 py-2 text-[15px] font-semibold rounded-lg transition-all duration-200 ${
-                      active ? activeLinkClass : linkClass
-                    }`}
-                  >
-                    {link.label}
-                    {active && (
-                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-3.5 h-0.5 bg-primary-500 rounded-full" />
-                    )}
-                  </Link>
-                )
-              })}
-            </div>
-
-            {/* Right Actions */}
-            <div className="hidden lg:flex items-center gap-2 shrink-0">
-              <Link
-                href="/admin/login"
-                className={`flex items-center gap-2 text-sm font-medium px-4 py-2.5 rounded-lg border transition-all duration-200 ${
-                  scrolled
-                    ? 'text-gray-400 border-white/15 hover:text-primary-400 hover:border-primary-500/40 hover:bg-primary-500/5'
-                    : 'text-gray-500 border-gray-300 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50'
-                }`}
-              >
-                <Shield className="w-4 h-4" />
-                Admin
+          {/* Desktop Nav */}
+          <nav className="hidden md:flex gap-8 font-headline font-bold uppercase tracking-tighter text-sm items-center">
+            {mainLinks.map(l => (
+              <Link key={l.href} href={l.href}
+                className={`transition-colors ${pathname === l.href ? 'text-[#ffd700] border-b-2 border-[#ffd700] pb-0.5' : 'text-[#e4e1e9]/80 hover:text-[#ffd700]'}`}>
+                {l.label}
               </Link>
+            ))}
 
-              <SignedOut>
-                <Link
-                  href="/sign-in"
-                  className="text-base font-bold text-white bg-primary-600 hover:bg-primary-500 px-7 py-3 rounded-lg transition-all duration-200 shadow-md shadow-primary-600/30"
-                >
-                  Sign In
-                </Link>
-              </SignedOut>
-
-              <SignedIn>
-                <Link
-                  href="/my-registration"
-                  className={`flex items-center gap-1.5 text-sm font-medium px-4 py-2.5 rounded-lg border transition-all duration-200 ${
-                    scrolled
-                      ? 'text-gray-300 border-white/15 hover:text-white hover:border-white/30'
-                      : 'text-gray-600 border-gray-300 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50'
-                  }`}
-                >
-                  My Registration
-                </Link>
-                <Link
-                  href="/register"
-                  className="text-base font-bold text-white bg-primary-600 hover:bg-primary-500 px-7 py-3 rounded-lg transition-all duration-200 shadow-md shadow-primary-600/30"
-                >
-                  Register
-                </Link>
-                <UserButton afterSignOutUrl="/" />
-              </SignedIn>
+            {/* More Dropdown */}
+            <div ref={moreRef} className="relative">
+              <button
+                onClick={() => setMoreOpen(!moreOpen)}
+                className={`flex items-center gap-1 transition-colors ${isMoreActive ? 'text-[#ffd700] border-b-2 border-[#ffd700] pb-0.5' : 'text-[#e4e1e9]/80 hover:text-[#ffd700]'}`}>
+                More
+                <span className="material-symbols-outlined text-base" style={{ fontSize: '16px' }}>
+                  {moreOpen ? 'expand_less' : 'expand_more'}
+                </span>
+              </button>
+              {moreOpen && (
+                <div className="absolute top-full right-0 mt-3 w-44 bg-[#131318] border border-[#444650]/30 shadow-2xl flex flex-col py-2 z-50">
+                  {moreLinks.map(l => (
+                    <Link key={l.href} href={l.href} onClick={() => setMoreOpen(false)}
+                      className={`px-5 py-2.5 text-xs font-headline font-bold uppercase tracking-widest transition-colors ${pathname === l.href ? 'text-[#ffd700] bg-[#1c1c21]' : 'text-[#e4e1e9]/70 hover:text-[#ffd700] hover:bg-[#1c1c21]'}`}>
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
+          </nav>
 
-            {/* Mobile Hamburger */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className={`lg:hidden p-2 rounded-lg transition-all ${scrolled ? 'text-gray-300 hover:text-white hover:bg-white/10' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'}`}
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {/* Right Actions */}
+          <div className="flex items-center gap-3 md:gap-4">
+            <AdminBadge />
+            {!isStaff && (
+              <>
+                <SignedOut>
+                  <AccountDropdown />
+                </SignedOut>
+                <SignedIn>
+                  <UserDropdown />
+                </SignedIn>
+                <RegisterButton hasReg={hasReg} />
+              </>
+            )}
+            <button className="md:hidden text-[#e4e1e9]/70 hover:text-[#ffd700] transition-colors" onClick={() => setMobileOpen(!mobileOpen)}>
+              <span className="material-symbols-outlined">{mobileOpen ? 'close' : 'menu'}</span>
             </button>
           </div>
         </div>
-      </nav>
 
-      {/* Mobile Drawer */}
-      <div className={`fixed inset-0 z-40 lg:hidden transition-all duration-300 ${isOpen ? 'visible' : 'invisible'}`}>
-        <div
-          className={`absolute inset-0 bg-gray-950/50 backdrop-blur-sm transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'}`}
-          onClick={() => setIsOpen(false)}
-        />
-        <div className={`absolute top-0 right-0 h-full w-72 bg-white border-l border-gray-200 shadow-2xl transition-transform duration-300 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-          <div className="flex items-center justify-between px-5 h-16 border-b border-gray-100">
-            <div className="flex items-center gap-2">
-              <div className="relative w-8 h-8 rounded-lg overflow-hidden ring-2 ring-primary-300">
-                <Image src="/Hero.png" alt="SPL" fill className="object-cover" />
-              </div>
-              <span className="text-sm font-bold text-gray-900">SPL Under-19</span>
-            </div>
-            <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-all">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="overflow-y-auto h-[calc(100%-4rem)] px-3 py-4 flex flex-col gap-0.5">
-            {navLinks.map((link) => {
-              const active = pathname === link.href
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                    active
-                      ? 'bg-primary-50 text-primary-600 border border-primary-200'
-                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
-                >
-                  {link.label}
-                  {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-500" />}
-                </Link>
-              )
-            })}
-
-            <div className="my-3 border-t border-gray-100" />
-
+        {/* Mobile Menu */}
+        {mobileOpen && (
+          <div className="md:hidden bg-[#131318] border-t border-[#444650]/20 px-6 py-4 flex flex-col gap-4">
+            {[...mainLinks, ...moreLinks].map(l => (
+              <Link key={l.href} href={l.href} onClick={() => setMobileOpen(false)}
+                className={`font-headline font-bold uppercase tracking-tight text-sm transition-colors ${pathname === l.href ? 'text-[#ffd700]' : 'text-[#e4e1e9]/80 hover:text-[#ffd700]'}`}>
+                {l.label}
+              </Link>
+            ))}
             <SignedOut>
-              <Link
-                href="/sign-in"
-                className="flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 transition-all shadow-md shadow-primary-600/20"
-              >
-                Sign In
+              {!isStaff && (
+                <>
+                  <Link href="/sign-in" onClick={() => setMobileOpen(false)}
+                    className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
+                    Sign In
+                  </Link>
+                  <Link href="/register" onClick={() => setMobileOpen(false)}
+                    className="font-headline font-bold uppercase tracking-tight text-sm text-[#ffd700]">
+                    Register
+                  </Link>
+                </>
+              )}
+              <Link href="/admin/login" onClick={() => setMobileOpen(false)}
+                className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
+                Admin Login
+              </Link>
+              <Link href="/coordinator/login" onClick={() => setMobileOpen(false)}
+                className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
+                Coordinator Login
               </Link>
             </SignedOut>
-
             <SignedIn>
-              <Link
-                href="/my-registration"
-                className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                  pathname === '/my-registration'
-                    ? 'bg-primary-50 text-primary-600 border border-primary-200'
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
-                }`}
-              >
-                My Registration
-              </Link>
-              <Link
-                href="/register"
-                className="flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 transition-all shadow-md shadow-primary-600/20"
-              >
-                Register Now
-              </Link>
-              <div className="flex items-center gap-3 px-4 py-2.5">
-                <UserButton afterSignOutUrl="/" />
-                <span className="text-sm text-gray-500">My Account</span>
-              </div>
+              {!isStaff && <MobileUserSection onClose={() => setMobileOpen(false)} hasReg={hasReg} />}
             </SignedIn>
-
-            <Link
-              href="/admin/login"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm text-gray-400 hover:text-gray-600 hover:bg-gray-50 border border-gray-200 transition-all"
-            >
-              <Shield className="w-3.5 h-3.5" />
-              Admin Login
-            </Link>
           </div>
-        </div>
+        )}
+      </header>
+
+      {/* Mobile Bottom Nav */}
+      <div className="md:hidden fixed bottom-0 left-0 w-full bg-[#131318]/90 backdrop-blur-xl z-50 px-6 py-3 flex justify-between items-center border-t border-[#444650]/15">
+        {[
+          { href: '/',         icon: 'home',             label: 'Home'     },
+          { href: '/schedule', icon: 'calendar_today',   label: 'Fixtures' },
+          { href: '/register', icon: 'app_registration', label: 'Register' },
+          { href: '/news',     icon: 'newspaper',        label: 'News'     },
+          { href: '/contact',  icon: 'sensors',          label: 'Contact'  },
+        ].map(item => (
+          <Link key={item.href} href={item.href}
+            className={`flex flex-col items-center gap-1 ${pathname === item.href ? 'text-[#ffd700]' : 'text-[#e4e1e9]/40'}`}>
+            <span className="material-symbols-outlined text-xl">{item.icon}</span>
+            <span className="text-[10px] font-headline font-bold uppercase tracking-wider">{item.label}</span>
+          </Link>
+        ))}
       </div>
     </>
   )

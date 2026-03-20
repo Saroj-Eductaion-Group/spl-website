@@ -1,294 +1,296 @@
 'use client'
 
 import Link from 'next/link'
-import { Trophy, Users, Calendar, MapPin, ArrowRight, CheckCircle, GraduationCap, Star } from 'lucide-react'
-import { useEffect, useRef } from 'react'
-import { gsap } from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { motion } from 'framer-motion'
-import Lenis from 'lenis'
-import AnimatedCounter from '@/components/AnimatedCounter'
-import Reveal from '@/components/Reveal'
 import Image from 'next/image'
-import SponsorStrip from '@/components/SponsorStrip'
+import { useEffect, useState } from 'react'
 
-gsap.registerPlugin(ScrollTrigger)
+interface Match {
+  id: string; phase: string; venue: string; date: string
+  result?: string; winner?: string
+  team1: { name: string }; team2?: { name: string }
+}
+interface Announcement { id: string; title: string; content: string; type: string; createdAt: string }
 
 export default function Home() {
-  const statsRef = useRef(null)
-  const cardsRef = useRef(null)
-  const featuresRef = useRef(null)
-  const ctaRef = useRef(null)
+  const [fixtures, setFixtures] = useState<Match[]>([])
+  const [announcements, setAnnouncements] = useState<Announcement[]>([])
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 2.5,
-      easing: (t) => 1 - Math.pow(1 - t, 4),
-      smoothWheel: true,
-      wheelMultiplier: 0.8,
-      touchMultiplier: 1.5,
-      infinite: false,
-    })
-    lenis.on('scroll', ScrollTrigger.update)
-    gsap.ticker.add((time) => { lenis.raf(time * 1000) })
-    gsap.ticker.lagSmoothing(0)
-
-    return () => {
-      lenis.destroy()
-      ScrollTrigger.getAll().forEach(t => t.kill())
-    }
+    fetch('/api/schedule').then(r => r.json()).then(d => { if (Array.isArray(d)) setFixtures(d.slice(0, 4)) }).catch(() => {})
+    fetch('/api/admin/announcements').then(r => r.json()).then(d => { if (Array.isArray(d)) setAnnouncements(d.filter((a: Announcement) => a.active).slice(0, 3)) }).catch(() => {})
   }, [])
 
   return (
-    <div className="min-h-screen">
+    <main className="relative pt-20">
 
-      {/* ── Hero ── */}
-      <section className="relative overflow-hidden py-24" style={{background: 'linear-gradient(135deg, #1e3270 0%, #1d4ed8 50%, #1e3270 100%)'}}>
-        <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(218,167,55,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(218,167,55,0.1) 0%, transparent 50%)'}} />
-        <div className="absolute top-0 right-0 w-[600px] h-[600px] rounded-full -translate-y-1/2 translate-x-1/4" style={{background: 'rgba(218,167,55,0.08)'}} />
-        <div className="absolute bottom-0 left-0 w-96 h-96 rounded-full translate-y-1/2 -translate-x-1/4" style={{background: 'rgba(218,167,55,0.08)'}} />
-        <div className="relative container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="flex justify-center mb-8"
-            >
-              <Image src="/Hero.png" alt="SPL Logo" width={220} height={120} className="object-contain" />
-            </motion.div>
-
-            <motion.h1
-              className="text-5xl md:text-7xl font-extrabold text-white mb-6 leading-tight"
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.9, delay: 0.2 }}
-            >
-              Saroj Premier League
-              <span className="block text-gold-400">Under-19</span>
-            </motion.h1>
-
-            <motion.p
-              className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto leading-relaxed"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-            >
-              Uttar Pradesh's most prestigious U19 cricket tournament for Class 12 students.
-              Compete, earn scholarships, and make your mark.
-            </motion.p>
-
-            <motion.div
-              className="flex flex-col sm:flex-row gap-4 justify-center"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.6 }}
-            >
-              <Link href="/register" className="inline-flex items-center bg-gold-500 hover:bg-gold-400 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all shadow-lg shadow-gold-500/30 hover:shadow-xl hover:-translate-y-0.5">
-                Register Now <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
-              <Link href="/about" className="inline-flex items-center border-2 border-white/30 text-white px-8 py-4 rounded-xl text-lg font-semibold hover:border-white hover:bg-white/10 transition-all">
-                Learn More
-              </Link>
-            </motion.div>
+        {/* ── Hero ── */}
+        <section className="relative h-[921px] w-full overflow-hidden bg-[#001a4d]">
+          {/* BG Image */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/stadium.avif"
+              alt="SPL Stadium"
+              fill
+              sizes="100vw"
+              className="object-cover opacity-40"
+              priority
+            />
+            <div className="absolute inset-0 hero-gradient" />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#001a4d]/80 via-[#002366]/40 to-transparent" />
           </div>
-        </div>
-      </section>
 
-      {/* ── Stats ── */}
-      <section ref={statsRef} className="py-16 bg-gray-900">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {[
-              { value: '₹11L', label: 'Winner Prize' },
-              { value: '50%', label: 'Scholarship' },
-              { value: '30', label: 'Days Tournament' },
-              { value: '1000+', label: 'Participants' },
-            ].map((stat, i) => (
-              <Reveal key={stat.label} delay={i * 0.1}>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-primary-400 mb-2">{stat.value}</div>
-                  <div className="text-gray-400 text-sm font-medium uppercase tracking-wide">{stat.label}</div>
+          <div className="relative z-10 h-full max-w-screen-2xl mx-auto px-6 flex flex-col justify-center">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div>
+                {/* Live badge */}
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="bg-[#002366] border border-[#ffd700]/40 text-[#ffd700] px-3 py-1 text-xs font-headline font-black uppercase tracking-widest flex items-center gap-2">
+                    <span className="w-2 h-2 bg-[#ffd700] rounded-full animate-pulse" />
+                    LIVE MATCH
+                  </span>
+                  <span className="text-[#c4c6d0] font-headline text-xs tracking-widest uppercase">
+                    FINALS WEEK • ROUND 12
+                  </span>
                 </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── Registration Cards ── */}
-      <section ref={cardsRef} className="py-20 bg-white">
-        <div className="container mx-auto px-4">
-          <Reveal>
-            <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-gray-900 mb-3">Choose Your Path</h2>
-              <p className="text-gray-500 text-lg">Two ways to join the championship</p>
-            </div>
-          </Reveal>
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <Reveal direction="left" delay={0.1}>
-              <div className="border-2 border-primary-200 rounded-2xl p-8 hover:border-primary-400 hover:shadow-xl transition-all group">
-                <div className="flex items-center mb-6">
-                  <div className="bg-primary-100 p-3 rounded-xl mr-4 group-hover:bg-primary-200 transition-colors">
-                    <Users className="w-7 h-7 text-primary-600" />
+                {/* Title */}
+                <h1 className="font-headline font-black text-6xl md:text-8xl lg:text-[7rem] leading-[0.9] tracking-tighter mb-8 italic uppercase">
+                  BATTLE OF <br />
+                  <span className="text-[#ffd700]">TITANS</span>
+                </h1>
+
+                {/* Live Scoreboard */}
+                <div className="bg-[#131318]/60 backdrop-blur-xl p-8 shadow-2xl border-l-4 border-[#ffd700] max-w-xl">
+                  <div className="flex justify-between items-center mb-6">
+                    <div className="text-center">
+                      <div className="text-3xl font-headline font-black mb-1">RCD</div>
+                      <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">Royal Challengers</div>
+                    </div>
+                    <span className="text-4xl font-headline font-light text-[#c4c6d0]/40">VS</span>
+                    <div className="text-center">
+                      <div className="text-3xl font-headline font-black mb-1 text-[#ffd700]">SKN</div>
+                      <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">Super Kings</div>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Team Registration</h3>
-                    <p className="text-gray-500 text-sm">Already have a squad</p>
+                  <div className="flex justify-center items-baseline gap-4 mb-4">
+                    <span className="text-6xl md:text-7xl font-headline font-black text-[#ffd700]">184/4</span>
+                    <span className="text-xl font-headline font-bold text-[#c4c6d0]">(18.2)</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-[#1c1c21]/80 px-4 py-3">
+                    <span className="text-xs font-medium text-[#e9c349] italic">Sharma 82*(42)</span>
+                    <span className="text-xs font-medium text-[#c4c6d0]">CRR: 10.03 • RRR: 11.45</span>
                   </div>
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {['Up to 15 players', 'Coach & Manager details', 'Direct tournament entry', 'District-level competition'].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-gray-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="border-t pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-500">Registration Fee</span>
-                    <span className="text-3xl font-bold text-gray-900">₹11,000</span>
-                  </div>
-                  <Link href="/register?type=team" className="block w-full bg-primary-600 text-white text-center py-3.5 rounded-xl font-bold hover:bg-primary-700 transition-colors">
-                    Register Team
+
+                {/* CTA Buttons */}
+                <div className="flex flex-wrap gap-4 mt-8">
+                  <Link href="/register"
+                    className="bg-[#ffd700] text-[#002366] px-8 py-3 font-headline font-black uppercase tracking-tight hover:brightness-110 transition-all">
+                    Register Now
+                  </Link>
+                  <Link href="/tournament-format"
+                    className="border border-[#444650] text-[#e4e1e9] px-8 py-3 font-headline font-black uppercase tracking-tight hover:border-[#ffd700] hover:text-[#ffd700] transition-all">
+                    Tournament Info
                   </Link>
                 </div>
               </div>
-            </Reveal>
 
-            <Reveal direction="right" delay={0.2}>
-              <div className="border-2 border-gold-200 rounded-2xl p-8 hover:border-gold-400 hover:shadow-xl transition-all group">
-                <div className="flex items-center mb-6">
-                  <div className="bg-gold-100 p-3 rounded-xl mr-4 group-hover:bg-gold-200 transition-colors">
-                    <Trophy className="w-7 h-7 text-gold-600" />
+              {/* Stats panel — desktop */}
+              <div className="hidden lg:flex flex-col gap-6 items-end">
+                {[
+                  { label: 'Winner Prize', value: '₹11,00,000' },
+                  { label: 'Scholarship', value: '50%' },
+                  { label: 'Participants', value: '1000+' },
+                  { label: 'Final Venue', value: 'Ekana Stadium' },
+                ].map(s => (
+                  <div key={s.label} className="bg-[#131318]/60 backdrop-blur-xl border border-[#444650]/30 px-8 py-5 text-right w-72">
+                    <div className="text-3xl font-headline font-black text-[#ffd700]">{s.value}</div>
+                    <div className="text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mt-1">{s.label}</div>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Individual Registration</h3>
-                    <p className="text-gray-500 text-sm">No team? No problem</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Upcoming Fixtures ── */}
+        <section className="bg-[#0b0b0f] py-20 px-6">
+          <div className="max-w-screen-2xl mx-auto">
+            <div className="flex justify-between items-end mb-12">
+              <div>
+                <h2 className="font-headline font-black text-4xl uppercase tracking-tighter italic">Upcoming Fixtures</h2>
+                <div className="w-24 h-1 bg-[#ffd700] mt-2" />
+              </div>
+              <Link href="/schedule" className="text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700] hover:underline flex items-center gap-1">
+                View All <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>arrow_forward</span>
+              </Link>
+            </div>
+
+            {fixtures.length > 0 ? (
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {fixtures.map((f, i) => (
+                  <div key={f.id}
+                    className={`bg-[#131318] p-6 hover:-translate-y-1 transition-transform duration-300 border ${i === 0 ? 'border-[#ffd700]/50' : 'border-[#444650]/10'}`}>
+                    <div className={`text-[0.6rem] font-headline font-bold tracking-[0.2em] uppercase mb-4 ${i === 0 ? 'text-[#ffd700]' : 'text-[#c4c6d0]'}`}>
+                      {new Date(f.date).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })} • {new Date(f.date).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })} IST
+                    </div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="text-sm font-headline font-black uppercase">{f.team1.name}</div>
+                      <div className="text-[10px] text-[#c4c6d0] font-bold px-2 py-1 bg-[#1c1c21] border border-[#444650]/20">VS</div>
+                      <div className="text-sm font-headline font-black uppercase">{f.team2?.name || 'TBD'}</div>
+                    </div>
+                    <div className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#ffd700] border border-[#ffd700]/30 px-2 py-0.5 mb-4 w-fit">
+                      {f.phase.replace('_', ' ')}
+                    </div>
+                    {f.result ? (
+                      <div className="text-xs text-emerald-400 font-headline font-bold uppercase">{f.result}</div>
+                    ) : (
+                      <Link href="/schedule"
+                        className="block w-full text-center border border-[#444650]/40 hover:border-[#ffd700] hover:bg-[#ffd700] hover:text-[#002366] py-2 text-[0.65rem] font-headline font-black uppercase tracking-widest transition-all">
+                        View Details
+                      </Link>
+                    )}
                   </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-16 border border-[#444650]/20 bg-[#131318]">
+                <span className="material-symbols-outlined text-[#ffd700]/20 block mb-3" style={{ fontSize: '48px' }}>calendar_today</span>
+                <p className="font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">Fixtures will be announced soon</p>
+                <Link href="/schedule" className="mt-4 inline-block text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700] hover:underline">View Schedule →</Link>
+              </div>
+            )}
+          </div>
+        </section>
+
+        {/* ── Latest News ── */}
+        <section className="bg-[#0b0b0f] py-20 px-6 border-t border-[#444650]/10">
+          <div className="max-w-screen-2xl mx-auto">
+            <div className="flex items-center gap-6 mb-16 relative">
+              <h2 className="font-headline font-black text-6xl md:text-8xl uppercase tracking-tighter opacity-[0.03] leading-none select-none">THE FEED</h2>
+              <h2 className="absolute font-headline font-black text-4xl uppercase tracking-tight italic">Latest News</h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+              {/* Main Feature */}
+              <div className="md:col-span-7 group cursor-pointer overflow-hidden relative aspect-[16/10] border border-[#444650]/10">
+                <Image
+                  src="/Hero.png"
+                  alt="SPL News Feature"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 58vw"
+                  className="object-cover grayscale brightness-75 group-hover:grayscale-0 group-hover:brightness-100 transition-all duration-700 scale-105 group-hover:scale-110"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0b0b0f] via-[#0b0b0f]/40 to-transparent p-8 flex flex-col justify-end">
+                  <span className="text-[#ffd700] font-headline font-bold text-xs tracking-[0.3em] uppercase mb-3">Official</span>
+                  <h3 className="text-3xl md:text-5xl font-headline font-black italic uppercase leading-[1.1] max-w-2xl mb-4 group-hover:text-[#ffd700] transition-colors">
+                    {announcements[0]?.title || 'SPL 2025 — Registration Now Open'}
+                  </h3>
+                  <p className="text-[#c4c6d0]/80 max-w-xl text-sm leading-relaxed hidden md:block">
+                    {announcements[0]?.content || 'Team and individual registrations are now open for Saroj Premier League Under-19 tournament. Register today to compete for ₹11,00,000 prize money.'}
+                  </p>
                 </div>
-                <ul className="space-y-3 mb-8">
-                  {['Individual player profile', 'District-wise team formation', 'SPL committee assigns team', 'Equal opportunity for all'].map(f => (
-                    <li key={f} className="flex items-center gap-3 text-gray-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" /> {f}
-                    </li>
-                  ))}
-                </ul>
-                <div className="border-t pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-gray-500">Registration Fee</span>
-                    <span className="text-3xl font-bold text-gray-900">₹1,000</span>
+              </div>
+
+              {/* Side Announcements */}
+              <div className="md:col-span-5 flex flex-col gap-6">
+                {(announcements.length > 1 ? announcements.slice(1) : [
+                  { id: '1', title: 'Ekana Stadium Confirmed as Final Venue', content: 'The grand finale of SPL will be held at the prestigious Ekana Cricket Stadium in Lucknow.', type: 'INFO', createdAt: '2025-02-10' },
+                  { id: '2', title: '50% Scholarship for All Participants', content: 'Every player participating in SPL will be eligible for 50% scholarship at Saroj International University.', type: 'UPDATE', createdAt: '2025-02-05' },
+                ]).slice(0, 2).map(n => (
+                  <div key={n.id} className="bg-[#131318] p-6 flex gap-6 hover:bg-[#1c1c21] transition-colors cursor-pointer border border-[#444650]/10">
+                    <div className="w-32 h-24 flex-shrink-0 bg-[#002366] overflow-hidden border border-[#444650]/20 relative flex items-center justify-center">
+                      <span className="font-headline font-black text-xs italic uppercase text-[#ffd700]/30">SPL</span>
+                    </div>
+                    <div>
+                      <span className="text-[0.6rem] font-headline font-bold text-[#ffd700] uppercase tracking-widest">{n.type}</span>
+                      <h4 className="font-headline font-bold text-lg leading-tight mt-2 uppercase hover:text-[#ffd700] transition-colors">{n.title}</h4>
+                    </div>
                   </div>
-                  <Link href="/register?type=individual" className="block w-full bg-gold-500 text-white text-center py-3.5 rounded-xl font-bold hover:bg-gold-600 transition-colors">
-                    Register Individual
+                ))}
+                <Link href="/news" className="text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700] hover:underline flex items-center gap-1 mt-auto">
+                  All Announcements <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>arrow_forward</span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Player of the Week ── */}
+        <section className="py-20 px-6 bg-[#0b0b0f] overflow-hidden border-t border-[#444650]/10">
+          <div className="max-w-screen-2xl mx-auto">
+            <div className="grid lg:grid-cols-12 gap-8 items-center">
+              <div className="lg:col-span-5 relative">
+                <div className="absolute -top-12 -left-12 text-[10rem] font-headline font-black text-[#ffd700]/5 select-none pointer-events-none uppercase">MVP</div>
+                <h2 className="font-headline font-black text-5xl italic uppercase mb-8 relative z-10 leading-none">
+                  Player of <br />
+                  <span className="text-[#ffd700] text-7xl">The Week</span>
+                </h2>
+                <div className="space-y-6 relative z-10">
+                  {[
+                    { stat: '142*', label: 'Runs Scored' },
+                    { stat: '3/12', label: 'Best Bowling' },
+                    { stat: '9.8',  label: 'Impact Rating' },
+                  ].map(s => (
+                    <div key={s.label} className="flex items-baseline gap-4 border-b border-[#444650]/20 pb-4">
+                      <span className="text-4xl font-headline font-black text-[#ffd700]">{s.stat}</span>
+                      <span className="text-sm font-headline font-bold text-[#c4c6d0] uppercase tracking-widest">{s.label}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-12">
+                  <h3 className="text-3xl font-headline font-black uppercase mb-2">Aaryan &apos;The Archer&apos; Nair</h3>
+                  <p className="text-[#c4c6d0] font-medium max-w-sm">
+                    Dominating both ends of the pitch with clinical precision and raw explosive power.
+                  </p>
+                  <Link href="/register"
+                    className="mt-8 inline-flex items-center gap-4 text-[#ffd700] font-headline font-black uppercase tracking-[0.2em] group">
+                    Register Now
+                    <span className="material-symbols-outlined group-hover:translate-x-2 transition-transform">arrow_forward</span>
                   </Link>
                 </div>
               </div>
-            </Reveal>
-          </div>
-        </div>
-      </section>
 
-      {/* ── Why SPL ── */}
-      <section ref={featuresRef} className="py-20 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <Reveal>
-            <div className="text-center mb-14">
-              <h2 className="text-4xl font-bold text-gray-900 mb-3">Why Choose SPL?</h2>
-              <p className="text-gray-500 text-lg">More than just a tournament</p>
-            </div>
-          </Reveal>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { icon: Trophy, color: 'primary', title: 'Professional Standards', desc: 'International-level organization with professional umpires and world-class facilities.' },
-              { icon: GraduationCap, color: 'gold', title: '50% Scholarship', desc: 'Every participant gets 50% scholarship at Saroj International University — regardless of performance.' },
-              { icon: Star, color: 'green', title: 'Talent Recognition', desc: 'Scouts from major cricket academies and state teams attend to identify promising talent.' },
-            ].map((f, i) => (
-              <Reveal key={f.title} delay={i * 0.1}>
-                <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow text-center">
-                  <div className={`w-16 h-16 bg-${f.color}-100 rounded-2xl flex items-center justify-center mx-auto mb-5`}>
-                    <f.icon className={`w-8 h-8 text-${f.color}-600`} />
+              <div className="lg:col-span-7 relative h-[500px] flex items-center justify-center">
+                <div className="absolute inset-0 bg-[#ffd700]/5 skew-y-6 scale-y-110 border-y border-[#ffd700]/20" />
+                <div className="relative z-10 h-full w-full border border-[#ffd700]/20 overflow-hidden">
+                  <Image
+                    src="/Hero.png"
+                    alt="Player of the Week"
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 58vw"
+                    className="object-cover grayscale brightness-90"
+                  />
+                  <div className="absolute bottom-8 right-8 z-20 bg-[#ffd700] text-[#002366] p-6 font-headline font-black italic text-3xl uppercase tracking-tighter shadow-[10px_10px_0_rgba(0,35,102,1)]">
+                    AARYAN NAIR
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{f.title}</h3>
-                  <p className="text-gray-500 leading-relaxed">{f.desc}</p>
                 </div>
-              </Reveal>
-            ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* ── Tournament Highlights ── */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <Reveal>
-            <h2 className="text-3xl font-bold text-center mb-12 text-gray-900">Tournament Highlights</h2>
-          </Reveal>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            {[
-              { icon: Trophy, color: 'text-gold-500', title: '₹11,00,000', sub: 'Winner Prize Money' },
-              { icon: GraduationCap, color: 'text-primary-500', title: '50% Scholarship', sub: 'For All Players' },
-              { icon: Calendar, color: 'text-primary-500', title: '1 Month', sub: 'Tournament Duration' },
-              { icon: MapPin, color: 'text-gold-500', title: 'Ekana Stadium', sub: 'Grand Final Venue' },
-            ].map((h, i) => (
-              <Reveal key={h.title} delay={i * 0.1}>
-                <div className="bg-gray-50 rounded-2xl p-6 text-center hover:shadow-md transition-shadow">
-                  <h.icon className={`w-10 h-10 ${h.color} mx-auto mb-3`} />
-                  <h3 className="font-bold text-gray-900 mb-1">{h.title}</h3>
-                  <p className="text-gray-500 text-sm">{h.sub}</p>
-                </div>
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section ref={ctaRef} className="py-20 bg-gradient-to-r from-primary-600 to-primary-800">
-        <div className="container mx-auto px-4 text-center">
-          <Reveal>
-            <h2 className="text-4xl font-bold text-white mb-4">Ready to Begin Your Journey?</h2>
-            <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto">
-              Join hundreds of talented cricketers in Uttar Pradesh's most prestigious tournament.
+        {/* ── Registration CTA ── */}
+        <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20">
+          <div className="max-w-screen-2xl mx-auto text-center">
+            <h2 className="font-headline font-black text-5xl md:text-7xl italic uppercase tracking-tighter mb-6 text-white">
+              JOIN THE <span className="text-[#ffd700]">ARENA</span>
+            </h2>
+            <p className="text-white/70 text-lg max-w-2xl mx-auto mb-10">
+              Register your team or join as an individual player. Compete for ₹11,00,000 prize money and a 50% scholarship at Saroj International University.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/register" className="bg-white text-primary-600 px-8 py-4 rounded-xl text-lg font-bold hover:bg-gray-50 transition-colors shadow-lg">
-                Start Registration
+              <Link href="/register?type=team"
+                className="bg-[#ffd700] text-[#002366] px-10 py-4 font-headline font-black uppercase tracking-tight text-lg hover:brightness-110 transition-all">
+                Register Team — ₹11,000
               </Link>
-              <Link href="/tournament-format" className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white hover:text-primary-600 transition-all">
-                View Tournament Details
+              <Link href="/register?type=individual"
+                className="border-2 border-[#ffd700] text-[#ffd700] px-10 py-4 font-headline font-black uppercase tracking-tight text-lg hover:bg-[#ffd700] hover:text-[#002366] transition-all">
+                Register Individual — ₹1,000
               </Link>
             </div>
-          </Reveal>
-        </div>
-      </section>
-
-      {/* ── Sponsors ── */}
-      <SponsorStrip />
-
-      {/* ── Quick Links ── */}
-      <section className="py-16 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <Reveal>
-            <h2 className="text-3xl font-bold text-center mb-10 text-gray-900">Quick Links</h2>
-          </Reveal>
-          <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
-            {[
-              { href: '/tournament-format', title: 'Tournament Format', desc: 'District → Zonal → State → Ekana Final' },
-              { href: '/eligibility', title: 'Eligibility & Rules', desc: 'Under-19, Class 12, UP residents only' },
-              { href: '/schedule', title: 'District Schedule', desc: 'View district-wise match fixtures' },
-            ].map(l => (
-              <Reveal key={l.href}>
-                <Link href={l.href} className="block bg-white rounded-2xl p-6 hover:shadow-lg transition-all hover:-translate-y-1 border border-gray-100">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2">{l.title}</h3>
-                  <p className="text-gray-500 text-sm">{l.desc}</p>
-                </Link>
-              </Reveal>
-            ))}
           </div>
-        </div>
-      </section>
-
-    </div>
+        </section>
+    </main>
   )
 }

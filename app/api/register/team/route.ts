@@ -4,12 +4,26 @@ import { sendRegistrationEmail } from '@/lib/email'
 import { sendRegistrationSMS } from '@/lib/sms'
 import { nanoid } from 'nanoid'
 import bcrypt from 'bcryptjs'
+import { currentUser } from '@clerk/nextjs/server'
 
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
     const registrationId = `SPL${nanoid(8).toUpperCase()}`
-    const tempPassword = await bcrypt.hash(nanoid(16), 10)
+
+    // Get or create DB user — prefer Clerk session, fallback to email
+    const clerkUser = await currentUser()
+    const email = (clerkUser?.emailAddresses?.[0]?.emailAddress || data.email)?.toLowerCase()
+
+    if (!email) return NextResponse.json({ error: 'Email is required' }, { status: 400 })
+
+    let dbUser = await prisma.user.findUnique({ where: { email } })
+    if (!dbUser) {
+      const tempPassword = await bcrypt.hash(nanoid(16), 10)
+      dbUser = await prisma.user.create({
+        data: { email, password: tempPassword, role: 'PUBLIC', name: clerkUser?.firstName || data.managerName || null }
+      })
+    }
 
     const team = await prisma.team.create({
       data: {
@@ -20,16 +34,10 @@ export async function POST(request: NextRequest) {
         coachPhone: data.coachPhone || null,
         managerName: data.managerName || null,
         managerPhone: data.managerPhone || null,
-        contactEmail: data.email || null,
+        contactEmail: email,
         contactPhone: data.managerPhone || data.coachPhone || null,
         registrationId,
-        createdBy: {
-          create: {
-            email: data.email?.toLowerCase() || `team_${registrationId}@spl.com`,
-            password: tempPassword,
-            role: 'PUBLIC'
-          }
-        }
+        createdById: dbUser.id
       }
     })
 
@@ -57,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.payment.create({ data: { amount: 11000, teamId: team.id, status: 'PENDING' } })
 
-    try { if (data.email) await sendRegistrationEmail(data.email, registrationId, data.teamName) } catch { }
+    try { if (email) await sendRegistrationEmail(email, registrationId, data.teamName) } catch { }
     try {
       const phone = data.managerPhone || data.coachPhone || ''
       if (phone) await sendRegistrationSMS(phone, registrationId, data.teamName, true)

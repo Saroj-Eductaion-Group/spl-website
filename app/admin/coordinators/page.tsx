@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, Shield } from 'lucide-react'
 
 interface Coordinator {
   id: string; name: string; email: string; phone?: string
@@ -21,6 +20,9 @@ const districts = [
   'Sonbhadra','Sultanpur','Unnao','Varanasi'
 ]
 
+const inputCls = "w-full bg-[#0b0b0f] border border-[#444650]/40 text-[#e4e1e9] px-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 transition-colors"
+const labelCls = "block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2"
+
 export default function AdminCoordinators() {
   const [coordinators, setCoordinators] = useState<Coordinator[]>([])
   const [loading, setLoading] = useState(true)
@@ -33,7 +35,8 @@ export default function AdminCoordinators() {
   const loadCoordinators = async () => {
     const token = localStorage.getItem('adminToken') || ''
     const res = await fetch('/api/admin/coordinators', { headers: { Authorization: `Bearer ${token}` } })
-    setCoordinators(await res.json())
+    const data = await res.json()
+    setCoordinators(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
@@ -52,9 +55,7 @@ export default function AdminCoordinators() {
       setShowForm(false)
       setForm({ name: '', email: '', phone: '', password: '', district: '' })
       loadCoordinators()
-    } else {
-      alert(data.error || 'Failed to create coordinator')
-    }
+    } else alert(data.error || 'Failed to create coordinator')
   }
 
   const deleteCoordinator = async (id: string) => {
@@ -68,77 +69,81 @@ export default function AdminCoordinators() {
     loadCoordinators()
   }
 
-  if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div></div>
+  if (loading) return (
+    <div className="flex items-center justify-center h-64">
+      <span className="w-8 h-8 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+    </div>
+  )
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-primary-600">District Coordinators</h1>
-          <p className="text-gray-600">Manage district-level coordinators</p>
+          <h1 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">
+            District <span className="text-[#ffd700]">Coordinators</span>
+          </h1>
+          <p className="text-[#c4c6d0]/60 text-sm mt-1">Manage district-level coordinators</p>
         </div>
-        <button onClick={() => setShowForm(!showForm)} className="btn-primary flex items-center gap-2">
-          <Plus className="w-4 h-4" /> Add Coordinator
+        <button onClick={() => setShowForm(!showForm)}
+          className="flex items-center gap-2 bg-[#ffd700] text-[#002366] px-5 py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all">
+          <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>add</span>
+          Add Coordinator
         </button>
       </div>
 
       {showForm && (
-        <div className="card mb-8">
-          <h2 className="text-xl font-semibold mb-4 text-primary-600">New Coordinator</h2>
+        <div className="bg-[#131318] border border-[#444650]/20 p-6">
+          <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700] mb-5">New Coordinator</h2>
           <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <label className="form-label">Full Name *</label>
-              <input className="form-input" placeholder="Enter name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
-            </div>
-            <div>
-              <label className="form-label">Email *</label>
-              <input type="email" className="form-input" placeholder="Enter email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
-            </div>
-            <div>
-              <label className="form-label">Phone</label>
-              <input className="form-input" placeholder="Enter phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} />
-            </div>
-            <div>
-              <label className="form-label">Password *</label>
-              <input type="password" className="form-input" placeholder="Set password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
-            </div>
+            <div><label className={labelCls}>Full Name *</label><input className={inputCls} placeholder="Enter name" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
+            <div><label className={labelCls}>Email *</label><input type="email" className={inputCls} placeholder="Enter email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} /></div>
+            <div><label className={labelCls}>Phone</label><input className={inputCls} placeholder="Enter phone" value={form.phone} onChange={e => setForm({ ...form, phone: e.target.value })} /></div>
+            <div><label className={labelCls}>Password *</label><input type="password" className={inputCls} placeholder="Set password" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} /></div>
             <div className="md:col-span-2">
-              <label className="form-label">Assigned District *</label>
-              <select className="form-input" value={form.district} onChange={e => setForm({ ...form, district: e.target.value })}>
+              <label className={labelCls}>Assigned District *</label>
+              <select className={inputCls} value={form.district} onChange={e => setForm({ ...form, district: e.target.value })}>
                 <option value="">Select District</option>
                 {districts.map(d => <option key={d} value={d}>{d}</option>)}
               </select>
             </div>
           </div>
-          <div className="flex gap-3 mt-4">
-            <button onClick={createCoordinator} disabled={saving} className="btn-primary disabled:opacity-50">{saving ? 'Creating...' : 'Create Coordinator'}</button>
-            <button onClick={() => setShowForm(false)} className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancel</button>
+          <div className="flex gap-3 mt-5">
+            <button onClick={createCoordinator} disabled={saving}
+              className="bg-[#ffd700] text-[#002366] px-6 py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50">
+              {saving ? 'Creating...' : 'Create Coordinator'}
+            </button>
+            <button onClick={() => setShowForm(false)}
+              className="border border-[#444650]/40 text-[#c4c6d0] px-6 py-2.5 font-headline font-bold uppercase tracking-tight text-sm hover:border-[#ffd700] hover:text-[#ffd700] transition-all">
+              Cancel
+            </button>
           </div>
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {coordinators.map(coord => (
-          <div key={coord.id} className="card">
+          <div key={coord.id} className="bg-[#131318] border border-[#444650]/20 p-5 hover:border-[#ffd700]/20 transition-colors">
             <div className="flex justify-between items-start mb-4">
-              <div className="bg-primary-100 p-2 rounded-lg">
-                <Shield className="w-6 h-6 text-primary-600" />
+              <div className="w-10 h-10 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center">
+                <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '20px' }}>shield_person</span>
               </div>
-              <button onClick={() => deleteCoordinator(coord.id)} className="text-red-400 hover:text-red-600">
-                <Trash2 className="w-4 h-4" />
+              <button onClick={() => deleteCoordinator(coord.id)} className="text-[#c4c6d0]/30 hover:text-red-400 transition-colors">
+                <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
               </button>
             </div>
-            <h3 className="font-semibold text-gray-900 mb-1">{coord.name}</h3>
-            <p className="text-sm text-gray-500 mb-1">{coord.email}</p>
-            {coord.phone && <p className="text-sm text-gray-500 mb-2">{coord.phone}</p>}
-            <span className="inline-block bg-gold-100 text-gold-800 text-xs font-semibold px-3 py-1 rounded-full">
+            <h3 className="font-headline font-black text-[#e4e1e9] uppercase tracking-tight mb-1">{coord.name}</h3>
+            <p className="text-sm text-[#c4c6d0]/60 mb-1">{coord.email}</p>
+            {coord.phone && <p className="text-sm text-[#c4c6d0]/60 mb-3">{coord.phone}</p>}
+            <span className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#ffd700] border border-[#ffd700]/30 bg-[#ffd700]/10 px-2 py-0.5">
               {coord.coordinatorDistrict || 'No District'}
             </span>
-            <p className="text-xs text-gray-400 mt-3">Added: {new Date(coord.createdAt).toLocaleDateString('en-IN')}</p>
+            <p className="text-xs text-[#c4c6d0]/30 mt-3">Added: {new Date(coord.createdAt).toLocaleDateString('en-IN')}</p>
           </div>
         ))}
         {coordinators.length === 0 && (
-          <div className="col-span-3 text-center py-12 text-gray-400">No coordinators added yet</div>
+          <div className="col-span-3 text-center py-12 text-[#c4c6d0]/30 font-headline uppercase tracking-widest text-sm">
+            No coordinators added yet
+          </div>
         )}
       </div>
     </div>

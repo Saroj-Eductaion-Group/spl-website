@@ -3,21 +3,12 @@
 import { useSignIn } from '@clerk/nextjs'
 import Image from 'next/image'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { Trophy, GraduationCap, Star, Eye, EyeOff, Loader2 } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-const leftPanelStyle = {
-  background: 'linear-gradient(135deg, #1e3270 0%, #1d4ed8 60%, #1e3270 100%)',
-}
-const overlayStyle = {
-  backgroundImage:
-    'radial-gradient(circle at 20% 50%, rgba(218,167,55,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(218,167,55,0.1) 0%, transparent 50%)',
-}
-const iconBgStyle = { background: 'rgba(218,167,55,0.2)' }
-
-export default function SignInPage() {
+function SignInForm() {
   const { signIn, setActive, isLoaded } = useSignIn()
-  const router = useRouter()
+  const searchParams = useSearchParams()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -27,59 +18,56 @@ export default function SignInPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!isLoaded) return
+    if (!isLoaded || !signIn) {
+      setError('Auth not ready, please wait a moment and try again.')
+      return
+    }
     setLoading(true)
     setError('')
     try {
       const result = await signIn.create({ identifier: email, password })
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId })
-        window.location.href = '/register'
+        const redirect = searchParams.get('redirect_url') || '/register'
+        window.location.href = redirect
+      } else {
+        setError('Sign in incomplete. Please try again.')
       }
     } catch (err: unknown) {
-      const msg =
-        (err as { errors?: { message: string }[] })?.errors?.[0]?.message ||
-        'Invalid email or password'
-      setError(msg)
+      const msg = (err as { errors?: { code?: string; message: string; longMessage?: string }[] })?.errors?.[0]
+      if (msg?.code === 'strategy_for_user_invalid') {
+        setError('This account was created with Google. Please use "Continue with Google" below.')
+      } else {
+        setError(msg?.longMessage || msg?.message || 'Invalid email or password')
+      }
     } finally {
       setLoading(false)
     }
   }
 
+  const inputCls = "w-full bg-[#131318] border border-[#444650]/40 text-[#e4e1e9] px-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 focus:bg-[#1c1c21] transition-colors"
+  const labelCls = "block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2"
+
   return (
-    <div className="min-h-screen -mt-20 flex">
+    <div className="min-h-screen -mt-20 flex bg-[#0b0b0f]">
 
       {/* Left Panel */}
-      <div
-        className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col items-center justify-center p-12"
-        style={leftPanelStyle}
-      >
-        <div className="absolute inset-0" style={overlayStyle} />
-        <div
-          className="absolute top-0 right-0 w-96 h-96 rounded-full -translate-y-1/2 translate-x-1/2"
-          style={{ background: 'rgba(218,167,55,0.08)' }}
-        />
-        <div
-          className="absolute bottom-0 left-0 w-64 h-64 rounded-full translate-y-1/2 -translate-x-1/2"
-          style={{ background: 'rgba(218,167,55,0.06)' }}
-        />
-
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col items-center justify-center p-12 bg-[#002366]">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(255,215,0,0.15)_0%,transparent_60%)]" />
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-[#ffd700] via-[#ffe566] to-[#ffd700]" />
         <div className="relative z-10 text-center">
-          <Image src="/Hero.png" alt="SPL Logo" width={180} height={100} className="object-contain mx-auto mb-8" />
-          <h1 className="text-4xl font-extrabold text-white mb-3">Saroj Premier League</h1>
-          <p className="text-blue-200 text-lg mb-12">Under-19 Cricket Tournament — Uttar Pradesh</p>
-
-          <div className="space-y-5 text-left max-w-xs mx-auto">
+          <Image src="/Hero.png" alt="SPL Logo" width={180} height={100} className="object-contain mx-auto mb-8" sizes="180px" />
+          <h1 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-white mb-3">Saroj Premier League</h1>
+          <p className="text-white/60 text-lg mb-12 font-body">Under-19 Cricket Tournament — Uttar Pradesh</p>
+          <div className="space-y-4 text-left max-w-xs mx-auto">
             {[
-              { icon: Trophy, text: '₹11,00,000 Winner Prize Money' },
-              { icon: GraduationCap, text: '50% Scholarship at Saroj International University' },
-              { icon: Star, text: 'Grand Final at Ekana Cricket Stadium' },
-            ].map(({ icon: Icon, text }) => (
-              <div key={text} className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={iconBgStyle}>
-                  <Icon className="w-5 h-5 text-yellow-400" />
-                </div>
-                <span className="text-blue-100 text-sm font-medium">{text}</span>
+              { icon: 'emoji_events',   text: '₹11,00,000 Winner Prize Money' },
+              { icon: 'school',         text: '50% Scholarship at Saroj International University' },
+              { icon: 'sports_cricket', text: 'Grand Final at Ekana Cricket Stadium' },
+            ].map(({ icon, text }) => (
+              <div key={text} className="flex items-center gap-3 bg-white/10 border border-[#ffd700]/20 px-4 py-3">
+                <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '20px' }}>{icon}</span>
+                <span className="text-white/80 text-sm font-body">{text}</span>
               </div>
             ))}
           </div>
@@ -87,99 +75,108 @@ export default function SignInPage() {
       </div>
 
       {/* Right Panel */}
-      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center bg-gray-50 px-6 py-12">
+      <div className="w-full lg:w-1/2 flex flex-col items-center justify-center px-6 py-12 bg-[#0b0b0f]">
         <div className="w-full max-w-md">
-
-          {/* Mobile logo */}
-          <div className="lg:hidden text-center mb-8">
-            <Image src="/Hero.png" alt="SPL" width={100} height={60} className="object-contain mx-auto mb-3" />
-            <h2 className="text-xl font-bold text-gray-900">Saroj Premier League</h2>
-            <p className="text-gray-500 text-sm">Under-19 Cricket Tournament</p>
+          <div className="lg:hidden text-center mb-10">
+            <Image src="/Hero.png" alt="SPL" width={100} height={60} className="object-contain mx-auto mb-3" sizes="100px" />
+            <h2 className="font-headline font-black text-xl italic uppercase text-[#ffd700]">Saroj Premier League</h2>
+            <p className="text-[#c4c6d0]/60 text-sm">Under-19 Cricket Tournament</p>
           </div>
 
-          {/* Card */}
-          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200 p-8 lg:p-10">
-            <div className="mb-8">
-              <h2 className="text-2xl font-extrabold text-gray-900">Welcome back</h2>
-              <p className="text-gray-500 text-sm mt-1">Sign in to register for the tournament</p>
+          <div className="mb-8">
+            <div className="w-12 h-12 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center mb-6">
+              <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '24px' }}>login</span>
             </div>
-
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {/* Email */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Email address
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 text-sm outline-none focus:border-blue-500 transition-colors"
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                  Password
-                </label>
-                <div className="relative">
-                  <input
-                    type={showPass ? 'text' : 'password'}
-                    required
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="Enter your password"
-                    className="w-full px-4 py-3 pr-11 rounded-2xl border-2 border-gray-200 text-gray-900 placeholder-gray-400 text-sm outline-none focus:border-blue-500 transition-colors"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPass(v => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Forgot password */}
-              <div className="flex justify-end -mt-1">
-                <a href="/forgot-password" className="text-xs text-blue-600 hover:text-blue-700 font-medium">
-                  Forgot password?
-                </a>
-              </div>
-
-              {/* Error */}
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-xl px-4 py-3">
-                  {error}
-                </div>
-              )}
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3.5 rounded-2xl font-bold text-sm text-white flex items-center justify-center gap-2 transition-all duration-200 hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:translate-y-0"
-                style={{ background: 'linear-gradient(135deg, #1d4ed8, #1e3270)' }}
-              >
-                {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-                {loading ? 'Signing in…' : 'Sign in'}
-              </button>
-            </form>
-
-            {/* Footer */}
-            <p className="text-center text-sm text-gray-500 mt-6">
-              Don&apos;t have an account?{' '}
-              <a href="/sign-up" className="text-blue-600 hover:text-blue-700 font-semibold">
-                Sign up
-              </a>
-            </p>
+            <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter text-[#e4e1e9]">Welcome Back</h2>
+            <p className="text-[#c4c6d0]/60 text-sm mt-1 font-body">Sign in to register for the tournament</p>
           </div>
+
+          {!isLoaded && (
+            <div className="flex items-center gap-2 text-[#c4c6d0]/50 text-sm mb-4 font-body">
+              <span className="w-4 h-4 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+              Loading...
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div>
+              <label className={labelCls}>Email Address</label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#444650]" style={{ fontSize: '18px' }}>mail</span>
+                <input type="email" required value={email} onChange={e => setEmail(e.target.value)} placeholder="you@example.com"
+                  className={inputCls + ' pl-10'} />
+              </div>
+            </div>
+            <div>
+              <label className={labelCls}>Password</label>
+              <div className="relative">
+                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#444650]" style={{ fontSize: '18px' }}>lock</span>
+                <input type={showPass ? 'text' : 'password'} required value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password"
+                  className={inputCls + ' pl-10 pr-11'} />
+                <button type="button" onClick={() => setShowPass(v => !v)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#444650] hover:text-[#ffd700] transition-colors">
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>{showPass ? 'visibility_off' : 'visibility'}</span>
+                </button>
+              </div>
+            </div>
+            <div className="flex justify-end -mt-1">
+              <a href="/forgot-password" className="text-xs text-[#ffd700]/70 hover:text-[#ffd700] font-headline font-bold uppercase tracking-widest transition-colors">
+                Forgot password?
+              </a>
+            </div>
+            {error && (
+              <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 text-sm flex items-center gap-2 font-body">
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>error</span>{error}
+              </div>
+            )}
+            <button type="submit" disabled={loading || !isLoaded}
+              className="w-full bg-[#ffd700] text-[#002366] py-3.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed">
+              {loading ? (
+                <span className="flex items-center gap-2 justify-center">
+                  <span className="w-4 h-4 border-2 border-[#002366]/30 border-t-[#002366] rounded-full animate-spin" />
+                  Signing in…
+                </span>
+              ) : 'Sign In'}
+            </button>
+          </form>
+
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-[#444650]/30" />
+            <span className="text-xs font-headline font-bold uppercase tracking-widest text-[#444650]">or</span>
+            <div className="flex-1 h-px bg-[#444650]/30" />
+          </div>
+
+          <button
+            onClick={() => signIn?.authenticateWithRedirect({ strategy: 'oauth_google', redirectUrl: '/sso-callback', redirectUrlComplete: searchParams.get('redirect_url') || '/register' })}
+            disabled={!isLoaded}
+            className="w-full flex items-center justify-center gap-3 bg-[#131318] border border-[#444650]/40 text-[#e4e1e9] py-3.5 font-headline font-bold uppercase tracking-tight text-sm hover:border-[#ffd700]/40 hover:bg-[#1c1c21] transition-all disabled:opacity-50">
+            <svg width="18" height="18" viewBox="0 0 24 24">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+              <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/>
+              <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+            </svg>
+            Continue with Google
+          </button>
+
+          <p className="text-center text-sm text-[#c4c6d0]/60 mt-6 font-body">
+            Don&apos;t have an account?{' '}
+            <a href="/sign-up" className="text-[#ffd700] font-semibold hover:underline">Sign up</a>
+          </p>
         </div>
       </div>
     </div>
+  )
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#0b0b0f] flex items-center justify-center">
+        <span className="w-10 h-10 border-2 border-[#444650] border-t-[#ffd700] rounded-full animate-spin" />
+      </div>
+    }>
+      <SignInForm />
+    </Suspense>
   )
 }
