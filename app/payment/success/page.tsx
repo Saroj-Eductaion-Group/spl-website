@@ -1,5 +1,6 @@
 'use client'
 
+import { Suspense } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { CheckCircle, Copy, ArrowRight, Phone, Mail, Trophy, GraduationCap } from 'lucide-react'
@@ -7,7 +8,7 @@ import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import SponsorStrip from '@/components/SponsorStrip'
 
-export default function PaymentSuccess() {
+function SuccessContent() {
   const searchParams = useSearchParams()
   const registrationId = searchParams.get('registrationId') || ''
   const txnid = searchParams.get('txnid') || ''
@@ -156,5 +157,13 @@ export default function PaymentSuccess() {
 
       <SponsorStrip />
     </div>
+  )
+}
+
+export default function PaymentSuccess() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full animate-spin" /></div>}>
+      <SuccessContent />
+    </Suspense>
   )
 }

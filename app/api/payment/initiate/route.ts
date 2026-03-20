@@ -16,17 +16,10 @@ export async function POST(request: NextRequest) {
 
     const txnid = `SPL${Date.now()}`
 
-    // Dev mode: no Easebuzz key configured
+    // Dev mode: no Easebuzz key configured — show pending page, do NOT auto-complete
     if (!EASEBUZZ_KEY || EASEBUZZ_KEY === 'your-easebuzz-key') {
-      if (teamId) {
-        await prisma.payment.updateMany({
-          where: { teamId },
-          data: { status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
-        })
-      }
-      // Individual players have no Payment record to update — receipt shown via success page params
-      const successUrl = `/payment/success?registrationId=${registrationId}&txnid=${txnid}&name=${encodeURIComponent(name)}&type=${registrationType}`
-      return NextResponse.json({ success: true, paymentUrl: successUrl })
+      const pendingUrl = `/payment/pending?registrationId=${registrationId}&name=${encodeURIComponent(name)}&type=${registrationType}&amount=${amount}`
+      return NextResponse.json({ success: true, paymentUrl: pendingUrl })
     }
 
     const productinfo = `SPL-${registrationType === 'team' ? 'Team' : 'Individual'}-Registration`

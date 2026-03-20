@@ -106,6 +106,16 @@ export default function Navbar() {
 
               <SignedIn>
                 <Link
+                  href="/my-registration"
+                  className={`flex items-center gap-1.5 text-sm font-medium px-4 py-2.5 rounded-lg border transition-all duration-200 ${
+                    scrolled
+                      ? 'text-gray-300 border-white/15 hover:text-white hover:border-white/30'
+                      : 'text-gray-600 border-gray-300 hover:text-primary-600 hover:border-primary-400 hover:bg-primary-50'
+                  }`}
+                >
+                  My Registration
+                </Link>
+                <Link
                   href="/register"
                   className="text-base font-bold text-white bg-primary-600 hover:bg-primary-500 px-7 py-3 rounded-lg transition-all duration-200 shadow-md shadow-primary-600/30"
                 >
@@ -176,6 +186,16 @@ export default function Navbar() {
             </SignedOut>
 
             <SignedIn>
+              <Link
+                href="/my-registration"
+                className={`flex items-center px-4 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+                  pathname === '/my-registration'
+                    ? 'bg-primary-50 text-primary-600 border border-primary-200'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                My Registration
+              </Link>
               <Link
                 href="/register"
                 className="flex items-center justify-center px-4 py-2.5 rounded-lg text-sm font-bold text-white bg-primary-600 hover:bg-primary-500 transition-all shadow-md shadow-primary-600/20"

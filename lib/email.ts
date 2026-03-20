@@ -85,6 +85,24 @@ export const sendPaymentReceiptEmail = async (email: string, name: string, regis
   })
 }
 
+export const sendTeamAssignmentEmail = async (email: string, playerName: string, teamName: string, district: string) => {
+  await transporter.sendMail({
+    from, to: email,
+    subject: `SPL — You've Been Assigned to a Team!`,
+    html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
+      <h2 style="color:#16a34a;">Team Assignment Confirmed! 🏏</h2>
+      <p>Dear ${s(playerName)},</p>
+      <p>Great news! The SPL District Committee has assigned you to a team.</p>
+      <div style="background:#f0fdf4;padding:20px;border-radius:8px;margin:20px 0;border-left:4px solid #16a34a;">
+        <p><strong>Assigned Team:</strong> ${s(teamName)}</p>
+        <p><strong>District:</strong> ${s(district)}</p>
+      </div>
+      <p>Please stay in touch with your team manager for further details.</p>
+      <p>Best regards,<br/>SPL Tournament Committee</p>
+    </div>`
+  })
+}
+
 export const sendMatchNotificationEmail = async (email: string, teamName: string, opponent: string, venue: string, date: string) => {
   await transporter.sendMail({
     from, to: email,

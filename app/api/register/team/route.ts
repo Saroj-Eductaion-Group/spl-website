@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
         registrationId,
         createdBy: {
           create: {
-            email: data.email || `team_${registrationId}@spl.com`,
+            email: data.email?.toLowerCase() || `team_${registrationId}@spl.com`,
             password: tempPassword,
             role: 'PUBLIC'
           }

@@ -11,11 +11,11 @@ export async function POST(request: NextRequest) {
     const registrationId = `SPL${nanoid(8).toUpperCase()}`
     const tempPassword = await bcrypt.hash(nanoid(16), 10)
 
-    const existingUser = await prisma.user.findUnique({ where: { email: data.email } })
+    const existingUser = await prisma.user.findUnique({ where: { email: data.email?.toLowerCase() } })
 
     const user = existingUser ?? await prisma.user.create({
       data: {
-        email: data.email || `player_${nanoid(8)}@spl.com`,
+        email: data.email?.toLowerCase() || `player_${nanoid(8)}@spl.com`,
         password: tempPassword,
         role: 'PUBLIC',
         name: data.name,

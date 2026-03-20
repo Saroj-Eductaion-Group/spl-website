@@ -36,8 +36,8 @@ export default function AdminTeams() {
 
   const updateTeamStatus = async (teamId: string, status: string) => {
     const token = localStorage.getItem('adminToken') || ''
-    await fetch('/api/admin/teams/update-status', {
-      method: 'POST',
+    await fetch('/api/admin/teams', {
+      method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
       body: JSON.stringify({ teamId, status })
     })
