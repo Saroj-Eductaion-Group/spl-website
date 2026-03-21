@@ -210,21 +210,26 @@ export default function Navbar() {
   const isStaff = useAdminToken()
   const { hasReg } = useHasRegistration()
 
+  const mobileMenuRef = useRef<HTMLDivElement>(null)
+
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (moreRef.current && !moreRef.current.contains(e.target as Node)) {
         setMoreOpen(false)
       }
+      if (mobileOpen && mobileMenuRef.current && !mobileMenuRef.current.contains(e.target as Node)) {
+        setMobileOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClick)
     return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
+  }, [mobileOpen])
 
   const isMoreActive = moreLinks.some(l => l.href === pathname)
 
   return (
     <>
-      <header className="bg-[#131318]/70 backdrop-blur-xl border-b border-[#444650]/15 shadow-[0_20px_40px_rgba(179,197,255,0.08)] fixed top-0 w-full z-50">
+      <header ref={mobileMenuRef} className="bg-[#131318]/70 backdrop-blur-xl border-b border-[#444650]/15 shadow-[0_20px_40px_rgba(179,197,255,0.08)] fixed top-0 w-full z-50">
         <div className="flex justify-between items-center w-full px-6 md:px-8 py-4 max-w-screen-2xl mx-auto">
 
           {/* Logo */}
@@ -298,9 +303,15 @@ export default function Navbar() {
                 {l.label}
               </Link>
             ))}
-            <SignedOut>
-              {!isStaff && (
-                <>
+            {isStaff ? (
+              <Link href={typeof window !== 'undefined' && localStorage.getItem('coordinatorToken') ? '/coordinator/dashboard' : '/admin/dashboard'} onClick={() => setMobileOpen(false)}
+                className="font-headline font-bold uppercase tracking-tight text-sm text-[#ffd700] flex items-center gap-2">
+                <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>admin_panel_settings</span>
+                {typeof window !== 'undefined' && localStorage.getItem('coordinatorToken') ? 'Coordinator Panel' : 'Admin Panel'}
+              </Link>
+            ) : (
+              <>
+                <SignedOut>
                   <Link href="/sign-in" onClick={() => setMobileOpen(false)}
                     className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
                     Sign In
@@ -309,20 +320,20 @@ export default function Navbar() {
                     className="font-headline font-bold uppercase tracking-tight text-sm text-[#ffd700]">
                     Register
                   </Link>
-                </>
-              )}
-              <Link href="/admin/login" onClick={() => setMobileOpen(false)}
-                className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
-                Admin Login
-              </Link>
-              <Link href="/coordinator/login" onClick={() => setMobileOpen(false)}
-                className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
-                Coordinator Login
-              </Link>
-            </SignedOut>
-            <SignedIn>
-              {!isStaff && <MobileUserSection onClose={() => setMobileOpen(false)} hasReg={hasReg} />}
-            </SignedIn>
+                  <Link href="/admin/login" onClick={() => setMobileOpen(false)}
+                    className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
+                    Admin Login
+                  </Link>
+                  <Link href="/coordinator/login" onClick={() => setMobileOpen(false)}
+                    className="font-headline font-bold uppercase tracking-tight text-sm text-[#e4e1e9]/80 hover:text-[#ffd700] transition-colors">
+                    Coordinator Login
+                  </Link>
+                </SignedOut>
+                <SignedIn>
+                  <MobileUserSection onClose={() => setMobileOpen(false)} hasReg={hasReg} />
+                </SignedIn>
+              </>
+            )}
           </div>
         )}
       </header>
@@ -336,7 +347,7 @@ export default function Navbar() {
           { href: '/news',     icon: 'newspaper',        label: 'News'     },
           { href: '/contact',  icon: 'sensors',          label: 'Contact'  },
         ].map(item => (
-          <Link key={item.href} href={item.href}
+          <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}
             className={`flex flex-col items-center gap-1 ${pathname === item.href ? 'text-[#ffd700]' : 'text-[#e4e1e9]/40'}`}>
             <span className="material-symbols-outlined text-xl">{item.icon}</span>
             <span className="text-[10px] font-headline font-bold uppercase tracking-wider">{item.label}</span>
