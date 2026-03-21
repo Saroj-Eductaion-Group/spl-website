@@ -24,6 +24,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
+// Deleting the data
 export async function DELETE(req: NextRequest) {
   if (!verifyAdminToken(req)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {

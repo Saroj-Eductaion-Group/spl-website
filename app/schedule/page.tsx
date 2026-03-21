@@ -48,34 +48,42 @@ export default function Schedule() {
 
   // --- Added: state for modal and teams data ---
   const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
-  const [allTeams, setAllTeams] = useState<Team[]>([])          // all teams fetched
+    const [teamsLoading, setTeamsLoading] = useState(true)          // all teams fetched
   const [teamsMap, setTeamsMap] = useState<Map<string, Team>>(new Map())  // quick lookup by name+district
 
   // Fetch matches (existing)
-  useEffect(() => {
-    fetch('/api/schedule').then(r => r.json())
+   useEffect(() => {
+    fetch('/api/schedule')
+      .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setMatches(data) })
-      .catch(() => {}).finally(() => setLoading(false))
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }, [])
 
   console.log(matches);
   
   // --- Added: fetch all teams (like admin teams) to build lookup map ---
-  useEffect(() => {
-    const token = localStorage.getItem('adminToken') || ''
-    fetch('/api/admin/teams', { headers: { Authorization: `Bearer ${token}` } })
-      .then(r => r.json())
-      .then((teams: Team[]) => {
-        setAllTeams(teams)
-        const map = new Map<string, Team>()
-        teams.forEach(team => {
-          const key = `${team.name}|${team.district}`  // simple composite key
-          map.set(key, team)
-        })
-        setTeamsMap(map)
+ // Replace the teams-fetching useEffect with this:
+
+useEffect(() => {
+  fetch('/api/FetchingTeams')
+    .then(res => res.json())
+    .then((teams: Team[]) => {
+      if (!Array.isArray(teams)) {
+        console.warn('Unexpected response from /api/FetchingTeams:', teams)
+        setTeamsMap(new Map())
+        return
+      }
+      const map = new Map<string, Team>()
+      teams.forEach(team => {
+        const key = `${team.name}|${team.district}`
+        map.set(key, team)
       })
-      .catch(err => console.error('Failed to fetch teams for modal', err))
-  }, [])
+      setTeamsMap(map)
+    })
+    .catch(err => console.error('Failed to fetch teams', err))
+    .finally(() => setTeamsLoading(false))
+}, [])
 
   const phases = ['ALL', 'DISTRICT', 'ZONAL', 'SEMI_FINAL', 'FINAL']
   const districts = ['ALL', ...Array.from(new Set(matches.flatMap(m => [m.team1.district, m.team2?.district].filter(Boolean) as string[]))).sort()]
