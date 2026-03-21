@@ -69,4 +69,4 @@ Set all environment variables in Vercel dashboard before deploying.
 
 ## License
 
-© 2025 Saroj Educational Group. All rights reserved.
+© 2026 Saroj Educational Group. All rights reserved.
