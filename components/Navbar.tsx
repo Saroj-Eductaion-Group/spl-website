@@ -106,6 +106,7 @@ function UserDropdown() {
       </button>
       {open && (
         <div className="absolute top-full right-0 mt-3 w-52 bg-[#131318] border border-[#444650]/30 shadow-2xl flex flex-col py-2 z-50">
+          {/* User info */}
           <div className="px-5 py-3 border-b border-[#444650]/20">
             <p className="text-xs font-headline font-bold uppercase tracking-widest text-[#ffd700] truncate">
               {user?.firstName} {user?.lastName}
@@ -114,12 +115,6 @@ function UserDropdown() {
               {user?.emailAddresses?.[0]?.emailAddress}
             </p>
           </div>
-          <div className="h-px bg-[#444650]/20 my-1" />
-          <Link href="/my-registration" onClick={() => setOpen(false)}
-            className="px-5 py-2.5 text-xs font-headline font-bold uppercase tracking-widest text-[#e4e1e9]/70 hover:text-[#ffd700] hover:bg-[#1c1c21] transition-colors flex items-center gap-2">
-            <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>assignment</span>
-            My Registration
-          </Link>
           <div className="h-px bg-[#444650]/20 my-1" />
           <button
             onClick={() => { setOpen(false); signOut().then(() => { window.location.href = '/' }) }}
@@ -174,10 +169,9 @@ function RegisterButton({ hasReg }: { hasReg: boolean }) {
   if (isSignedIn && hasReg) {
     return (
       <Link href="/my-registration"
-        className="bg-[#ffd700] text-[#002366] px-4 py-2 font-headline font-bold uppercase tracking-tight text-xs scale-95 hover:scale-100 active:scale-90 transition-all duration-200 flex items-center gap-1">
-        <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>assignment</span>
-        <span className="hidden sm:inline">My Reg</span>
-        <span className="sm:hidden">Reg</span>
+        className="bg-[#ffd700] text-[#002366] px-4 md:px-6 py-2 font-headline font-bold uppercase tracking-tight text-sm scale-95 hover:scale-100 active:scale-90 transition-all duration-200 flex items-center gap-1.5">
+        <span className="material-symbols-outlined" style={{ fontSize: '15px' }}>assignment</span>
+        My Registration
       </Link>
     )
   }
@@ -335,7 +329,7 @@ export default function Navbar() {
         {[
           { href: '/',         icon: 'home',             label: 'Home'     },
           { href: '/schedule', icon: 'calendar_today',   label: 'Fixtures' },
-          { href: hasReg ? '/my-registration' : '/register', icon: hasReg ? 'assignment' : 'app_registration', label: hasReg ? 'My Reg' : 'Register' },
+          { href: '/register', icon: 'app_registration', label: 'Register' },
           { href: '/news',     icon: 'newspaper',        label: 'News'     },
           { href: '/contact',  icon: 'sensors',          label: 'Contact'  },
         ].map(item => (
