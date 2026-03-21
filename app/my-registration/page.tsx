@@ -278,16 +278,16 @@ export default function MyRegistrationPage() {
                           )}
 
                           {team.contactEmail && (
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col gap-2">
                               <div className="flex items-center gap-2">
                                 <span className="material-symbols-outlined text-[#ffd700]/60" style={{ fontSize: '16px' }}>mail</span>
-                                <div>
+                                <div className="min-w-0">
                                   <p className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">Team Email</p>
-                                  <p className="text-sm font-headline font-bold text-[#e4e1e9]">{team.contactEmail}</p>
+                                  <p className="text-sm font-headline font-bold text-[#e4e1e9] break-all">{team.contactEmail}</p>
                                 </div>
                               </div>
                               <a href={`mailto:${team.contactEmail}`}
-                                className="flex items-center gap-1.5 bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700] px-3 py-1.5 text-xs font-headline font-black uppercase tracking-wide hover:bg-[#ffd700]/20 transition-colors">
+                                className="self-start flex items-center gap-1.5 bg-[#ffd700]/10 border border-[#ffd700]/30 text-[#ffd700] px-3 py-1.5 text-xs font-headline font-black uppercase tracking-wide hover:bg-[#ffd700]/20 transition-colors ml-6">
                                 <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>send</span>
                                 Email
                               </a>

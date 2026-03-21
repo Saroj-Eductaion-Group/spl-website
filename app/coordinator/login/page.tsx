@@ -40,7 +40,7 @@ export default function CoordinatorLogin() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0b0f] flex -mt-20">
+    <div className="min-h-screen bg-[#0b0b0f] flex">
 
       {/* Left — Branding */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden flex-col items-center justify-center p-16 bg-[#002366]">
