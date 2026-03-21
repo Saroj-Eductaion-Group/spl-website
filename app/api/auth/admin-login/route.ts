@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     if (email === 'admin@spl.com') {
       const existing = await prisma.user.findUnique({ where: { email } })
       if (!existing) {
-        const hashed = await bcrypt.hash('admin123', 10)
+        const hashed = await bcrypt.hash('Admin@2112', 10)
         await prisma.user.create({
           data: { email: 'admin@spl.com', password: hashed, role: 'ADMIN', name: 'SPL Administrator' }
         })
