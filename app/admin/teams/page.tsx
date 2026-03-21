@@ -34,6 +34,7 @@ export default function AdminTeams() {
     try {
       const token = localStorage.getItem('adminToken') || ''
       const data = await fetch('/api/admin/teams', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.json())
+      console.log("Team Data: ", data);
       setTeams(data)
     } catch { } finally { setLoading(false) }
   }

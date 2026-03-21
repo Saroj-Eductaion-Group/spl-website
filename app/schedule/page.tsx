@@ -3,6 +3,22 @@
 import { useEffect, useState } from 'react'
 import SponsorStrip from '@/components/SponsorStrip'
 
+// --- Add Team & Player interfaces (copied from admin teams) ---
+interface Player {
+  id: string; name: string; phone: string; role: string; isIndividual?: boolean
+  aadhaarDoc?: string; schoolIdDoc?: string; dobProofDoc?: string; photoDoc?: string
+}
+interface Team {
+  id: string; name: string; district: string; schoolCollege: string
+  status: string; registrationId: string; createdAt: string
+  coachName?: string; coachPhone?: string; managerName?: string; managerPhone?: string
+  contactEmail?: string; contactPhone?: string
+  _count: { players: number }
+  payments: { status: string; amount: number }[]
+  players: Player[]
+}
+// -----------------------------------------------------------
+
 interface Match {
   id: string; phase: string; venue: string; date: string
   result?: string; winner?: string; score1?: string; score2?: string
@@ -28,16 +44,40 @@ export default function Schedule() {
   const [matches, setMatches] = useState<Match[]>([])
   const [activePhase, setActivePhase] = useState('ALL')
   const [loading, setLoading] = useState(true)
+  const [activeDistrict, setActiveDistrict] = useState('ALL')
 
+  // --- Added: state for modal and teams data ---
+  const [selectedMatch, setSelectedMatch] = useState<Match | null>(null)
+  const [allTeams, setAllTeams] = useState<Team[]>([])          // all teams fetched
+  const [teamsMap, setTeamsMap] = useState<Map<string, Team>>(new Map())  // quick lookup by name+district
+
+  // Fetch matches (existing)
   useEffect(() => {
     fetch('/api/schedule').then(r => r.json())
       .then(data => { if (Array.isArray(data)) setMatches(data) })
       .catch(() => {}).finally(() => setLoading(false))
   }, [])
 
-  const phases = ['ALL', 'DISTRICT', 'ZONAL', 'SEMI_FINAL', 'FINAL']
-  const [activeDistrict, setActiveDistrict] = useState('ALL')
+  console.log(matches);
+  
+  // --- Added: fetch all teams (like admin teams) to build lookup map ---
+  useEffect(() => {
+    const token = localStorage.getItem('adminToken') || ''
+    fetch('/api/admin/teams', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.json())
+      .then((teams: Team[]) => {
+        setAllTeams(teams)
+        const map = new Map<string, Team>()
+        teams.forEach(team => {
+          const key = `${team.name}|${team.district}`  // simple composite key
+          map.set(key, team)
+        })
+        setTeamsMap(map)
+      })
+      .catch(err => console.error('Failed to fetch teams for modal', err))
+  }, [])
 
+  const phases = ['ALL', 'DISTRICT', 'ZONAL', 'SEMI_FINAL', 'FINAL']
   const districts = ['ALL', ...Array.from(new Set(matches.flatMap(m => [m.team1.district, m.team2?.district].filter(Boolean) as string[]))).sort()]
 
   const filtered = matches.filter(m => {
@@ -45,6 +85,14 @@ export default function Schedule() {
     const districtOk = activeDistrict === 'ALL' || m.team1.district === activeDistrict || m.team2?.district === activeDistrict
     return phaseOk && districtOk
   })
+
+  // --- Helper to get full team object from match ---
+  const getTeamFromMatch = (match: Match, side: 'team1' | 'team2') => {
+    const teamData = match[side]
+    if (!teamData) return null
+    const key = `${teamData.name}|${teamData.district}`
+    return teamsMap.get(key) || null
+  }
 
   return (
     <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
@@ -110,7 +158,12 @@ export default function Schedule() {
           ) : filtered.length > 0 ? (
             <div className="space-y-4">
               {filtered.map(match => (
-                <div key={match.id} className="bg-[#131318] border border-[#444650]/20 p-6 hover:border-[#ffd700]/30 transition-colors">
+                // --- Added onClick to open modal ---
+                <div
+                  key={match.id}
+                  onClick={() => setSelectedMatch(match)}
+                  className="bg-[#131318] border border-[#444650]/20 p-6 hover:border-[#ffd700]/30 transition-colors cursor-pointer"
+                >
                   <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
@@ -133,6 +186,7 @@ export default function Schedule() {
                         {match.score1 && <p className="text-xs text-[#c4c6d0]">{match.team1.name}: <span className="text-[#e4e1e9] font-bold">{match.score1}</span></p>}
                         {match.score2 && <p className="text-xs text-[#c4c6d0]">{match.team2?.name}: <span className="text-[#e4e1e9] font-bold">{match.score2}</span></p>}
                         {match.winner && <p className="text-xs text-[#ffd700] font-headline font-bold uppercase mt-2">🏆 {match.winner}</p>}
+                        {match.result && <p className="text-xs text-[#c4c6d0]">{match.result}</p>}
                       </div>
                     ) : (
                       <div className="border border-[#444650]/30 px-6 py-4 text-center min-w-[120px]">
@@ -162,6 +216,86 @@ export default function Schedule() {
         </h2>
         <p className="text-white/70">Lucknow, Uttar Pradesh • Prize: ₹11,00,000 • Scholarship: 50%</p>
       </section>
+
+      {/* --- Poped model where both teams players data shows --- */}
+      {selectedMatch && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#131318] border border-[#444650]/30 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center p-6 border-b border-[#444650]/20 sticky top-0 bg-[#131318]">
+              <div>
+                <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700]">
+                  {selectedMatch.team1.name} vs {selectedMatch.team2?.name || 'TBD'}
+                </h2>
+                <p className="text-xs text-[#c4c6d0]/60 mt-1">
+                  {new Date(selectedMatch.date).toLocaleString('en-IN', { dateStyle: 'full', timeStyle: 'short' })} • {selectedMatch.venue}
+                </p>
+              </div>
+              <button onClick={() => setSelectedMatch(null)} className="text-[#c4c6d0]/40 hover:text-[#ffd700] transition-colors">
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+            <div className="p-6">
+              {/* Team 1 & Team 2 players side by side */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[1, 2].map((sideNum) => {
+                  const side = sideNum === 1 ? 'team1' : 'team2'
+                  const teamData = selectedMatch[side]
+                  if (!teamData) return null
+                  const fullTeam = getTeamFromMatch(selectedMatch, side as 'team1' | 'team2')
+                  const players = fullTeam?.players || []
+                  return (
+                    <div key={side}>
+                      <h3 className="font-headline font-bold uppercase tracking-tight text-[#c4c6d0] mb-3 text-sm">
+                        {teamData.name} Players ({players.length})
+                      </h3>
+                      {players.length > 0 ? (
+                        <div className="space-y-3">
+                          {players.map((player, idx) => (
+                            <div key={player.id} className="flex items-center gap-3 bg-[#0b0b0f] border border-[#444650]/20 p-3">
+                              <div className="w-12 h-12 bg-[#131318] rounded-full flex items-center justify-center overflow-hidden">
+                                {player.photoDoc ? (
+                                  <img src={player.photoDoc} alt={player.name} className="w-full h-full object-cover" />
+                                ) : (
+                                  <span className="material-symbols-outlined text-[#c4c6d0]/40">person</span>
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <div className="font-headline font-bold text-[#e4e1e9] text-sm">{player.name}</div>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-[#ffd700] border border-[#ffd700]/30 bg-[#ffd700]/10 px-2 py-0.5">
+                                    {player.role}
+                                  </span>
+                                  {/* {player.isIndividual && (
+                                    <span className="text-[0.6rem] font-headline font-bold uppercase tracking-widest text-violet-400 border border-violet-400/30 bg-violet-400/10 px-2 py-0.5">
+                                      Individual
+                                    </span>
+                                  )} */}
+                                </div>
+                                {/* <div className="text-xs text-[#c4c6d0]/50 mt-1">📞 {player.phone}</div> */}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-[#c4c6d0]/40">No players registered for this team.</p>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+              {selectedMatch.result && (
+                <div className="mt-6 pt-4 border-t border-[#444650]/20 text-center">
+                  <p className="text-[#ffd700] font-headline font-bold uppercase tracking-widest text-sm">
+                    {selectedMatch.result}
+                    {selectedMatch.winner && ` • Winner: ${selectedMatch.winner}`}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+      {/* --- END MODAL --- */}
     </div>
   )
 }
