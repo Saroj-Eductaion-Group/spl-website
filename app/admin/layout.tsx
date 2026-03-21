@@ -16,6 +16,7 @@ const navItems = [
   { href: '/admin/messages',      icon: 'forum',                label: 'Messages'      },
   { href: '/admin/reports',       icon: 'bar_chart',            label: 'Reports'       },
   { href: '/admin/sponsors',      icon: 'handshake',            label: 'Sponsors'      },
+  { href: '/admin/player-of-week', icon: 'emoji_events',         label: 'Player of Week'},
 ]
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {

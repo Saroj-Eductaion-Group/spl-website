@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import SponsorStrip from '@/components/SponsorStrip'
 
 interface Match {
   id: string; phase: string; venue: string; date: string
@@ -25,8 +26,8 @@ const timeline = [
 
 export default function Schedule() {
   const [matches, setMatches] = useState<Match[]>([])
-  const [loading, setLoading] = useState(true)
   const [activePhase, setActivePhase] = useState('ALL')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetch('/api/schedule').then(r => r.json())
@@ -35,7 +36,15 @@ export default function Schedule() {
   }, [])
 
   const phases = ['ALL', 'DISTRICT', 'ZONAL', 'SEMI_FINAL', 'FINAL']
-  const filtered = activePhase === 'ALL' ? matches : matches.filter(m => m.phase === activePhase)
+  const [activeDistrict, setActiveDistrict] = useState('ALL')
+
+  const districts = ['ALL', ...Array.from(new Set(matches.flatMap(m => [m.team1.district, m.team2?.district].filter(Boolean) as string[]))).sort()]
+
+  const filtered = matches.filter(m => {
+    const phaseOk = activePhase === 'ALL' || m.phase === activePhase
+    const districtOk = activeDistrict === 'ALL' || m.team1.district === activeDistrict || m.team2?.district === activeDistrict
+    return phaseOk && districtOk
+  })
 
   return (
     <div className="min-h-screen bg-[#0b0b0f] text-[#e4e1e9] pt-20">
@@ -72,13 +81,25 @@ export default function Schedule() {
               <div className="w-24 h-1 bg-[#ffd700] mb-4" />
               <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic">Match Fixtures</h2>
             </div>
-            <div className="flex flex-wrap gap-2">
-              {phases.map(p => (
-                <button key={p} onClick={() => setActivePhase(p)}
-                  className={`px-4 py-2 text-xs font-headline font-black uppercase tracking-widest transition-all ${activePhase === p ? 'bg-[#ffd700] text-[#002366]' : 'border border-[#444650]/40 text-[#c4c6d0] hover:border-[#ffd700] hover:text-[#ffd700]'}`}>
-                  {p.replace('_', ' ')}
-                </button>
-              ))}
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-wrap gap-2">
+                {phases.map(p => (
+                  <button key={p} onClick={() => setActivePhase(p)}
+                    className={`px-4 py-2 text-xs font-headline font-black uppercase tracking-widest transition-all ${activePhase === p ? 'bg-[#ffd700] text-[#002366]' : 'border border-[#444650]/40 text-[#c4c6d0] hover:border-[#ffd700] hover:text-[#ffd700]'}`}>
+                    {p.replace('_', ' ')}
+                  </button>
+                ))}
+              </div>
+              {districts.length > 1 && (
+                <div className="flex flex-wrap gap-2">
+                  {districts.map(d => (
+                    <button key={d} onClick={() => setActiveDistrict(d)}
+                      className={`px-3 py-1.5 text-[0.6rem] font-headline font-black uppercase tracking-widest transition-all ${activeDistrict === d ? 'bg-[#002366] text-[#ffd700] border border-[#ffd700]/40' : 'border border-[#444650]/30 text-[#c4c6d0]/60 hover:border-[#ffd700]/40 hover:text-[#ffd700]'}`}>
+                      {d === 'ALL' ? 'All Districts' : d}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -133,6 +154,7 @@ export default function Schedule() {
       </section>
 
       {/* Grand Final */}
+      <SponsorStrip />
       <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20 text-center">
         <div className="text-6xl mb-6">🏟️</div>
         <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter mb-3 text-white">

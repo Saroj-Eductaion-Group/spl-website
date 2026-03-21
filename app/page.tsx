@@ -6,18 +6,31 @@ import { useEffect, useState } from 'react'
 
 interface Match {
   id: string; phase: string; venue: string; date: string
-  result?: string; winner?: string
+  result?: string; winner?: string; score1?: string; score2?: string
   team1: { name: string }; team2?: { name: string }
 }
-interface Announcement { id: string; title: string; content: string; type: string; createdAt: string }
+interface Announcement { id: string; title: string; content: string; type: string; active: boolean; createdAt: string }
+interface PlayerOfWeek {
+  name: string; teamName: string; district: string; role: string
+  photoUrl?: string; runs?: string; wickets?: string; impactRating?: string; description?: string
+}
 
 export default function Home() {
   const [fixtures, setFixtures] = useState<Match[]>([])
   const [announcements, setAnnouncements] = useState<Announcement[]>([])
+  const [liveMatch, setLiveMatch] = useState<Match | null>(null)
+  const [pow, setPow] = useState<PlayerOfWeek | null>(null)
 
   useEffect(() => {
-    fetch('/api/schedule').then(r => r.json()).then(d => { if (Array.isArray(d)) setFixtures(d.slice(0, 4)) }).catch(() => {})
+    fetch('/api/schedule').then(r => r.json()).then(d => {
+      if (Array.isArray(d)) {
+        setFixtures(d.slice(0, 4))
+        const completed = d.filter((m: Match) => m.result || m.score1)
+        if (completed.length > 0) setLiveMatch(completed[completed.length - 1])
+      }
+    }).catch(() => {})
     fetch('/api/admin/announcements').then(r => r.json()).then(d => { if (Array.isArray(d)) setAnnouncements(d.filter((a: Announcement) => a.active).slice(0, 3)) }).catch(() => {})
+    fetch('/api/admin/player-of-week').then(r => r.json()).then(d => { if (d) setPow(d) }).catch(() => {})
   }, [])
 
   return (
@@ -32,11 +45,13 @@ export default function Home() {
               alt="SPL Stadium"
               fill
               sizes="100vw"
-              className="object-cover opacity-40"
+              className="object-cover opacity-75"
               priority
             />
-            <div className="absolute inset-0 hero-gradient" />
-            <div className="absolute inset-0 bg-gradient-to-r from-[#001a4d]/80 via-[#002366]/40 to-transparent" />
+            {/* single gradient: left side dark for text legibility, right stays visible */}
+            <div className="absolute inset-0 bg-gradient-to-r from-[#001a4d]/90 via-[#001a4d]/50 to-[#001a4d]/10" />
+            {/* subtle bottom fade to page bg */}
+            <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#0b0b0f] to-transparent" />
           </div>
 
           <div className="relative z-10 h-full max-w-screen-2xl mx-auto px-6 flex flex-col justify-center">
@@ -61,25 +76,59 @@ export default function Home() {
 
                 {/* Live Scoreboard */}
                 <div className="bg-[#131318]/60 backdrop-blur-xl p-8 shadow-2xl border-l-4 border-[#ffd700] max-w-xl">
-                  <div className="flex justify-between items-center mb-6">
-                    <div className="text-center">
-                      <div className="text-3xl font-headline font-black mb-1">RCD</div>
-                      <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">Royal Challengers</div>
-                    </div>
-                    <span className="text-4xl font-headline font-light text-[#c4c6d0]/40">VS</span>
-                    <div className="text-center">
-                      <div className="text-3xl font-headline font-black mb-1 text-[#ffd700]">SKN</div>
-                      <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">Super Kings</div>
-                    </div>
-                  </div>
-                  <div className="flex justify-center items-baseline gap-4 mb-4">
-                    <span className="text-6xl md:text-7xl font-headline font-black text-[#ffd700]">184/4</span>
-                    <span className="text-xl font-headline font-bold text-[#c4c6d0]">(18.2)</span>
-                  </div>
-                  <div className="flex justify-between items-center bg-[#1c1c21]/80 px-4 py-3">
-                    <span className="text-xs font-medium text-[#e9c349] italic">Sharma 82*(42)</span>
-                    <span className="text-xs font-medium text-[#c4c6d0]">CRR: 10.03 • RRR: 11.45</span>
-                  </div>
+                  {liveMatch ? (
+                    <>
+                      <div className="flex justify-between items-center mb-6">
+                        <div className="text-center">
+                          <div className="text-3xl font-headline font-black mb-1">
+                            {liveMatch.team1.name.split(' ').map((w: string) => w[0]).join('').slice(0, 3).toUpperCase()}
+                          </div>
+                          <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">{liveMatch.team1.name}</div>
+                        </div>
+                        <span className="text-4xl font-headline font-light text-[#c4c6d0]/40">VS</span>
+                        <div className="text-center">
+                          <div className="text-3xl font-headline font-black mb-1 text-[#ffd700]">
+                            {(liveMatch.team2?.name || 'TBD').split(' ').map((w: string) => w[0]).join('').slice(0, 3).toUpperCase()}
+                          </div>
+                          <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">{liveMatch.team2?.name || 'TBD'}</div>
+                        </div>
+                      </div>
+                      {liveMatch.score1 && (
+                        <div className="flex justify-center items-baseline gap-4 mb-4">
+                          <span className="text-5xl md:text-6xl font-headline font-black text-[#ffd700]">{liveMatch.score1}</span>
+                        </div>
+                      )}
+                      <div className="flex justify-between items-center bg-[#1c1c21]/80 px-4 py-3">
+                        <span className="text-xs font-medium text-[#e9c349] italic">
+                          {liveMatch.phase.replace('_', ' ')}
+                        </span>
+                        {liveMatch.winner && (
+                          <span className="text-xs font-medium text-emerald-400">🏆 {liveMatch.winner}</span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex justify-between items-center mb-6">
+                        <div className="text-center">
+                          <div className="text-3xl font-headline font-black mb-1">SPL</div>
+                          <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">Season 2025</div>
+                        </div>
+                        <span className="text-4xl font-headline font-light text-[#c4c6d0]/40">U19</span>
+                        <div className="text-center">
+                          <div className="text-3xl font-headline font-black mb-1 text-[#ffd700]">UP</div>
+                          <div className="text-[0.6rem] tracking-[0.2em] text-[#c4c6d0] font-headline font-bold uppercase">Uttar Pradesh</div>
+                        </div>
+                      </div>
+                      <div className="flex justify-center items-baseline gap-4 mb-4">
+                        <span className="text-5xl font-headline font-black text-[#ffd700]">₹11L</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-[#1c1c21]/80 px-4 py-3">
+                        <span className="text-xs font-medium text-[#e9c349] italic">Winner Prize Money</span>
+                        <span className="text-xs font-medium text-[#c4c6d0]">50% Scholarship</span>
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 {/* CTA Buttons */}
@@ -217,6 +266,7 @@ export default function Home() {
         </section>
 
         {/* ── Player of the Week ── */}
+        {pow && (
         <section className="py-20 px-6 bg-[#0b0b0f] overflow-hidden border-t border-[#444650]/10">
           <div className="max-w-screen-2xl mx-auto">
             <div className="grid lg:grid-cols-12 gap-8 items-center">
@@ -228,9 +278,9 @@ export default function Home() {
                 </h2>
                 <div className="space-y-6 relative z-10">
                   {[
-                    { stat: '142*', label: 'Runs Scored' },
-                    { stat: '3/12', label: 'Best Bowling' },
-                    { stat: '9.8',  label: 'Impact Rating' },
+                    { stat: pow.runs || '—',          label: 'Runs Scored'   },
+                    { stat: pow.wickets || '—',       label: 'Best Bowling'  },
+                    { stat: pow.impactRating || '—',  label: 'Impact Rating' },
                   ].map(s => (
                     <div key={s.label} className="flex items-baseline gap-4 border-b border-[#444650]/20 pb-4">
                       <span className="text-4xl font-headline font-black text-[#ffd700]">{s.stat}</span>
@@ -239,10 +289,9 @@ export default function Home() {
                   ))}
                 </div>
                 <div className="mt-12">
-                  <h3 className="text-3xl font-headline font-black uppercase mb-2">Aaryan &apos;The Archer&apos; Nair</h3>
-                  <p className="text-[#c4c6d0] font-medium max-w-sm">
-                    Dominating both ends of the pitch with clinical precision and raw explosive power.
-                  </p>
+                  <h3 className="text-3xl font-headline font-black uppercase mb-1">{pow.name}</h3>
+                  <p className="text-[#ffd700] text-sm font-headline font-bold uppercase tracking-widest mb-2">{pow.role} · {pow.teamName} · {pow.district}</p>
+                  <p className="text-[#c4c6d0] font-medium max-w-sm">{pow.description || 'Outstanding performance this week.'}</p>
                   <Link href="/register"
                     className="mt-8 inline-flex items-center gap-4 text-[#ffd700] font-headline font-black uppercase tracking-[0.2em] group">
                     Register Now
@@ -255,20 +304,21 @@ export default function Home() {
                 <div className="absolute inset-0 bg-[#ffd700]/5 skew-y-6 scale-y-110 border-y border-[#ffd700]/20" />
                 <div className="relative z-10 h-full w-full border border-[#ffd700]/20 overflow-hidden">
                   <Image
-                    src="/Hero.png"
-                    alt="Player of the Week"
+                    src={pow.photoUrl || '/Hero.png'}
+                    alt={pow.name}
                     fill
                     sizes="(max-width: 1024px) 100vw, 58vw"
                     className="object-cover grayscale brightness-90"
                   />
                   <div className="absolute bottom-8 right-8 z-20 bg-[#ffd700] text-[#002366] p-6 font-headline font-black italic text-3xl uppercase tracking-tighter shadow-[10px_10px_0_rgba(0,35,102,1)]">
-                    AARYAN NAIR
+                    {pow.name.split(' ').slice(0, 2).join(' ').toUpperCase()}
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
+        )}
 
         {/* ── Registration CTA ── */}
         <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20">

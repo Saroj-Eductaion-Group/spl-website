@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import SponsorStrip from '@/components/SponsorStrip'
 
 interface Match {
   id: string; phase: string; venue: string; date: string
@@ -120,6 +121,10 @@ export default function CoordinatorResults() {
             <p className="font-headline font-bold uppercase tracking-widest text-[#c4c6d0]/40">No matches scheduled for {district} district yet</p>
           </div>
         )}
+      </div>
+
+      <div className="mt-10 -mx-4">
+        <SponsorStrip />
       </div>
     </div>
   )

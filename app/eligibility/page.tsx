@@ -129,6 +129,32 @@ export default function Eligibility() {
         </div>
       </section>
 
+      {/* Downloads */}
+      <section className="py-16 px-6 bg-[#131318] border-y border-[#444650]/15">
+        <div className="max-w-screen-xl mx-auto">
+          <div className="w-24 h-1 bg-[#ffd700] mb-4" />
+          <h2 className="font-headline font-black text-3xl uppercase tracking-tighter italic mb-8">Download Documents</h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            {[
+              { label: 'SPL Official Brochure', desc: 'Tournament overview, rules and prize details', file: '/uploads/SPL Website Document.pdf', icon: 'picture_as_pdf' },
+              { label: 'Registration Form (PDF)', desc: 'Printable registration form for offline submission', file: '/uploads/SPL Website Document.pdf', icon: 'assignment' },
+            ].map(doc => (
+              <a key={doc.label} href={doc.file} target="_blank" rel="noopener noreferrer"
+                className="bg-[#0b0b0f] border border-[#444650]/20 p-5 flex items-center gap-4 hover:border-[#ffd700]/40 transition-colors group">
+                <div className="w-12 h-12 bg-[#ffd700]/10 border border-[#ffd700]/20 flex items-center justify-center flex-shrink-0">
+                  <span className="material-symbols-outlined text-[#ffd700]" style={{ fontSize: '24px' }}>{doc.icon}</span>
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-headline font-bold uppercase tracking-tight text-[#e4e1e9] group-hover:text-[#ffd700] transition-colors">{doc.label}</h3>
+                  <p className="text-xs text-[#c4c6d0]/60 mt-0.5">{doc.desc}</p>
+                </div>
+                <span className="material-symbols-outlined text-[#444650] group-hover:text-[#ffd700] transition-colors" style={{ fontSize: '20px' }}>download</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* CTA */}
       <section className="py-20 px-6 bg-[#002366] border-t border-[#ffd700]/20 text-center">
         <h2 className="font-headline font-black text-4xl italic uppercase tracking-tighter mb-6 text-white">

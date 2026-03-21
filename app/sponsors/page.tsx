@@ -129,7 +129,7 @@ export default function Sponsors() {
         <p className="text-white/70 mb-8 max-w-xl mx-auto">Join us in supporting youth cricket and building the future of sports in Uttar Pradesh</p>
         <div className="text-white/70 text-sm mb-6">
           <p>Email: <span className="text-[#ffd700]">info@splcricket.com</span></p>
-          <p>Phone: <span className="text-[#ffd700]">+91 XXXXX XXXXX</span></p>
+          <p>Phone: <span className="text-[#ffd700]">+91 98765 43210</span></p>
         </div>
         <Link href="/contact" className="bg-[#ffd700] text-[#002366] px-10 py-4 font-headline font-black uppercase tracking-tight hover:brightness-110 transition-all inline-block">
           Contact Us

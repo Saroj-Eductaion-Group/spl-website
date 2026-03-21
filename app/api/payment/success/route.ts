@@ -34,8 +34,9 @@ export async function POST(request: NextRequest) {
         data: { status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
       })
     } else if (playerId && playerId.length === 24) {
-      await prisma.payment.create({
-        data: { amount: parseInt(amount), status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
+      await prisma.payment.updateMany({
+        where: { playerId },
+        data: { status: 'COMPLETED', transactionId: txnid, paymentId: txnid }
       })
     }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sendApprovalEmail, sendRejectionEmail } from '@/lib/email'
+import { sendApprovalSMS, sendRejectionSMS } from '@/lib/sms'
 import { verifyCoordinatorToken } from '@/lib/auth'
 
 export async function GET(request: NextRequest) {
@@ -24,15 +25,32 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
-  if (!verifyCoordinatorToken(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const userId = verifyCoordinatorToken(request)
+  if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   try {
     const { teamId, status, reason } = await request.json()
-    const team = await prisma.team.update({ where: { id: teamId }, data: { status } })
+
+    // Verify the team belongs to this coordinator's district
+    const coordinator = await prisma.user.findUnique({ where: { id: userId }, select: { coordinatorDistrict: true } })
+    const team = await prisma.team.findUnique({ where: { id: teamId }, select: { district: true, contactEmail: true, name: true, registrationId: true } })
+    if (!team) return NextResponse.json({ error: 'Team not found' }, { status: 404 })
+    if (coordinator?.coordinatorDistrict && team.district !== coordinator.coordinatorDistrict) {
+      return NextResponse.json({ error: 'Unauthorized: team is not in your district' }, { status: 403 })
+    }
+
+    await prisma.team.update({ where: { id: teamId }, data: { status } })
     if (team.contactEmail) {
       try {
         if (status === 'APPROVED') await sendApprovalEmail(team.contactEmail, team.name, team.registrationId)
         else if (status === 'REJECTED') await sendRejectionEmail(team.contactEmail, team.name, team.registrationId, reason)
       } catch (e) { console.error('Email failed:', e) }
+    }
+    const teamFull = await prisma.team.findUnique({ where: { id: teamId }, select: { contactPhone: true } })
+    if (teamFull?.contactPhone) {
+      try {
+        if (status === 'APPROVED') await sendApprovalSMS(teamFull.contactPhone, team.name, team.registrationId)
+        else if (status === 'REJECTED') await sendRejectionSMS(teamFull.contactPhone, team.name, team.registrationId, reason)
+      } catch (e) { console.error('SMS failed:', e) }
     }
     return NextResponse.json({ success: true })
   } catch (error) {

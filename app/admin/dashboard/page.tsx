@@ -11,6 +11,7 @@ interface DashboardStats {
   pendingApprovals: number
   approvedTeams: number
   rejectedTeams: number
+  individualPlayers: number
 }
 
 export default function AdminDashboard() {
@@ -36,7 +37,7 @@ export default function AdminDashboard() {
   const metrics = [
     { label: 'Total Teams',       value: stats?.totalTeams ?? 0,       icon: 'emoji_events',  color: 'text-[#ffd700]',  bg: 'bg-[#ffd700]/10',  border: 'border-[#ffd700]/20' },
     { label: 'Total Players',     value: stats?.totalPlayers ?? 0,     icon: 'groups',        color: 'text-emerald-400', bg: 'bg-emerald-400/10', border: 'border-emerald-400/20' },
-    { label: 'Total Revenue',     value: `₹${((stats?.totalPayments ?? 0) / 100000).toFixed(1)}L`, icon: 'payments', color: 'text-violet-400', bg: 'bg-violet-400/10', border: 'border-violet-400/20' },
+    { label: 'Individual Players',value: stats?.individualPlayers ?? 0,icon: 'person_add',    color: 'text-violet-400',  bg: 'bg-violet-400/10',  border: 'border-violet-400/20' },
     { label: 'Pending Approvals', value: stats?.pendingApprovals ?? 0, icon: 'pending',       color: 'text-orange-400', bg: 'bg-orange-400/10',  border: 'border-orange-400/20' },
   ]
 

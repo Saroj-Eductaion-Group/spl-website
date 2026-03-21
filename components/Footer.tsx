@@ -48,9 +48,9 @@ export default function Footer() {
         </nav>
       </div>
 
-      <div className="w-full h-px bg-[#ffd700]/10 max-w-screen-2xl mx-auto" />
-      <p className="font-body text-xs uppercase tracking-widest text-white/30 text-center py-8">
-        © 2025 Saroj Premier League. All Rights Reserved. | Organized by Saroj Educational Group
+      <div className="w-full h-px bg-[#ffd700]/20" />
+      <p className="font-body text-sm uppercase tracking-widest text-white text-center py-6">
+        © 2026 Saroj Premier League. All Rights Reserved. | Organized by Saroj Educational Group
       </p>
     </footer>
   )

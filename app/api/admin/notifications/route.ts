@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { verifyAdminToken } from '@/lib/auth'
 import nodemailer from 'nodemailer'
+import { sendSMSBlast } from '@/lib/sms'
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
@@ -22,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     const teams = await prisma.team.findMany({
       where: { id: { in: teamIds }, contactEmail: { not: null } },
-      select: { id: true, name: true, contactEmail: true, registrationId: true }
+      select: { id: true, name: true, contactEmail: true, contactPhone: true, registrationId: true }
     })
 
     let sent = 0, failed = 0
@@ -50,6 +51,12 @@ export async function POST(req: NextRequest) {
       } catch {
         failed++
       }
+    }
+
+    // SMS blast to teams with phone numbers
+    const phones = teams.map(t => t.contactPhone).filter(Boolean) as string[]
+    if (phones.length > 0) {
+      try { await sendSMSBlast(phones, `SPL: ${message.slice(0, 140)} -SPL Committee`) } catch { }
     }
 
     return NextResponse.json({ success: true, sent, failed })

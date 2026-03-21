@@ -45,10 +45,12 @@ export async function GET(req: NextRequest) {
         'Registered On': new Date(p.createdAt).toLocaleDateString('en-IN')
       }))
     } else if (type === 'payments') {
-      const payments = await prisma.payment.findMany({ include: { team: true } })
+      const payments = await prisma.payment.findMany({ include: { team: true, player: true } })
       rows = payments.map(p => ({
         'Transaction ID': p.transactionId || '',
-        'Team Name': p.team?.name || 'N/A',
+        'Type': p.team ? 'Team' : 'Individual',
+        'Team / Player': p.team?.name || p.player?.name || 'N/A',
+        'District': p.team?.district || p.player?.district || '',
         'Amount (₹)': p.amount,
         'Status': p.status,
         'Payment ID': p.paymentId || '',

@@ -10,7 +10,8 @@ export default function SSOCallback() {
 
   useEffect(() => {
     handleRedirectCallback({
-      fallbackRedirectUrl: '/register',
+      signInFallbackRedirectUrl: '/register',
+      signUpFallbackRedirectUrl: '/register',
     }).catch(() => router.replace('/sign-in'))
   }, [handleRedirectCallback, router])
 

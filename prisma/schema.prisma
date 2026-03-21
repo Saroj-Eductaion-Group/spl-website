@@ -47,8 +47,8 @@ model Team {
 
   players     Player[]
   payments    Payment[]
-  homeMatches Match[]  @relation("HomeTeam")
-  awayMatches Match[]  @relation("AwayTeam")
+  homeMatches Match[]   @relation("HomeTeam")
+  awayMatches Match[]   @relation("AwayTeam")
 }
 
 model Player {
@@ -70,17 +70,18 @@ model Player {
   dobProofDoc String?
   photoDoc    String?
 
-  isIndividual Boolean @default(false)
-  teamAssigned Boolean @default(false)
+  isIndividual   Boolean @default(false)
+  teamAssigned   Boolean @default(false)
   registrationId String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  team        Team?  @relation(fields: [teamId], references: [id])
-  teamId      String? @db.ObjectId
-  createdBy   User   @relation(fields: [createdById], references: [id])
-  createdById String @db.ObjectId
+  team        Team?     @relation(fields: [teamId], references: [id])
+  teamId      String?   @db.ObjectId
+  createdBy   User      @relation(fields: [createdById], references: [id])
+  createdById String    @db.ObjectId
+  payments    Payment[]
 }
 
 model Payment {
@@ -93,8 +94,10 @@ model Payment {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  team   Team?   @relation(fields: [teamId], references: [id])
-  teamId String? @db.ObjectId
+  team     Team?   @relation(fields: [teamId], references: [id])
+  teamId   String? @db.ObjectId
+  player   Player? @relation(fields: [playerId], references: [id])
+  playerId String? @db.ObjectId
 }
 
 model Match {
@@ -128,12 +131,12 @@ model Announcement {
 }
 
 model Sponsor {
-  id       String  @id @default(auto()) @map("_id") @db.ObjectId
-  name     String
-  tier     String  @default("ASSOCIATE") // TITLE | OFFICIAL | ASSOCIATE
-  logoUrl  String?
-  website  String?
-  active   Boolean @default(true)
+  id      String  @id @default(auto()) @map("_id") @db.ObjectId
+  name    String
+  tier    String  @default("ASSOCIATE") // TITLE | OFFICIAL | ASSOCIATE
+  logoUrl String?
+  website String?
+  active  Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -151,13 +154,30 @@ model ContactMessage {
   createdAt DateTime @default(now())
 }
 
+model PlayerOfWeek {
+  id          String  @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  teamName    String
+  district    String
+  role        String
+  photoUrl    String?
+  runs        String?
+  wickets     String?
+  impactRating String?
+  description String?
+  active      Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model GalleryItem {
-  id        String  @id @default(auto()) @map("_id") @db.ObjectId
-  title     String
-  url       String
-  category  String  @default("General") // Events | Matches | Training | Registration | General
-  type      String  @default("photo")   // photo | video
-  active    Boolean @default(true)
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  title    String
+  url      String
+  category String  @default("General") // Events | Matches | Training | Registration | General
+  type     String  @default("photo")   // photo | video
+  active   Boolean @default(true)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

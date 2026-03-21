@@ -40,10 +40,11 @@ export default function AdminTeams() {
 
   const updateTeamStatus = async (teamId: string, status: string) => {
     const token = localStorage.getItem('adminToken') || ''
+    const reason = status === 'REJECTED' ? (prompt('Enter rejection reason (optional):') || '') : ''
     await fetch('/api/admin/teams', {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ teamId, status })
+      body: JSON.stringify({ teamId, status, reason })
     })
     loadTeams()
     if (viewTeam?.id === teamId) setViewTeam(prev => prev ? { ...prev, status } : null)

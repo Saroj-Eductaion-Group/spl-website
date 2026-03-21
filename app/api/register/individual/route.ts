@@ -48,6 +48,8 @@ export async function POST(request: NextRequest) {
       }
     })
 
+    await prisma.payment.create({ data: { amount: 1000, playerId: player.id, status: 'PENDING' } })
+
     try { if (data.email) await sendRegistrationEmail(data.email, registrationId, undefined, data.name) } catch { }
     try { if (data.phone) await sendRegistrationSMS(data.phone, registrationId, data.name, false) } catch { }
 

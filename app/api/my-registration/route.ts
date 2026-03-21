@@ -45,6 +45,7 @@ export async function GET(req: NextRequest) {
       where: { createdById: dbUser.id, isIndividual: true },
       orderBy: { createdAt: 'desc' },
       include: {
+        payments: { select: { status: true, transactionId: true, amount: true } },
         team: {
           select: {
             name: true, district: true, schoolCollege: true,
@@ -66,6 +67,7 @@ export async function GET(req: NextRequest) {
           role: player.role,
           teamAssigned: player.teamAssigned,
           assignedTeam: player.team || null,
+          payment: player.payments[0] || null,
           createdAt: player.createdAt
         }
       })

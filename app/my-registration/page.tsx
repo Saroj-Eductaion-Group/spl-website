@@ -309,7 +309,7 @@ export default function MyRegistrationPage() {
             })()}
 
             {/* Payment */}
-            {registration.type === 'team' && (
+            {(registration.type === 'team' || registration.type === 'individual') && (
               <div className="bg-[#131318] border border-[#444650]/20 p-6">
                 <h3 className="font-headline font-black uppercase tracking-tight text-[#e4e1e9] mb-4">Payment Status</h3>
                 {registration.payment ? (() => {

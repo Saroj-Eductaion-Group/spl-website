@@ -21,6 +21,10 @@ export default function CoordinatorPlayers() {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null)
   const [assignTeamId, setAssignTeamId] = useState('')
   const [assigning, setAssigning] = useState(false)
+  const [showCreateTeam, setShowCreateTeam] = useState(false)
+  const [newTeamName, setNewTeamName] = useState('')
+  const [newTeamSchool, setNewTeamSchool] = useState('')
+  const [creatingTeam, setCreatingTeam] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -41,6 +45,25 @@ export default function CoordinatorPlayers() {
     setPlayers(await pRes.json())
     setTeams(await tRes.json())
     setLoading(false)
+  }
+
+  const createTeam = async () => {
+    if (!newTeamName.trim() || !newTeamSchool.trim()) return alert('Team name and school are required')
+    setCreatingTeam(true)
+    const token = localStorage.getItem('coordinatorToken') || ''
+    const res = await fetch('/api/coordinator/create-team', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ name: newTeamName, schoolCollege: newTeamSchool, district })
+    })
+    const data = await res.json()
+    setCreatingTeam(false)
+    if (data.success) {
+      setShowCreateTeam(false)
+      setNewTeamName('')
+      setNewTeamSchool('')
+      loadData(district)
+    } else alert(data.error || 'Failed to create team')
   }
 
   const assignPlayer = async () => {
@@ -67,9 +90,49 @@ export default function CoordinatorPlayers() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       <div className="mb-6">
-        <h1 className="font-headline font-black text-3xl italic uppercase tracking-tighter text-[#e4e1e9]">Unassigned <span className="text-[#ffd700]">Players</span></h1>
-        <p className="text-[#c4c6d0]/60 text-sm mt-1">{district} District — {players.length} players waiting for team assignment</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="font-headline font-black text-3xl italic uppercase tracking-tighter text-[#e4e1e9]">Unassigned <span className="text-[#ffd700]">Players</span></h1>
+            <p className="text-[#c4c6d0]/60 text-sm mt-1">{district} District — {players.length} players waiting for team assignment</p>
+          </div>
+          <button onClick={() => setShowCreateTeam(true)}
+            className="flex items-center gap-2 bg-[#ffd700] text-[#002366] px-4 py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all">
+            <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>group_add</span> Create New Team
+          </button>
+        </div>
       </div>
+
+      {/* Create Team Modal */}
+      {showCreateTeam && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#131318] border border-[#444650]/30 max-w-md w-full p-6">
+            <h2 className="font-headline font-black text-xl uppercase tracking-tight text-[#ffd700] mb-5">Create New Team</h2>
+            <div className="space-y-4 mb-5">
+              <div>
+                <label className={labelCls}>Team Name *</label>
+                <input className={inputCls} placeholder="e.g. Lucknow Warriors" value={newTeamName} onChange={e => setNewTeamName(e.target.value)} />
+              </div>
+              <div>
+                <label className={labelCls}>School / College *</label>
+                <input className={inputCls} placeholder="School or college name" value={newTeamSchool} onChange={e => setNewTeamSchool(e.target.value)} />
+              </div>
+              <div className="bg-[#002366]/40 border border-[#ffd700]/20 px-4 py-2.5 text-sm text-[#ffd700] font-headline font-bold">
+                District: {district}
+              </div>
+            </div>
+            <div className="flex gap-3">
+              <button onClick={createTeam} disabled={creatingTeam || !newTeamName.trim()}
+                className="flex-1 bg-[#ffd700] text-[#002366] py-2.5 font-headline font-black uppercase tracking-tight text-sm hover:brightness-110 transition-all disabled:opacity-50">
+                {creatingTeam ? 'Creating...' : 'Create Team'}
+              </button>
+              <button onClick={() => { setShowCreateTeam(false); setNewTeamName(''); setNewTeamSchool('') }}
+                className="flex-1 border border-[#444650]/40 text-[#c4c6d0] py-2.5 font-headline font-bold uppercase tracking-tight text-sm hover:border-[#ffd700] hover:text-[#ffd700] transition-all">
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Assign Modal */}
       {selectedPlayer && (

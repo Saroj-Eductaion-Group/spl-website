@@ -46,3 +46,9 @@ export async function sendPaymentReceiptSMS(phone: string, name: string, registr
 export async function sendMatchNotificationSMS(phone: string, teamName: string, opponent: string, venue: string, date: string) {
   await sendSMS(phone, `SPL U19 Match alert! Check website for your match details. Carry original documents. -SPL Committee`)
 }
+
+export async function sendSMSBlast(phones: string[], message: string) {
+  for (const phone of phones) {
+    try { await sendSMS(phone, message) } catch { }
+  }
+}

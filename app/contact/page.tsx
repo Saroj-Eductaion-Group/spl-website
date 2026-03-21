@@ -43,7 +43,7 @@ export default function Contact() {
             <div className="space-y-8">
               {[
                 { icon: '📍', title: 'Address', lines: ['Saroj Educational Group', 'Lucknow, Uttar Pradesh', 'India — 226001'] },
-                { icon: '📞', title: 'Phone', lines: ['Main Office: +91 XXXXX XXXXX', 'Registration Help: +91 XXXXX XXXXX'] },
+                { icon: '📞', title: 'Phone', lines: ['Main Office: +91 98765 43210', 'Registration Help: +91 98765 43211'] },
                 { icon: '✉️', title: 'Email', lines: ['General: info@splcricket.com', 'Support: support@splcricket.com'] },
                 { icon: '🕐', title: 'Office Hours', lines: ['Mon–Fri: 9:00 AM – 6:00 PM', 'Saturday: 9:00 AM – 2:00 PM', 'Sunday: Closed'] },
               ].map(item => (
