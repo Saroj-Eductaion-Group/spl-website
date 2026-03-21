@@ -13,6 +13,9 @@ function useHasRegistration() {
   useEffect(() => {
     if (!isLoaded) return
     if (!isSignedIn) { setHasReg(false); setChecked(true); return }
+    localStorage.removeItem('adminToken')
+    localStorage.removeItem('coordinatorToken')
+    localStorage.removeItem('coordinatorDistrict')
     fetch('/api/my-registration')
       .then(r => { if (!r.ok) throw new Error(); return r.json() })
       .then(d => { setHasReg(!!d.registration); setChecked(true) })

@@ -1,6 +1,15 @@
+'use client'
+
 import Link from 'next/link'
+import { useUser } from '@clerk/nextjs'
+import { useEffect, useState } from 'react'
 
 export default function Footer() {
+  const { isSignedIn } = useUser()
+  const [isStaff, setIsStaff] = useState(false)
+  useEffect(() => {
+    setIsStaff(!!localStorage.getItem('adminToken') || !!localStorage.getItem('coordinatorToken'))
+  }, [])
   return (
     <footer className="bg-[#001a4d] border-t border-[#ffd700]/15 pb-20 lg:pb-0">
       {/* Gold top bar */}
@@ -43,8 +52,12 @@ export default function Footer() {
           <Link href="/schedule" className="text-white/50 hover:text-[#ffd700] transition-all">Match Schedule</Link>
           <Link href="/prizes" className="text-white/50 hover:text-[#ffd700] transition-all">Prize Money</Link>
           <Link href="/contact" className="text-white/50 hover:text-[#ffd700] transition-all">Contact Us</Link>
-          <Link href="/admin/login" className="text-white/50 hover:text-[#ffd700] transition-all">Admin Login</Link>
-          <Link href="/coordinator/login" className="text-white/50 hover:text-[#ffd700] transition-all">Coordinator Login</Link>
+          {!isSignedIn && !isStaff && (
+            <>
+              <Link href="/admin/login" className="text-white/50 hover:text-[#ffd700] transition-all">Admin Login</Link>
+              <Link href="/coordinator/login" className="text-white/50 hover:text-[#ffd700] transition-all">Coordinator Login</Link>
+            </>
+          )}
         </nav>
       </div>
 

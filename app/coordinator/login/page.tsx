@@ -3,12 +3,15 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useClerk } from '@clerk/nextjs'
 
 export default function CoordinatorLogin() {
   const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
+  const { signOut } = useClerk()
 
   useEffect(() => {
     if (localStorage.getItem('coordinatorToken')) router.replace('/coordinator/dashboard')
@@ -26,6 +29,7 @@ export default function CoordinatorLogin() {
       })
       const data = await res.json()
       if (res.ok) {
+        await signOut()
         localStorage.setItem('coordinatorToken', data.token)
         localStorage.setItem('coordinatorDistrict', data.user?.district || '')
         router.push('/coordinator/dashboard')
@@ -106,12 +110,19 @@ export default function CoordinatorLogin() {
             </div>
 
             <div>
-              <label className="block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0] mb-2">Password</label>
+              <div className="flex justify-between items-center mb-2">
+                <label className="block text-xs font-headline font-bold uppercase tracking-widest text-[#c4c6d0]">Password</label>
+                <Link href="/coordinator/forgot-password" className="text-xs font-body text-[#ffd700]/70 hover:text-[#ffd700] transition-colors">Forgot Password?</Link>
+              </div>
               <div className="relative">
                 <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#444650]" style={{ fontSize: '18px' }}>lock</span>
-                <input type="password" required placeholder="Enter your password"
+                <input type={showPassword ? 'text' : 'password'} required placeholder="Enter your password"
                   value={credentials.password} onChange={e => setCredentials({ ...credentials, password: e.target.value })}
-                  className="w-full bg-[#131318] border border-[#444650]/40 text-[#e4e1e9] pl-10 pr-4 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 focus:bg-[#1c1c21] transition-colors" />
+                  className="w-full bg-[#131318] border border-[#444650]/40 text-[#e4e1e9] pl-10 pr-10 py-3 text-sm font-body placeholder:text-[#444650] focus:outline-none focus:border-[#ffd700]/60 focus:bg-[#1c1c21] transition-colors" />
+                <button type="button" onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#444650] hover:text-[#c4c6d0] transition-colors">
+                  <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>{showPassword ? 'visibility_off' : 'visibility'}</span>
+                </button>
               </div>
             </div>
 

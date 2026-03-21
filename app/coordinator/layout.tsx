@@ -22,7 +22,7 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
   useEffect(() => {
     const token = localStorage.getItem('coordinatorToken')
     const dist = localStorage.getItem('coordinatorDistrict') || ''
-    if (pathname === '/coordinator/login') {
+    if (pathname === '/coordinator/login' || pathname === '/coordinator/forgot-password' || pathname === '/coordinator/reset-password') {
       setLoading(false)
       return
     }
@@ -50,7 +50,7 @@ export default function CoordinatorLayout({ children }: { children: React.ReactN
     </div>
   )
 
-  if (pathname === '/coordinator/login') return <>{children}</>
+  if (pathname === '/coordinator/login' || pathname === '/coordinator/forgot-password' || pathname === '/coordinator/reset-password') return <>{children}</>
   if (!isAuthenticated) return null
 
   return (

@@ -3,12 +3,14 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useClerk } from '@clerk/nextjs'
 
 export default function AdminLogin() {
   const [credentials, setCredentials] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+  const { signOut } = useClerk()
 
   useEffect(() => {
     if (localStorage.getItem('adminToken')) router.replace('/admin/dashboard')
@@ -26,6 +28,7 @@ export default function AdminLogin() {
       })
       const data = await res.json()
       if (res.ok) {
+        await signOut()
         localStorage.setItem('adminToken', data.token)
         router.push('/admin/dashboard')
       } else {

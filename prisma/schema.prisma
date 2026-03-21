@@ -16,6 +16,8 @@ model User {
   phone               String?
   district            String?
   coordinatorDistrict String?
+  resetToken          String?
+  resetTokenExpiry    DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
